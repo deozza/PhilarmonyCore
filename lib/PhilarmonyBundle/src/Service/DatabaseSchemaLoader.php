@@ -1,7 +1,6 @@
 <?php
 namespace Deozza\PhilarmonyBundle\Service;
 
-
 use Deozza\PhilarmonyBundle\Entity\EntityPost;
 use Deozza\PhilarmonyBundle\Entity\PropertyPost;
 use Deozza\PhilarmonyBundle\Entity\TypePost;

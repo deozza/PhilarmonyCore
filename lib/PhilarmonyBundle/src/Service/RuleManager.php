@@ -2,7 +2,6 @@
 
 namespace Deozza\PhilarmonyBundle\Service;
 
-
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 

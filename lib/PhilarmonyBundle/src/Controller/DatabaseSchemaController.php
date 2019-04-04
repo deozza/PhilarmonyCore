@@ -8,7 +8,6 @@ use Deozza\PhilarmonyBundle\Form\EntityEnumerationPostType;
 use Deozza\PhilarmonyBundle\Form\PropertyEnumerationPostType;
 use Deozza\PhilarmonyBundle\Form\TypeEnumerationPostType;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
-use Deozza\PhilarmonyBundle\Service\FormErrorSerializer;
 use Deozza\PhilarmonyBundle\Service\ProcessForm;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;

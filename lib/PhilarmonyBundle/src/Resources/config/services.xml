@@ -24,6 +24,7 @@
 
         <service class="Deozza\PhilarmonyBundle\Service\RuleManager" id="philarmony.rule_manager">
             <bind key="$entityManager" type="service" id="doctrine.orm.entity_manager"/>
+            <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
         </service>
         <service id="Deozza\PhilarmonyBundle\Service\RuleManager" alias="philarmony.rule_manager" />
 

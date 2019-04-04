@@ -4,15 +4,17 @@ namespace Deozza\PhilarmonyBundle\Service;
 
 
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class RuleManager
 {
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, DatabaseSchemaLoader $schemaLoader)
     {
         $this->em = $entityManager;
+        $this->schemaLoader = $schemaLoader;
     }
 
-    public function decide($object, $folder)
+    public function decide($object,Request $request, $folder)
     {
         $errors = [];
 
@@ -26,9 +28,9 @@ class RuleManager
 
                 $rule = new $class;
 
-                if($rule->supports($object))
+                if($rule->supports($object, $request))
                 {
-                    $error = $rule->decide($object, $this->em);
+                    $error = $rule->decide($object,$request, $this->em, $this->schemaLoader);
                     if(!empty($error))
                     {
                         $errors[] = $error;

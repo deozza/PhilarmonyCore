@@ -7,6 +7,7 @@ use Deozza\PhilarmonyBundle\Form\PropertyType;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
 use Deozza\PhilarmonyBundle\Service\ProcessForm;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
+use Deozza\PhilarmonyBundle\Service\RuleManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,12 +23,14 @@ class PropertyController extends AbstractController
     public function __construct(ResponseMaker $responseMaker,
                                 EntityManagerInterface $em,
                                 ProcessForm $processForm,
-                                DatabaseSchemaLoader $schemaLoader)
+                                DatabaseSchemaLoader $schemaLoader,
+                                RuleManager $ruleManager)
     {
         $this->response = $responseMaker;
         $this->em = $em;
         $this->processForm = $processForm;
         $this->schemaLoader = $schemaLoader;
+        $this->ruleManager = $ruleManager;
     }
 
     /**
@@ -106,12 +109,16 @@ class PropertyController extends AbstractController
             return $this->response->notFound("The $entity_name with the id %s was not found", $id);
         }
 
-        $propertyKind = $this->schemaLoader->loadPropertyEnumeration($property_name, true);
+        $propertyList = $this->schemaLoader->loadPropertyEnumeration();
+        $propertyExist = $this->schemaLoader->loadPropertyEnumeration($property_name, true);
 
-        if(empty($propertyKind))
+
+        if(!in_array($propertyExist, array_keys($propertyList)))
         {
             return $this->response->notFound("The property named %s does not exist", $property_name);
         }
+
+        $type = $this->schemaLoader->loadTypeEnumeration($propertyList[$propertyExist]['TYPE']);
 
 
         $property = new Property();
@@ -124,7 +131,15 @@ class PropertyController extends AbstractController
         }
 
         $property->setEntity($entity);
-        $property->setKind($propertyKind);
+        $property->setKind($propertyExist);
+
+        $conflict_errors = $this->ruleManager->decide($posted, $request,__DIR__);
+
+        if($conflict_errors > 0)
+        {
+            return $this->response->conflict("You can not add this property", $conflict_errors);
+        }
+
         $this->em->persist($property);
         $this->em->flush();
 
@@ -141,7 +156,7 @@ class PropertyController extends AbstractController
      *     name="delete_property",
      *     methods={"DELETE"})
      */
-    public function deletePropertyAction($property_name, $id)
+    public function deletePropertyAction($property_name, $id, Request $request)
     {
         $exist = $this->em->getRepository(Property::class)->findOneBy(
             [
@@ -153,6 +168,13 @@ class PropertyController extends AbstractController
         if(empty($exist))
         {
             return  $this->response->notFound("The $property_name with the id %s was not found", $id);
+        }
+
+        $conflict_errors = $this->ruleManager->decide($exist, $request,__DIR__);
+
+        if($conflict_errors > 0)
+        {
+            return $this->response->conflict("You can not add this property", $conflict_errors);
         }
 
         $this->em->remove($exist);

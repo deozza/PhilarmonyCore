@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Property controller.
  *
- * @Route("api/")
+ * @Route("api/databaseSchema/")
  */
 class DatabaseSchemaController extends AbstractController
 {

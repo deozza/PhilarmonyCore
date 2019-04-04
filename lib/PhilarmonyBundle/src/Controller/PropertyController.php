@@ -92,7 +92,7 @@ class PropertyController extends AbstractController
      *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *          "property_name" = "^(\w{1,50})$"
      *     },
-     *     name="post_entity",
+     *     name="post_property",
      *      methods={"POST"})
      */
     public function postPropertyAction($entity_name, $id, $property_name, Request $request)
@@ -118,9 +118,6 @@ class PropertyController extends AbstractController
             return $this->response->notFound("The property named %s does not exist", $property_name);
         }
 
-        $type = $this->schemaLoader->loadTypeEnumeration($propertyList[$propertyExist]['TYPE']);
-
-
         $property = new Property();
         $propertyType = new \ReflectionClass(PropertyType::class);
         $posted = $this->processForm->process($request, $propertyType->getName(), $property);
@@ -133,9 +130,10 @@ class PropertyController extends AbstractController
         $property->setEntity($entity);
         $property->setKind($propertyExist);
 
-        $conflict_errors = $this->ruleManager->decide($posted, $request,__DIR__);
+        $basic_errors = $this->ruleManager->decideBasic($posted, $request,__DIR__);
+        $conflict_errors = $this->ruleManager->decide($posted, $request);
 
-        if($conflict_errors > 0)
+        if($basic_errors > 0)
         {
             return $this->response->conflict("You can not add this property", $conflict_errors);
         }
@@ -170,9 +168,9 @@ class PropertyController extends AbstractController
             return  $this->response->notFound("The $property_name with the id %s was not found", $id);
         }
 
-        $conflict_errors = $this->ruleManager->decide($exist, $request,__DIR__);
+        $basic_errors = $this->ruleManager->decideBasic($exist, $request,__DIR__);
 
-        if($conflict_errors > 0)
+        if($basic_errors > 0)
         {
             return $this->response->conflict("You can not add this property", $conflict_errors);
         }

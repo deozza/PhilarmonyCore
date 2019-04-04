@@ -30,20 +30,5 @@
             <argument key="$path">%kernel.project_dir%</argument>
         </service>
 
-        <service id="Deozza\PhilarmonyBundle\Controller\DatabaseSchemaController"  public="true">
-            <bind key="$responseMaker" type="service" id="philarmony.response_maker" />
-            <bind key="$processForm" type="service" id="philarmony.process_form" />
-            <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
-            <bind key="$em" type="service" id="doctrine.orm.entity_manager"/>
-        </service>
-
-        <service id="Deozza\PhilarmonyBundle\Controller\EntityController"  public="true" >
-            <bind key="$responseMaker" type="service" id="philarmony.response_maker" />
-            <bind key="$processForm" type="service" id="philarmony.process_form" />
-            <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
-            <bind key="$em" type="service" id="doctrine.orm.entity_manager"/>
-        </service>
-
-
     </services>
 </container>

@@ -9,8 +9,7 @@ use Ramsey\Uuid\UuidInterface;
 use JMS\Serializer\Annotation as JMS;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\EntityRepository")
- *
+ * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  */
 class Entity
@@ -39,7 +38,7 @@ class Entity
     private $owner;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Property", mappedBy="entity")
+     * @ORM\OneToMany(targetEntity="Deozza\PhilarmonyBundle\Entity\Property", mappedBy="entity")
      */
     private $properties;
 

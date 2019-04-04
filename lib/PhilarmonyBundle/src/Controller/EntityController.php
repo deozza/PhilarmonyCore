@@ -1,11 +1,9 @@
 <?php
 namespace Deozza\PhilarmonyBundle\Controller;
 
-
 use Deozza\PhilarmonyBundle\Entity\Entity;
-use Deozza\PhilarmonyBundle\Repository\EntityRepository;
+use Deozza\PhilarmonyBundle\Entity\Property;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
-use Deozza\PhilarmonyBundle\Service\FormErrorSerializer;
 use Deozza\PhilarmonyBundle\Service\ProcessForm;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Property controller.
+ * Entity controller.
  *
  * @Route("api/")
  */
@@ -32,28 +30,39 @@ class EntityController extends AbstractController
     }
 
     /**
-     * @Route("{entity_name}", name="get_entity_list", methods={"GET"})
+     * @Route(
+     *     "entity/{entity_name}",
+     *     requirements={
+     *          "entity_name" = "^(\w{1,50})$"
+     *     },
+     *     name="get_entity_list",
+     *      methods={"GET"})
      */
     public function getEntityListAction($entity_name)
     {
-        $entity= $this->schemaLoader->loadEntityEnumeration($entity_name);
+        $exists= $this->schemaLoader->loadEntityEnumeration($entity_name, true);
 
-        if(empty($entity))
+        if(empty($exists))
         {
             return $this->response->notFound("This route does not exists%s", "");
         }
 
-        return $this->response->ok($entity);
+        $entities = $this->em->getRepository(Entity::class)->findByKind($exists);
+
+        return $this->response->ok($entities);
     }
 
     /**
      * @Route(
-     *     "{entity_name}/{id}",
-     *     requirements={"id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"},
+     *     "entity/{entity_name}/{id}",
+     *     requirements={
+     *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+     *          "entity_name" = "^(\w{1,50})$"
+     *     },
      *     name="get_entity",
      *     methods={"GET"})
      */
-    public function getEntityAction($entity_name, $id, EntityRepository $repository)
+    public function getEntityAction($entity_name, $id)
     {
         $entity = $this->schemaLoader->loadEntityEnumeration($entity_name);
         if(empty($entity))
@@ -61,7 +70,7 @@ class EntityController extends AbstractController
             return $this->response->notFound("This route does not exist%s", "");
         }
 
-        $exist = $repository->findOneByUuid($id);
+        $exist = $this->em->getRepository(Entity::class)->findOneByUuid($id);
 
         if(empty($exist))
         {
@@ -72,7 +81,13 @@ class EntityController extends AbstractController
     }
 
     /**
-     * @Route("{entity_name}", name="post_entity", methods={"POST"})
+     * @Route(
+     *     "entity/{entity_name}",
+     *      requirements={
+     *          "entity_name" = "^(\w{1,50})$"
+     *     },
+     *     name="post_entity",
+     *      methods={"POST"})
      */
     public function postEntityAction($entity_name)
     {
@@ -93,12 +108,15 @@ class EntityController extends AbstractController
 
     /**
      * @Route(
-     *     "{entity_name}/{id}",
-     *     requirements={"id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"},
-     *     name="get_entity",
+     *     "entity/{entity_name}/{id}",
+     *     requirements={
+     *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+     *          "entity_name" = "^(\w{1,50})$"
+     *      },
+     *     name="delete_entity",
      *     methods={"DELETE"})
      */
-    public function deleteEntityAction($entity_name, $id, EntityRepository $repository)
+    public function deleteEntityAction($entity_name, $id)
     {
         $entity = $this->schemaLoader->loadEntityEnumeration($entity_name);
         if(empty($entity))
@@ -106,7 +124,7 @@ class EntityController extends AbstractController
             return $this->response->notFound("This route does not exist%s", "");
         }
 
-        $exist = $repository->findOneByUuid($id);
+        $exist = $this->em->getRepository(Entity::class)->findOneByUuid($id);
 
         if(empty($exist))
         {

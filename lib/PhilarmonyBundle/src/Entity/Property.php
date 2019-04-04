@@ -5,9 +5,11 @@ namespace Deozza\PhilarmonyBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
+use JMS\Serializer\Annotation as JMS;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\PropertyRepository")
+ * @ORM\Entity()
+ * @ORM\HasLifecycleCallbacks()
  */
 class Property
 {
@@ -20,6 +22,7 @@ class Property
 
     /**
      * @ORM\Column(type="uuid", unique=true)
+     * @JMS\Accessor(getter="getUuidAsString")
      */
     protected $uuid;
 
@@ -34,7 +37,7 @@ class Property
     private $kind;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Entity")
+     * @ORM\ManyToOne(targetEntity="Deozza\PhilarmonyBundle\Entity\Entity")
      */
     private $entity;
 
@@ -48,9 +51,64 @@ class Property
         return $this->id;
     }
 
+    /**
+     * @ORM\PrePersist
+     */
+    public function setupUuid()
+    {
+        $this->setUuid(Uuid::uuid4());
+        return $this;
+    }
+
+    public function setUuid($uuid)
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
     public function getUuid(): ?UuidInterface
     {
         return $this->uuid;
     }
+
+    public function getUuidAsString()
+    {
+        return $this->uuid->toString();
+    }
+
+    public function getValue(): ?string
+    {
+        return $this->value;
+    }
+
+    public function setValue(string $value): self
+    {
+        $this->value = $value;
+        return $this;
+    }
+
+    public function getKind(): ?string
+    {
+        return $this->kind;
+    }
+
+    public function setKind(string $kind): self
+    {
+        $this->kind = $kind;
+        return $this;
+    }
+
+    public function getEntity(): ?Entity
+    {
+        return $this->entity;
+    }
+
+    public function setEntity(Entity $entity): self
+    {
+        $this->entity = $entity;
+        return $this;
+    }
+
 
 }

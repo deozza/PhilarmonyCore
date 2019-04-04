@@ -42,13 +42,27 @@ class PropertyController extends AbstractController
      *     name="get_property_list",
      *      methods={"GET"})
      */
-    public function getPropertyListAction($property_name)
+    public function getPropertyListAction($property_name, Request $request)
     {
         $exists= $this->schemaLoader->loadPropertyEnumeration($property_name, true);
 
         if(empty($exists))
         {
             return $this->response->notFound("This route does not exists%s", "");
+        }
+
+        $access_errors = $this->ruleManager->decideAccess($exists, $request);
+
+        if($access_errors > 0)
+        {
+            return $this->response->forbiddenAccess("You can not add this property");
+        }
+
+        $conflict_errors = $this->ruleManager->decideConflict($exists, $request,__DIR__);
+
+        if($conflict_errors > 0)
+        {
+            return $this->response->conflict("You can not add this property", $conflict_errors);
         }
 
         $properties= $this->em->getRepository(Property::class)->findByKind($exists);
@@ -66,7 +80,7 @@ class PropertyController extends AbstractController
      *     name="get_property",
      *     methods={"GET"})
      */
-    public function getPropertyAction($property_name, $id)
+    public function getPropertyAction($property_name, $id, Request $request)
     {
         $property = $this->schemaLoader->loadPropertyEnumeration($property_name);
         if(empty($entity))
@@ -80,6 +94,21 @@ class PropertyController extends AbstractController
         {
             return $this->response->notFound("The $property_name with the id %s does not exist", $id);
         }
+
+        $access_errors = $this->ruleManager->decideAccess($exist, $request);
+
+        if($access_errors > 0)
+        {
+            return $this->response->forbiddenAccess("You can not add this property");
+        }
+
+        $conflict_errors = $this->ruleManager->decideConflict($exist, $request,__DIR__);
+
+        if($conflict_errors > 0)
+        {
+            return $this->response->conflict("You can not add this property", $conflict_errors);
+        }
+
 
         return $this->response->ok($exist);
     }
@@ -130,10 +159,16 @@ class PropertyController extends AbstractController
         $property->setEntity($entity);
         $property->setKind($propertyExist);
 
-        $basic_errors = $this->ruleManager->decideBasic($posted, $request,__DIR__);
-        $conflict_errors = $this->ruleManager->decide($posted, $request);
+        $access_errors = $this->ruleManager->decideAccess($posted, $request);
 
-        if($basic_errors > 0)
+        if($access_errors > 0)
+        {
+            return $this->response->forbiddenAccess("You can not add this property");
+        }
+
+        $conflict_errors = $this->ruleManager->decideConflict($posted, $request,__DIR__);
+
+        if($conflict_errors > 0)
         {
             return $this->response->conflict("You can not add this property", $conflict_errors);
         }
@@ -168,9 +203,16 @@ class PropertyController extends AbstractController
             return  $this->response->notFound("The $property_name with the id %s was not found", $id);
         }
 
-        $basic_errors = $this->ruleManager->decideBasic($exist, $request,__DIR__);
+        $access_errors = $this->ruleManager->decideAccess($exist, $request);
 
-        if($basic_errors > 0)
+        if($access_errors > 0)
+        {
+            return $this->response->forbiddenAccess("You can not add this property");
+        }
+
+        $conflict_errors = $this->ruleManager->decideConflict($exist, $request,__DIR__);
+
+        if($conflict_errors > 0)
         {
             return $this->response->conflict("You can not add this property", $conflict_errors);
         }

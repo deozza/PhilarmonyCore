@@ -6,7 +6,7 @@ use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class UniqueRule
+class UniqueConflictRule
 {
     const ERROR_EXISTS = "PROPERTY_ALREADY_EXISTS";
 

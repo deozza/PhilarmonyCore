@@ -12,32 +12,14 @@ class RuleManager
         $this->em = $entityManager;
         $this->schemaLoader = $schemaLoader;
         $this->srcPath = $srcPath;
+        $this->folders = [];
     }
 
-    public function decideBasic($object,Request $request, $folder)
+    public function decideConflict($object,Request $request, $folder)
     {
-        $errors = [];
-
-        foreach (glob($folder.'/../Rules/*Rule.php') as $file)
-        {
-            $class = $this->getClassNamespaceFromFile($file);
-
-            if(!empty($class))
-            {
-                $class = "\\$class\\".basename($file, ".php");
-
-                $rule = new $class;
-
-                if($rule->supports($object, $request))
-                {
-                    $error = $rule->decide($object,$request, $this->em, $this->schemaLoader);
-                    if(!empty($error))
-                    {
-                        $errors[] = $error;
-                    }
-                }
-            }
-        }
+        $this->getUsefullFolder($this->srcPath);
+        $this->folders[] = $folder;
+        $errors = $this->decide($object, $request, $this->folders, $glob = "/*ConflictRule.php");
 
         if(count($errors) > 0)
         {
@@ -47,31 +29,11 @@ class RuleManager
         return count($errors);
     }
 
-    public function decide($object,Request $request)
+    public function decideAccess($object,Request $request)
     {
-        $errors = [];
         $this->getUsefullFolder($this->srcPath);
 
-        foreach (glob($folder.'/../Rules/*Rule.php') as $file)
-        {
-            $class = $this->getClassNamespaceFromFile($file);
-
-            if(!empty($class))
-            {
-                $class = "\\$class\\".basename($file, ".php");
-
-                $rule = new $class;
-
-                if($rule->supports($object, $request))
-                {
-                    $error = $rule->decide($object,$request, $this->em, $this->schemaLoader);
-                    if(!empty($error))
-                    {
-                        $errors[] = $error;
-                    }
-                }
-            }
-        }
+        $errors = $this->decide($object, $request, $this->folders, $glob = "/*AccessRule.php");
 
         if(count($errors) > 0)
         {
@@ -81,22 +43,51 @@ class RuleManager
         return count($errors);
     }
 
-    public function getUsefullFolder($path)
+    protected function decide($object, Request $request, $folders, $glob)
     {
-        dump(scandir($path));
+        $errors = [];
+        foreach($folders as $folder)
+        {
+            foreach (glob($folder[0].$glob) as $file)
+            {
+                $class = $this->getClassNamespaceFromFile($file);
+
+                if(!empty($class))
+                {
+                    $class = "\\$class\\".basename($file, ".php");
+
+                    $rule = new $class;
+
+                    if($rule->supports($object, $request))
+                    {
+                        $error = $rule->decide($object,$request, $this->em, $this->schemaLoader);
+                        if(!empty($error))
+                        {
+                            $errors[] = $error;
+                        }
+
+                    }
+                }
+            }
+        }
+        return $errors;
+
+    }
+
+    protected function getUsefullFolder($path)
+    {
+        if(glob($path."/*Rules"))
+        {
+            $this->folders[] = glob($path."*Rules");
+        }
         foreach(scandir($path) as $subfolder)
         {
-            if(preg_match("/^(\w+)[.](\w{1,3})$/", $subfolder))
+            if(preg_match("/^(\w+)$/", $subfolder))
             {
-                dump($subfolder. " is file");
-            }
-            else
-            {
-                dump($subfolder. " is dir");
+                $this->getUsefullFolder($path.$subfolder."/");
             }
         }
     }
-
 
 
     protected function getClassNamespaceFromFile($filePathName) : string

@@ -7,6 +7,7 @@ use Deozza\PhilarmonyBundle\Service\ProcessForm;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -36,7 +37,7 @@ class EntityController extends AbstractController
      *     name="get_entity_list",
      *      methods={"GET"})
      */
-    public function getEntityListAction($entity_name)
+    public function getEntityListAction($entity_name, Request $request)
     {
         $exists= $this->schemaLoader->loadEntityEnumeration($entity_name, true);
 
@@ -44,6 +45,21 @@ class EntityController extends AbstractController
         {
             return $this->response->notFound("This route does not exists%s", "");
         }
+
+        $access_errors = $this->ruleManager->decideAccess($exists, $request);
+
+        if($access_errors > 0)
+        {
+            return $this->response->forbiddenAccess("You can not add this property");
+        }
+
+        $conflict_errors = $this->ruleManager->decideConflict($exists, $request,__DIR__);
+
+        if($conflict_errors > 0)
+        {
+            return $this->response->conflict("You can not add this property", $conflict_errors);
+        }
+
 
         $entities = $this->em->getRepository(Entity::class)->findByKind($exists);
 
@@ -60,7 +76,7 @@ class EntityController extends AbstractController
      *     name="get_entity",
      *     methods={"GET"})
      */
-    public function getEntityAction($entity_name, $id)
+    public function getEntityAction($entity_name, $id, Request $request)
     {
         $entity = $this->schemaLoader->loadEntityEnumeration($entity_name);
         if(empty($entity))
@@ -75,6 +91,21 @@ class EntityController extends AbstractController
             return $this->response->notFound("The $entity_name with the id %s does not exist", $id);
         }
 
+        $access_errors = $this->ruleManager->decideAccess($exist, $request);
+
+        if($access_errors > 0)
+        {
+            return $this->response->forbiddenAccess("You can not add this property");
+        }
+
+        $conflict_errors = $this->ruleManager->decideConflict($exist, $request,__DIR__);
+
+        if($conflict_errors > 0)
+        {
+            return $this->response->conflict("You can not add this property", $conflict_errors);
+        }
+
+
         return $this->response->ok($exist);
     }
 
@@ -87,13 +118,28 @@ class EntityController extends AbstractController
      *     name="post_entity",
      *      methods={"POST"})
      */
-    public function postEntityAction($entity_name)
+    public function postEntityAction($entity_name, Request $request)
     {
         $entity = $this->schemaLoader->loadEntityEnumeration($entity_name, true);
         if(empty($entity))
         {
             return $this->response->notFound("This route does not exist%s", "");
         }
+
+        $access_errors = $this->ruleManager->decideAccess($entity, $request);
+
+        if($access_errors > 0)
+        {
+            return $this->response->forbiddenAccess("You can not add this property");
+        }
+
+        $conflict_errors = $this->ruleManager->decideConflict($entity, $request,__DIR__);
+
+        if($conflict_errors > 0)
+        {
+            return $this->response->conflict("You can not add this property", $conflict_errors);
+        }
+
 
         $newEntity = new Entity();
         $newEntity->setKind($entity);
@@ -114,7 +160,7 @@ class EntityController extends AbstractController
      *     name="delete_entity",
      *     methods={"DELETE"})
      */
-    public function deleteEntityAction($entity_name, $id)
+    public function deleteEntityAction($entity_name, $id, Request $request)
     {
         $entity = $this->schemaLoader->loadEntityEnumeration($entity_name);
         if(empty($entity))
@@ -128,6 +174,21 @@ class EntityController extends AbstractController
         {
             return $this->response->notFound("The $entity_name with the id %s does not exist", $id);
         }
+
+        $access_errors = $this->ruleManager->decideAccess($exist, $request);
+
+        if($access_errors > 0)
+        {
+            return $this->response->forbiddenAccess("You can not add this property");
+        }
+
+        $conflict_errors = $this->ruleManager->decideConflict($exist, $request,__DIR__);
+
+        if($conflict_errors > 0)
+        {
+            return $this->response->conflict("You can not add this property", $conflict_errors);
+        }
+
 
         $propertiesLinked = $exist->getProperties();
 

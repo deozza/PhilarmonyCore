@@ -5,7 +5,7 @@ use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class RegexRule
+class RegexConflictRule
 {
     const ERROR_TYPE = "VALUE_NOT_MATCHING_TYPE";
 

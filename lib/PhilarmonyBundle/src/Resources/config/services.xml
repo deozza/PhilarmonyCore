@@ -22,6 +22,11 @@
         </service>
         <service id="Deozza\PhilarmonyBundle\Service\FormErrorSerializer" alias="philarmony.form_error" />
 
+        <service class="Deozza\PhilarmonyBundle\Service\RuleManager" id="philarmony.rule_manager">
+            <bind key="$entityManager" type="service" id="doctrine.orm.entity_manager"/>
+        </service>
+        <service id="Deozza\PhilarmonyBundle\Service\RuleManager" alias="philarmony.rule_manager" />
+
         <service id="Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader" alias="philarmony.schema_loader"></service>
         <service class="Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader" id="philarmony.schema_loader">
             <argument key="$entity"/>

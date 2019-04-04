@@ -92,7 +92,7 @@ class DatabaseSchemaLoader
 
     public function pushEntityEnumeration(EntityPost $entityPost)
     {
-        $file = __DIR__ . "/../../config/Philarmony/entity.json";
+        $file = $this->rootPath.$this->entityPath.".json";
         $entities = json_decode(file_get_contents($file), true);
         $entities[strtoupper($entityPost->getName())] = $entityPost->getProperties();
         try
@@ -108,7 +108,7 @@ class DatabaseSchemaLoader
 
     public function pushPropertyEnumeration(PropertyPost $propertyPost)
     {
-        $file = __DIR__ . "/../../config/Philarmony/property.json";
+        $file = $this->rootPath.$this->propertyPath.".json";
         $properties = json_decode(file_get_contents($file), true);
         $properties[strtoupper($propertyPost->getName())] =
             [
@@ -139,7 +139,7 @@ class DatabaseSchemaLoader
             return false;
         }
 
-        $file = __DIR__ . "/../../config/Philarmony/type.json";
+        $file = $this->rootPath.$this->typePath.".json";
         $types = json_decode(file_get_contents($file), true);
         $types[strtoupper($typePost->getName())] =
             [

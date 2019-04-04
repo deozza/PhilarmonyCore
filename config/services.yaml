@@ -24,21 +24,5 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
-    response_maker:
-        class: App\Service\ResponseMaker
-        public: true
-
-    process_form:
-        class: App\Service\ProcessForm
-        public: true
-
-    form_error_serializer:
-        class: App\Service\FormErrorSerialiazer
-        public: true
-
-    database_schema_loader:
-        class: App\Service\DatabaseSchemaLoader
-        public: true
-
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

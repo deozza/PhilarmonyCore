@@ -1,5 +1,5 @@
 <?php
-namespace App\Service;
+namespace Deozza\PhilarmonyBundle\Service;
 
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;

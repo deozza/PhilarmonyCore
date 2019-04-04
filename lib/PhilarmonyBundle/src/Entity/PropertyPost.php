@@ -1,5 +1,5 @@
 <?php
-namespace App\Entity;
+namespace Deozza\PhilarmonyBundle\Entity;
 
 use Symfony\Component\Validator\Constraints as Assert;
 

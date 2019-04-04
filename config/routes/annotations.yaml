@@ -1,3 +1,8 @@
 controllers:
     resource: ../../src/Controller/
     type: annotation
+
+philarmony_controllers:
+    resource: "@DeozzaPhilarmonyBundle/Controller"
+    type: annotation
+    prefix: /

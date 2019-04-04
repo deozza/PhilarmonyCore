@@ -1,16 +1,16 @@
 <?php
-namespace App\Controller;
+namespace Deozza\PhilarmonyBundle\Controller;
 
-use App\Entity\EntityPost;
-use App\Entity\PropertyPost;
-use App\Entity\TypePost;
-use App\Form\EntityEnumerationPostType;
-use App\Form\PropertyEnumerationPostType;
-use App\Form\TypeEnumerationPostType;
-use App\Service\DatabaseSchemaLoader;
-use App\Service\FormErrorSerializer;
-use App\Service\ProcessForm;
-use App\Service\ResponseMaker;
+use Deozza\PhilarmonyBundle\Entity\EntityPost;
+use Deozza\PhilarmonyBundle\Entity\PropertyPost;
+use Deozza\PhilarmonyBundle\Entity\TypePost;
+use Deozza\PhilarmonyBundle\Form\EntityEnumerationPostType;
+use Deozza\PhilarmonyBundle\Form\PropertyEnumerationPostType;
+use Deozza\PhilarmonyBundle\Form\TypeEnumerationPostType;
+use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
+use Deozza\PhilarmonyBundle\Service\FormErrorSerializer;
+use Deozza\PhilarmonyBundle\Service\ProcessForm;
+use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,13 +24,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class DatabaseSchemaController extends AbstractController
 {
     public function __construct(ResponseMaker $responseMaker,
-                                FormErrorSerializer $formErrorSerializer,
                                 EntityManagerInterface $em,
                                 ProcessForm $processForm,
                                 DatabaseSchemaLoader $schemaLoader)
     {
         $this->response = $responseMaker;
-        $this->formErrorSerializer = $formErrorSerializer;
         $this->em = $em;
         $this->processForm = $processForm;
         $this->schemaLoader = $schemaLoader;

@@ -1,0 +1,5 @@
+deozza_philarmony:
+  directory:
+    entity :
+    property:
+    type: /config/Philarmony/type

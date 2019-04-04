@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace Deozza\PhilarmonyBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;

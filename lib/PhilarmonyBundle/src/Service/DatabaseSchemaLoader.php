@@ -1,15 +1,26 @@
 <?php
-namespace App\Service;
+namespace Deozza\PhilarmonyBundle\Service;
 
-use App\Entity\EntityPost;
-use App\Entity\PropertyPost;
-use App\Entity\TypePost;
+
+use Deozza\PhilarmonyBundle\Entity\EntityPost;
+use Deozza\PhilarmonyBundle\Entity\PropertyPost;
+use Deozza\PhilarmonyBundle\Entity\TypePost;
 
 class DatabaseSchemaLoader
 {
+
+    public function __construct(string $entity, string $property, string $type, string $path)
+    {
+        $this->rootPath = $path;
+        $this->entityPath = $entity;
+        $this->propertyPath = $property;
+        $this->typePath = $type;
+
+    }
+
     public function loadEntityEnumeration($entity_name = null, $returnKey = false)
     {
-        $entities = json_decode(file_get_contents(__DIR__."/../../config/Philarmony/entity.json"), true);
+        $entities = json_decode(file_get_contents($this->rootPath.$this->entityPath.".json"), true);
 
         if(empty($entity_name))
         {
@@ -33,7 +44,7 @@ class DatabaseSchemaLoader
 
     public function loadPropertyEnumeration($property_name = null, $returnKey = false)
     {
-        $properties = json_decode(file_get_contents(__DIR__."/../../config/Philarmony/property.json"), true);
+        $properties = json_decode(file_get_contents($this->rootPath.$this->propertyPath.".json"), true);
 
         if(empty($property_name))
         {
@@ -57,7 +68,7 @@ class DatabaseSchemaLoader
 
     public function loadTypeEnumeration($type_name = null, $returnKey = false)
     {
-        $types = json_decode(file_get_contents(__DIR__."/../../config/Philarmony/type.json"), true);
+        $types = json_decode(file_get_contents($this->rootPath.$this->typePath.".json"), true);
 
         if(empty($type_name))
         {
@@ -81,7 +92,7 @@ class DatabaseSchemaLoader
 
     public function pushEntityEnumeration(EntityPost $entityPost)
     {
-        $file =__DIR__."/../../config/Philarmony/entity.json";
+        $file = __DIR__ . "/../../config/Philarmony/entity.json";
         $entities = json_decode(file_get_contents($file), true);
         $entities[strtoupper($entityPost->getName())] = $entityPost->getProperties();
         try
@@ -97,7 +108,7 @@ class DatabaseSchemaLoader
 
     public function pushPropertyEnumeration(PropertyPost $propertyPost)
     {
-        $file =__DIR__."/../../config/Philarmony/property.json";
+        $file = __DIR__ . "/../../config/Philarmony/property.json";
         $properties = json_decode(file_get_contents($file), true);
         $properties[strtoupper($propertyPost->getName())] =
             [
@@ -128,7 +139,7 @@ class DatabaseSchemaLoader
             return false;
         }
 
-        $file =__DIR__."/../../config/Philarmony/type.json";
+        $file = __DIR__ . "/../../config/Philarmony/type.json";
         $types = json_decode(file_get_contents($file), true);
         $types[strtoupper($typePost->getName())] =
             [

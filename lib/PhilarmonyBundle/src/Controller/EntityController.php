@@ -1,12 +1,13 @@
 <?php
-namespace App\Controller;
+namespace Deozza\PhilarmonyBundle\Controller;
 
-use App\Entity\Entity;
-use App\Repository\EntityRepository;
-use App\Service\DatabaseSchemaLoader;
-use App\Service\FormErrorSerializer;
-use App\Service\ProcessForm;
-use App\Service\ResponseMaker;
+
+use Deozza\PhilarmonyBundle\Entity\Entity;
+use Deozza\PhilarmonyBundle\Repository\EntityRepository;
+use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
+use Deozza\PhilarmonyBundle\Service\FormErrorSerializer;
+use Deozza\PhilarmonyBundle\Service\ProcessForm;
+use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,13 +21,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class EntityController extends AbstractController
 {
     public function __construct(ResponseMaker $responseMaker,
-                                FormErrorSerializer $formErrorSerializer,
                                 EntityManagerInterface $em,
                                 ProcessForm $processForm,
                                 DatabaseSchemaLoader $schemaLoader)
     {
         $this->response = $responseMaker;
-        $this->formErrorSerializer = $formErrorSerializer;
         $this->em = $em;
         $this->processForm = $processForm;
         $this->schemaLoader = $schemaLoader;

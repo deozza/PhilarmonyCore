@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace Deozza\PhilarmonyBundle\Service;
 
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;

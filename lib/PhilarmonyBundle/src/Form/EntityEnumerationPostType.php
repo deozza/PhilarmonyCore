@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Form;
+namespace Deozza\PhilarmonyBundle\Form;
 
-use App\Entity\EntityPost;
+use Deozza\PhilarmonyBundle\Entity\EntityPost;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;

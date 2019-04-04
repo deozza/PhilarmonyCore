@@ -1,9 +1,9 @@
 <?php
-namespace App\Entity;
+namespace Deozza\PhilarmonyBundle\Entity;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class TypePost
+class EntityPost
 {
     /**
      * @var string
@@ -12,12 +12,7 @@ class TypePost
      */
     private $name;
 
-    /**
-     * @var string
-     *
-     * @Assert\Type("string")
-     */
-    private $regex;
+    private $properties;
 
     public function getName(): ?string
     {
@@ -30,14 +25,14 @@ class TypePost
         return $this;
     }
 
-    public function getRegex(): ?string
+    public function getProperties()
     {
-        return $this->regex;
+        return $this->properties;
     }
 
-    public function setRegex($regex): self
+    public function setProperties($properties): self
     {
-        $this->regex = $regex;
+        $this->properties = $properties;
         return $this;
     }
 

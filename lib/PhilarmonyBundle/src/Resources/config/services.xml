@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services
+        http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service class="Deozza\PhilarmonyBundle\Service\ProcessForm" id="philarmony.process_form">
+            <bind key="$responseMaker" type="service" id="philarmony.response_maker"/>
+            <bind key="$serializer" type="service" id="philarmony.form_error"/>
+            <bind key="$formFactory" type="service" id="form.factory"/>
+        </service>
+        <service id="Deozza\PhilarmonyBundle\Service\ProcessForm" alias="philarmony.process_form" />
+
+        <service class="Deozza\PhilarmonyBundle\Service\ResponseMaker" id="philarmony.response_maker">
+            <bind key="$serializer" type="service" id="jms_serializer.serializer"/>
+        </service>
+        <service id="Deozza\PhilarmonyBundle\Service\ResponseMaker" alias="philarmony.response_maker"/>
+
+        <service class="Deozza\PhilarmonyBundle\Service\FormErrorSerializer" id="philarmony.form_error">
+            <bind key="$translator" type="service" id="translator.data_collector"/>
+        </service>
+        <service id="Deozza\PhilarmonyBundle\Service\FormErrorSerializer" alias="philarmony.form_error" />
+
+        <service id="Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader" alias="philarmony.schema_loader"></service>
+        <service class="Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader" id="philarmony.schema_loader">
+            <argument key="$entity"/>
+            <argument key="$property" />
+            <argument key="$type"/>
+            <argument key="$path">%kernel.project_dir%</argument>
+        </service>
+
+        <service id="Deozza\PhilarmonyBundle\Controller\DatabaseSchemaController"  public="true">
+            <bind key="$responseMaker" type="service" id="philarmony.response_maker" />
+            <bind key="$processForm" type="service" id="philarmony.process_form" />
+            <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
+            <bind key="$em" type="service" id="doctrine.orm.entity_manager"/>
+        </service>
+
+        <service id="Deozza\PhilarmonyBundle\Controller\EntityController"  public="true" >
+            <bind key="$responseMaker" type="service" id="philarmony.response_maker" />
+            <bind key="$processForm" type="service" id="philarmony.process_form" />
+            <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
+            <bind key="$em" type="service" id="doctrine.orm.entity_manager"/>
+        </service>
+
+
+    </services>
+</container>

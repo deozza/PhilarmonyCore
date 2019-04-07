@@ -1,6 +1,7 @@
 <?php
 namespace Deozza\PhilarmonyBundle\Rules;
 
+use Deozza\PhilarmonyBundle\Entity\Property;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,7 +12,7 @@ class RegexConflictRule
 
     public function supports($context, Request $request)
     {
-        return in_array($request->getMethod(), ['POST', 'PATCH']);
+        return in_array($request->getMethod(), ['POST', 'PATCH']) && is_a($context, Property::class);
 
     }
 

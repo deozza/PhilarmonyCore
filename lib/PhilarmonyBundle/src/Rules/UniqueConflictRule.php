@@ -12,7 +12,7 @@ class UniqueConflictRule
 
     public function supports($context, Request $request)
     {
-        return in_array($request->getMethod(), ['POST']);
+        return in_array($request->getMethod(), ['POST']) && is_a($context, Property::class);
     }
 
     public function decide($object, Request $request, EntityManagerInterface $em, DatabaseSchemaLoader $schemaLoader)

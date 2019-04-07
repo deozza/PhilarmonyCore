@@ -18,7 +18,7 @@ class RuleManager
     public function decideConflict($object,Request $request, $folder)
     {
         $this->getUsefullFolder($this->srcPath);
-        $this->folders[] = $folder;
+        $this->folders[] = [$folder."/../Rules"];
         $errors = $this->decide($object, $request, $this->folders, $glob = "/*ConflictRule.php");
 
         if(count($errors) > 0)

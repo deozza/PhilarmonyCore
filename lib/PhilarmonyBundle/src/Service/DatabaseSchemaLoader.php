@@ -1,6 +1,7 @@
 <?php
 namespace Deozza\PhilarmonyBundle\Service;
 
+use Deozza\PhilarmonyBundle\Entity\EntityJoinPost;
 use Deozza\PhilarmonyBundle\Entity\EntityPost;
 use Deozza\PhilarmonyBundle\Entity\PropertyPost;
 use Deozza\PhilarmonyBundle\Entity\TypePost;
@@ -123,6 +124,22 @@ class DatabaseSchemaLoader
         {
             file_put_contents($file, json_encode($entities));
             return $entities;
+        }
+        catch(\Exception $e)
+        {
+            return false;
+        }
+    }
+
+    public function pushEntityjoinEnumeration(EntityJoinPost $entityJoinPost)
+    {
+        $file = $this->rootPath.$this->entityPath.".json";
+        $entityJoin = json_decode(file_get_contents($file), true);
+        $entityJoin[strtoupper($entityJoinPost->getName())] = $entityJoinPost->getProperties();
+        try
+        {
+            file_put_contents($file, json_encode($entityJoin));
+            return $entityJoin;
         }
         catch(\Exception $e)
         {

@@ -1,5 +1,6 @@
 deozza_philarmony:
   directory:
     entity : /config/Philarmony/entity
+    entityJoin : /config/Philarmony/entityJoin
     property: /config/Philarmony/property
     type: /config/Philarmony/type

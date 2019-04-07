@@ -1,0 +1,11 @@
+{
+  "AQUARIUM_STATS":
+  {
+    "KIND": "ONE_TO_ONE",
+    "ENTITY1":"AQUARIUM",
+    "PROPERTIES":
+    [
+      "NAME"
+    ]
+  }
+}

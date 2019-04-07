@@ -8,10 +8,11 @@ use Deozza\PhilarmonyBundle\Entity\TypePost;
 class DatabaseSchemaLoader
 {
 
-    public function __construct(string $entity, string $property, string $type, string $path)
+    public function __construct(string $entity, string $entityjoin, string $property, string $type, string $path)
     {
         $this->rootPath = $path;
         $this->entityPath = $entity;
+        $this->entityjoinPath = $entityjoin;
         $this->propertyPath = $property;
         $this->typePath = $type;
 
@@ -35,6 +36,30 @@ class DatabaseSchemaLoader
                     return $key;
                 }
                 return $entities[$key];
+            }
+        }
+
+        return null;
+    }
+
+    public function loadEntityJoinEnumeration($entityjoin_name = null, $returnKey = false)
+    {
+        $entityjoins = json_decode(file_get_contents($this->rootPath.$this->entityjoinPath.".json"), true);
+
+        if(empty($entityjoin_name))
+        {
+            return $entityjoins;
+        }
+
+        foreach (array_keys($entityjoins) as $key)
+        {
+            if($key == strtoupper($entityjoin_name))
+            {
+                if($returnKey)
+                {
+                    return $key;
+                }
+                return $entityjoins[$key];
             }
         }
 

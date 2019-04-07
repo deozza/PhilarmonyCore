@@ -32,6 +32,7 @@
         <service id="Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader" alias="philarmony.schema_loader"></service>
         <service class="Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader" id="philarmony.schema_loader">
             <argument key="$entity"/>
+            <argument key="$entityjoin"/>
             <argument key="$property" />
             <argument key="$type"/>
             <argument key="$path">%kernel.project_dir%</argument>

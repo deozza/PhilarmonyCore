@@ -43,6 +43,15 @@ class DatabaseSchemaController extends AbstractController
     }
 
     /**
+     * @Route("entityjoin", name="get_entityjoin_enumeration", methods={"GET"})
+     */
+    public function getEntityJoinEnumerationAction()
+    {
+        $entityJoins = $this->schemaLoader->loadEntityJoinEnumeration();
+        return $this->response->ok($entityJoins);
+    }
+
+    /**
      * @Route("property", name="get_property_enumeration", methods={"GET"})
      */
     public function getPropertyEnumerationAction()

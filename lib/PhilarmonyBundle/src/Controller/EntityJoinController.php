@@ -198,27 +198,27 @@ class EntityJoinController extends AbstractController
 
     /**
      * @Route(
-     *     "entity/{entity_name}/{id}",
+     *     "entity/{entityjoin_name}/{id}",
      *     requirements={
      *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-     *          "entity_name" = "^(\w{1,50})$"
+     *          "entityjoin_name" = "^(\w{1,50})$"
      *      },
      *     name="delete_entityjoin",
      *     methods={"DELETE"})
      */
-    public function deleteEntityAction($entity_name, $id, Request $request)
+    public function deleteEntityJoinAction($entityjoin_name, $id, Request $request)
     {
-        $entity = $this->schemaLoader->loadEntityEnumeration($entity_name);
-        if(empty($entity))
+        $entityjoin = $this->schemaLoader->loadEntityEnumeration($entityjoin_name);
+        if(empty($entityjoin))
         {
             return $this->response->notFound("This route does not exist%s", "");
         }
 
-        $exist = $this->em->getRepository(Entity::class)->findOneByUuid($id);
+        $exist = $this->em->getRepository(EntityJoin::class)->findOneByUuid($id);
 
         if(empty($exist))
         {
-            return $this->response->notFound("The $entity_name with the id %s does not exist", $id);
+            return $this->response->notFound("The $entityjoin_name with the id %s does not exist", $id);
         }
 
         $access_errors = $this->ruleManager->decideAccess($exist, $request);

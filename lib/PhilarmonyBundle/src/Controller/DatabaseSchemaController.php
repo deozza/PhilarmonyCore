@@ -1,10 +1,12 @@
 <?php
 namespace Deozza\PhilarmonyBundle\Controller;
 
+use Deozza\PhilarmonyBundle\Entity\EntityJoinPost;
 use Deozza\PhilarmonyBundle\Entity\EntityPost;
 use Deozza\PhilarmonyBundle\Entity\PropertyPost;
 use Deozza\PhilarmonyBundle\Entity\TypePost;
 use Deozza\PhilarmonyBundle\Form\EntityEnumerationPostType;
+use Deozza\PhilarmonyBundle\Form\EntityJoinEnumerationPostType;
 use Deozza\PhilarmonyBundle\Form\PropertyEnumerationPostType;
 use Deozza\PhilarmonyBundle\Form\TypeEnumerationPostType;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
@@ -43,33 +45,6 @@ class DatabaseSchemaController extends AbstractController
     }
 
     /**
-     * @Route("entityjoin", name="get_entityjoin_enumeration", methods={"GET"})
-     */
-    public function getEntityJoinEnumerationAction()
-    {
-        $entityJoins = $this->schemaLoader->loadEntityJoinEnumeration();
-        return $this->response->ok($entityJoins);
-    }
-
-    /**
-     * @Route("property", name="get_property_enumeration", methods={"GET"})
-     */
-    public function getPropertyEnumerationAction()
-    {
-        $properties = $this->schemaLoader->loadPropertyEnumeration();
-        return $this->response->ok($properties);
-    }
-
-    /**
-     * @Route("type", name="get_type_enumeration", methods={"GET"})
-     */
-    public function getTypeEnumerationAction()
-    {
-        $type = $this->schemaLoader->loadTypeEnumeration();
-        return $this->response->ok($type);
-    }
-
-    /**
      * @Route("entity", name="post_entity_enumeration", methods={"POST"})
      */
     public function postEntityEnumerationAction(Request $request)
@@ -93,6 +68,52 @@ class DatabaseSchemaController extends AbstractController
         }
 
         return $this->response->created($entities);
+    }
+
+
+    /**
+     * @Route("entityjoin", name="get_entityjoin_enumeration", methods={"GET"})
+     */
+    public function getEntityJoinEnumerationAction()
+    {
+        $entityJoins = $this->schemaLoader->loadEntityJoinEnumeration();
+        return $this->response->ok($entityJoins);
+    }
+
+    /**
+     * @Route("entityjoin", name="post_entityjin_enumeration", methods={"POST"})
+     */
+    public function postEntityJoinEnumerationAction(Request $request)
+    {
+        $entities = $this->schemaLoader->loadEntityEnumeration();
+        $properties = $this->schemaLoader->loadPropertyEnumeration();
+
+        $entityjoin = new EntityJoinPost();
+        $entityjoinType = new \ReflectionClass(EntityJoinEnumerationPostType::class);
+        $posted = $this->processForm->process($request, $entityjoinType->getName(), $entityjoin, ['entities'=>array_keys($entities), 'properties'=>array_keys($properties)]);
+
+        if(!is_a($posted, EntityJoinPost::class))
+        {
+            return $posted;
+        }
+
+        $entityJoins = $this->schemaLoader->pushEntityJoinEnumeration($posted);
+
+        if($entityJoins == false)
+        {
+            return $this->response->badRequest("An error happened while updating the database schema");
+        }
+
+        return $this->response->created($entityJoins);
+    }
+
+    /**
+     * @Route("property", name="get_property_enumeration", methods={"GET"})
+     */
+    public function getPropertyEnumerationAction()
+    {
+        $properties = $this->schemaLoader->loadPropertyEnumeration();
+        return $this->response->ok($properties);
     }
 
     /**
@@ -119,6 +140,15 @@ class DatabaseSchemaController extends AbstractController
         }
 
         return $this->response->created($entities);
+    }
+
+    /**
+     * @Route("type", name="get_type_enumeration", methods={"GET"})
+     */
+    public function getTypeEnumerationAction()
+    {
+        $type = $this->schemaLoader->loadTypeEnumeration();
+        return $this->response->ok($type);
     }
 
     /**

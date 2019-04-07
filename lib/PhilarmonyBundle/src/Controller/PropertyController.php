@@ -83,7 +83,7 @@ class PropertyController extends AbstractController
     public function getPropertyAction($property_name, $id, Request $request)
     {
         $property = $this->schemaLoader->loadPropertyEnumeration($property_name);
-        if(empty($entity))
+        if(empty($property))
         {
             return $this->response->notFound("This route does not exist%s", "");
         }

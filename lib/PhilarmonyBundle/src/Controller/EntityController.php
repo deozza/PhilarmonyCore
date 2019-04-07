@@ -146,7 +146,7 @@ class EntityController extends AbstractController
 
         $newEntity = new Entity();
         $newEntity->setKind($entity);
-        $newEntity->setOwner("Toto");
+        $newEntity->setOwner($this->getUser());
         $this->em->persist($newEntity);
         $this->em->flush();
 

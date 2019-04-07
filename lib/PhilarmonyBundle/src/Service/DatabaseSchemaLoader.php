@@ -131,7 +131,7 @@ class DatabaseSchemaLoader
         }
     }
 
-    public function pushEntityjoinEnumeration(EntityJoinPost $entityJoinPost)
+    public function pushEntityJoinEnumeration(EntityJoinPost $entityJoinPost)
     {
         $file = $this->rootPath.$this->entityPath.".json";
         $entityJoin = json_decode(file_get_contents($file), true);

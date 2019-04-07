@@ -33,7 +33,7 @@ class EntityJoin
     private $kind;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="object")
      */
     private $owner;
 
@@ -104,12 +104,12 @@ class EntityJoin
         return $this;
     }
 
-    public function getOwner(): ?string
+    public function getOwner()
     {
         return $this->owner;
     }
 
-    public function setOwner(string $owner): self
+    public function setOwner($owner)
     {
         $this->owner = $owner;
 

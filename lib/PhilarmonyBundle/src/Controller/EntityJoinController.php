@@ -142,7 +142,7 @@ class EntityJoinController extends AbstractController
 
         $newEntityJoin = new EntityJoin();
         $newEntityJoin->setKind($entityjoin_name);
-        $newEntityJoin->setOwner("Toto");
+        $newEntityJoin->setOwner($this->getUser());
 
         $entityjoinType = new \ReflectionClass(EntityJoinType::class);
         $posted = $this->processForm->process($request, $entityjoinType->getName(), $newEntityJoin);

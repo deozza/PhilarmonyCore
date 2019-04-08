@@ -57,111 +57,8 @@ class DatabaseSchemaController extends AbstractController
             return $this->response->conflict("You can not get this resource", $conflict_errors);
         }
         $entities = $this->schemaLoader->loadEntityEnumeration();
+
         return $this->response->ok($entities);
-    }
-
-    /**
-     * @Route("entity", name="post_entity_enumeration", methods={"POST"})
-     */
-    public function postEntityEnumerationAction(Request $request)
-    {
-        $access_errors = $this->ruleManager->decideAccess("entity", $request);
-
-        if($access_errors > 0)
-        {
-            return $this->response->forbiddenAccess("You can not post this resource");
-        }
-
-        $properties = $this->schemaLoader->loadPropertyEnumeration();
-
-        $entity = new EntityPost();
-        $entityType = new \ReflectionClass(EntityEnumerationPostType::class);
-        $posted = $this->processForm->process($request, $entityType->getName(), $entity, ['properties'=>array_keys($properties)]);
-
-        if(!is_a($posted, EntityPost::class))
-        {
-            return $posted;
-        }
-
-        $conflict_errors = $this->ruleManager->decideConflict($posted, $request,__DIR__);
-
-        if($conflict_errors > 0)
-        {
-            return $this->response->conflict("You can not post this resource", $conflict_errors);
-        }
-
-        $entities = $this->schemaLoader->pushEntityEnumeration($posted);
-
-        if($entities == false)
-        {
-            return $this->response->badRequest("An error happened while updating the database schema");
-        }
-
-        return $this->response->created($entities);
-    }
-
-
-    /**
-     * @Route("entityjoin", name="get_entityjoin_enumeration", methods={"GET"})
-     */
-    public function getEntityJoinEnumerationAction(Request $request)
-    {
-        $access_errors = $this->ruleManager->decideAccess("entityjoin", $request);
-
-        if($access_errors > 0)
-        {
-            return $this->response->forbiddenAccess("You can not get this resource");
-        }
-
-        $conflict_errors = $this->ruleManager->decideConflict("entityjoin", $request,__DIR__);
-
-        if($conflict_errors > 0)
-        {
-            return $this->response->conflict("You can not get this resource", $conflict_errors);
-        }
-        $entityJoins = $this->schemaLoader->loadEntityJoinEnumeration();
-        return $this->response->ok($entityJoins);
-    }
-
-    /**
-     * @Route("entityjoin", name="post_entityjin_enumeration", methods={"POST"})
-     */
-    public function postEntityJoinEnumerationAction(Request $request)
-    {
-        $access_errors = $this->ruleManager->decideAccess("entity", $request);
-
-        if($access_errors > 0)
-        {
-            return $this->response->forbiddenAccess("You can not post this resource");
-        }
-
-        $entities = $this->schemaLoader->loadEntityEnumeration();
-        $properties = $this->schemaLoader->loadPropertyEnumeration();
-
-        $entityjoin = new EntityJoinPost();
-        $entityjoinType = new \ReflectionClass(EntityJoinEnumerationPostType::class);
-        $posted = $this->processForm->process($request, $entityjoinType->getName(), $entityjoin, ['entities'=>array_keys($entities), 'properties'=>array_keys($properties)]);
-
-        if(!is_a($posted, EntityJoinPost::class))
-        {
-            return $posted;
-        }
-
-        $conflict_errors = $this->ruleManager->decideConflict($posted, $request,__DIR__);
-
-        if($conflict_errors > 0)
-        {
-            return $this->response->conflict("You can not post this resource", $conflict_errors);
-        }
-
-        $entityJoins = $this->schemaLoader->pushEntityJoinEnumeration($posted);
-
-        if($entityJoins == false)
-        {
-            return $this->response->badRequest("An error happened while updating the database schema");
-        }
-
-        return $this->response->created($entityJoins);
     }
 
     /**
@@ -187,104 +84,24 @@ class DatabaseSchemaController extends AbstractController
     }
 
     /**
-     * @Route("property", name="post_property_enumeration", methods={"POST"})
+     * @Route("enumeration", name="get_enumeration_enumeration", methods={"GET"})
      */
-    public function postPropertyEnumerationAction(Request $request)
+    public function getEnumerationEnumerationAction(Request $request)
     {
-        $access_errors = $this->ruleManager->decideAccess("entity", $request);
-
-        if($access_errors > 0)
-        {
-            return $this->response->forbiddenAccess("You can not post this resource");
-        }
-
-        $types = $this->schemaLoader->loadTypeEnumeration();
-
-        $property = new PropertyPost();
-        $propertyType = new \ReflectionClass(PropertyEnumerationPostType::class);
-        $posted = $this->processForm->process($request, $propertyType->getName(), $property, ['types'=>array_keys($types)]);
-
-        if(!is_a($posted, PropertyPost::class))
-        {
-            return $posted;
-        }
-
-        $conflict_errors = $this->ruleManager->decideConflict($posted, $request,__DIR__);
-
-        if($conflict_errors > 0)
-        {
-            return $this->response->conflict("You can not post this resource", $conflict_errors);
-        }
-
-        $entities = $this->schemaLoader->pushPropertyEnumeration($posted);
-
-        if($entities == false)
-        {
-            return $this->response->badRequest("An error happened while updating the database schema");
-        }
-
-        return $this->response->created($entities);
-    }
-
-    /**
-     * @Route("type", name="get_type_enumeration", methods={"GET"})
-     */
-    public function getTypeEnumerationAction(Request $request)
-    {
-        $access_errors = $this->ruleManager->decideAccess("type", $request);
+        $access_errors = $this->ruleManager->decideAccess("enumeration", $request);
 
         if($access_errors > 0)
         {
             return $this->response->forbiddenAccess("You can not get this resource");
         }
 
-        $conflict_errors = $this->ruleManager->decideConflict("type", $request,__DIR__);
+        $conflict_errors = $this->ruleManager->decideConflict("enumeration", $request,__DIR__);
 
         if($conflict_errors > 0)
         {
             return $this->response->conflict("You can not get this resource", $conflict_errors);
         }
-        $type = $this->schemaLoader->loadTypeEnumeration();
-        return $this->response->ok($type);
+        $enumerations = $this->schemaLoader->loadEnumerationEnumeration();
+        return $this->response->ok($enumerations);
     }
-
-    /**
-     * @Route("type", name="post_type_enumeration", methods={"POST"})
-     */
-    public function postTypeEnumerationAction(Request $request)
-    {
-        $access_errors = $this->ruleManager->decideAccess("entity", $request);
-
-        if($access_errors > 0)
-        {
-            return $this->response->forbiddenAccess("You can not post this resource");
-        }
-
-        $type = new TypePost();
-        $TypeType = new \ReflectionClass(TypeEnumerationPostType::class);
-        $posted = $this->processForm->process($request, $TypeType->getName(), $type);
-
-        if(!is_a($posted, TypePost::class))
-        {
-            return $posted;
-        }
-
-        $conflict_errors = $this->ruleManager->decideConflict($posted, $request,__DIR__);
-
-        if($conflict_errors > 0)
-        {
-            return $this->response->conflict("You can not post this resource", $conflict_errors);
-        }
-
-        $types = $this->schemaLoader->pushTypeEnumeration($posted);
-
-        if($types == false)
-        {
-            return $this->response->badRequest("An error happened while updating the database schema");
-        }
-
-        return $this->response->created($types);
-    }
-
-
 }

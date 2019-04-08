@@ -18,7 +18,7 @@
         <service id="Deozza\PhilarmonyBundle\Service\ResponseMaker" alias="philarmony.response_maker"/>
 
         <service class="Deozza\PhilarmonyBundle\Service\FormErrorSerializer" id="philarmony.form_error">
-            <bind key="$translator" type="service" id="translator.data_collector"/>
+            <bind key="$translator" type="service" id="translator.default"/>
         </service>
         <service id="Deozza\PhilarmonyBundle\Service\FormErrorSerializer" alias="philarmony.form_error" />
 

@@ -12,6 +12,7 @@ use Deozza\PhilarmonyBundle\Form\TypeEnumerationPostType;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
 use Deozza\PhilarmonyBundle\Service\ProcessForm;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
+use Deozza\PhilarmonyBundle\Service\RuleManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,12 +28,14 @@ class DatabaseSchemaController extends AbstractController
     public function __construct(ResponseMaker $responseMaker,
                                 EntityManagerInterface $em,
                                 ProcessForm $processForm,
-                                DatabaseSchemaLoader $schemaLoader)
+                                DatabaseSchemaLoader $schemaLoader,
+                                RuleManager $ruleManager)
     {
         $this->response = $responseMaker;
         $this->em = $em;
         $this->processForm = $processForm;
         $this->schemaLoader = $schemaLoader;
+        $this->ruleManager = $ruleManager;
     }
 
     /**

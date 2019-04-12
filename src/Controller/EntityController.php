@@ -2,12 +2,18 @@
 namespace Deozza\PhilarmonyBundle\Controller;
 
 use Deozza\PhilarmonyBundle\Entity\Entity;
+use Deozza\PhilarmonyBundle\Entity\Property;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
 use Deozza\PhilarmonyBundle\Service\ProcessForm;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Deozza\PhilarmonyBundle\Service\RuleManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -18,6 +24,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class EntityController extends AbstractController
 {
+
     public function __construct(ResponseMaker $responseMaker,
                                 EntityManagerInterface $em,
                                 ProcessForm $processForm,
@@ -123,7 +130,8 @@ class EntityController extends AbstractController
      */
     public function postEntityAction($entity_name, Request $request)
     {
-        $entity = $this->schemaLoader->loadEntityEnumeration($entity_name, true);
+        $entity = $this->schemaLoader->loadEntityEnumeration($entity_name);
+
         if(empty($entity))
         {
             return $this->response->notFound("This route does not exist%s", "");
@@ -136,6 +144,17 @@ class EntityController extends AbstractController
             return $this->response->forbiddenAccess("You can not add this property");
         }
 
+        if(!$entity['post'])
+        {
+            return $this->response->methodNotAllowed($request->getMethod());
+        }
+
+        $newEntity = new Entity();
+        $newEntity->setKind($entity_name);
+        $newEntity->setOwner($request->getUser());
+
+        $posted = $this->processForm->generateAndProcess($request->getContent(), $newEntity, $entity);
+
         $conflict_errors = $this->ruleManager->decideConflict($entity, $request,__DIR__);
 
         if($conflict_errors > 0)
@@ -143,11 +162,25 @@ class EntityController extends AbstractController
             return $this->response->conflict("You can not add this property", $conflict_errors);
         }
 
+        if(is_object($posted))
+        {
+            return $posted;
+        }
 
-        $newEntity = new Entity();
-        $newEntity->setKind($entity);
-        $newEntity->setOwner($this->getUser());
         $this->em->persist($newEntity);
+
+        foreach ($posted as $key=>$value)
+        {
+            if($value !== null)
+            {
+                $property = new Property();
+                $property->setEntity($newEntity);
+                $property->setKind($key);
+                $property->setValue($value);
+                $this->em->persist($property);
+            }
+        }
+
         $this->em->flush();
 
         return $this->response->created($newEntity);

@@ -36,15 +36,15 @@ class DatabaseSchemaLoader
             return $values;
         }
 
-        foreach (array_keys($values) as $key)
+        foreach (array_keys($values['entities']) as $key)
         {
-            if($key == strtoupper($entity_name))
+            if($key == $entity_name)
             {
                 if($returnKey)
                 {
                     return $key;
                 }
-                return $values[$key];
+                return $values['entities'][$key];
             }
         }
 
@@ -68,15 +68,15 @@ class DatabaseSchemaLoader
             return $values;
         }
 
-        foreach (array_keys($values) as $key)
+        foreach (array_keys($values['properties']) as $key)
         {
-            if($key == strtoupper($property_name))
+            if($key == $property_name)
             {
                 if($returnKey)
                 {
                     return $key;
                 }
-                return $values[$key];
+                return $values['properties'][$key];
             }
         }
 
@@ -86,7 +86,6 @@ class DatabaseSchemaLoader
     public function loadEnumerationEnumeration($enumeration_name = null, $returnKey = false)
     {
         $enumerations = file_get_contents($this->rootPath.$this->enumerationPath.".yaml");
-
         try
         {
             $values = Yaml::parse($enumerations);
@@ -100,15 +99,15 @@ class DatabaseSchemaLoader
             return $values;
         }
 
-        foreach (array_keys($values) as $key)
+        foreach (array_keys($values['enumerations']) as $key)
         {
-            if($key == strtoupper($enumeration_name))
+            if($key == $enumeration_name)
             {
                 if($returnKey)
                 {
                     return $key;
                 }
-                return $values[$key];
+                return $values['enumerations'][$key];
             }
         }
 

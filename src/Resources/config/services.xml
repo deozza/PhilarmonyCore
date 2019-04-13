@@ -10,6 +10,7 @@
             <bind key="$serializer" type="service" id="philarmony.form_error"/>
             <bind key="$formFactory" type="service" id="form.factory"/>
             <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
+            <bind key="$em" type="service" id="doctrine.orm.entity_manager"/>
         </service>
         <service id="Deozza\PhilarmonyBundle\Service\ProcessForm" alias="philarmony.process_form" />
 

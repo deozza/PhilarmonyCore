@@ -2,6 +2,8 @@
 namespace Deozza\PhilarmonyBundle\Service;
 
 use Deozza\PhilarmonyBundle\Entity\Entity;
+use Deozza\PhilarmonyBundle\Entity\Property;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -11,7 +13,6 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ProcessForm
@@ -24,51 +25,55 @@ class ProcessForm
         "enumeration" => ChoiceType::class,
         "entity" => EntityType::class
     ];
-    public function __construct(ResponseMaker $responseMaker, FormErrorSerializer $serializer, FormFactoryInterface $formFactory, DatabaseSchemaLoader $schemaLoader)
+    public function __construct(ResponseMaker $responseMaker, FormErrorSerializer $serializer, FormFactoryInterface $formFactory, DatabaseSchemaLoader $schemaLoader, EntityManagerInterface $em)
     {
         $this->response = $responseMaker;
         $this->serializer = $serializer;
         $this->form = $formFactory;
         $this->schemaLoader = $schemaLoader;
+        $this->em = $em;
     }
 
-    public function simpleProcess(Request $request, $formClass, $entity, $options = [])
+    public function generateAndProcess($formKind, $requestBody, $entityToProcess, $entityKind, $formFields = null)
     {
-        if(!is_object($entity))
+        if(!is_object($entityToProcess))
         {
             return;
         }
-        $form = $this->form->create($formClass, $entity, $options);
-        return $this->processData($request->getContent(), $form);
-    }
 
-    public function generateAndProcess($requestBody, $newEntity, $entity)
-    {
-        if(!is_object($newEntity))
-        {
-            return;
-        }
+        $isAnEntity = is_a($entityToProcess, Entity::class);
 
         $form = $this->form->create(FormType::class);
 
-        $form_fields = $entity['post']['properties'];
-
-        if($form_fields === "all")
+        if($formFields === null)
         {
-            $form_fields = $entity['properties'];
+            $formFields = $entityKind['post']['properties'];
+
+            if($formFields === "all")
+            {
+                $formFields = $entityKind['properties'];
+            }
         }
 
-        foreach($form_fields as $field)
+        foreach($formFields as $field)
         {
-            $this->addFieldToForm($field, $form);
+            $this->addFieldToForm($field, $form, $isAnEntity);
         }
 
-        return $this->processData($requestBody, $form);
+        $data = $this->processData($requestBody, $form, $formKind);
+
+        if(!is_object($data) && $isAnEntity)
+        {
+            $this->saveData($data, $entityToProcess);
+        }
+
+        return $data;
     }
 
-    private function addFieldToForm($field, $form)
+    private function addFieldToForm($field, $form, $isAnEntity)
     {
         $property = $this->schemaLoader->loadPropertyEnumeration($field);
+
         $this->type = explode(".", $property['type']);
         $class = self::FIELD_CLASS[$this->type[0]];
         $constraints = [];
@@ -76,6 +81,11 @@ class ProcessForm
         if($property['required'])
         {
             $constraints[] = new NotBlank();
+        }
+
+        if(!$isAnEntity)
+        {
+            $field = "value";
         }
 
         if($class == EntityType::class)
@@ -110,10 +120,10 @@ class ProcessForm
 
     }
 
-    private function processData($data, $form)
+    private function processData($data, $form, $formKind)
     {
         $data = json_decode($data, true);
-        $form->submit($data);
+        $form->submit($data, $formKind==="post");
 
         if(!$form->isValid())
         {
@@ -123,7 +133,24 @@ class ProcessForm
             ]);
         }
 
-
         return $form->getData();
+    }
+
+    private function saveData($data, $entityToProcess)
+    {
+        $this->em->persist($entityToProcess);
+
+        foreach($data as $key=>$value)
+        {
+            if(!empty($value))
+            {
+                $property = new Property();
+                $property->setKind($key);
+                $property->setEntity($entityToProcess);
+
+                $property->setValue($value);
+                $this->em->persist($property);
+            }
+        }
     }
 }

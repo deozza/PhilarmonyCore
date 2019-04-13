@@ -35,33 +35,33 @@ class ResponseMaker
     }
 
 
-    public function badRequest($message)
+    public function badRequest(string $message)
     {
         $this->response->setStatusCode(self::BAD_REQUEST);
         $this->response->setContent(json_encode(["error"=>$message]));
         return $this->response;
     }
 
-    public function notFound($message, $resource)
+    public function notFound(string $message)
     {
         $this->response->setStatusCode(self::NOT_FOUND);
         $this->response->setContent(
             json_encode(
                 [
-                    "error" => sprintf($message, $resource)
+                    "error" => sprintf($message)
                 ]
             )
         );
         return $this->response;
     }
 
-    public function notAuthorized($message = null)
+    public function notAuthorized()
     {
         $this->response->setStatusCode(self::NOT_AUTHORIZED);
         return $this->response;
     }
 
-    public function forbiddenAccess($message = null)
+    public function forbiddenAccess(string $message = null)
     {
         $this->response->setStatusCode(self::FORBIDDEN_ACCESS);
         $this->response->setContent(

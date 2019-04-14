@@ -2,10 +2,10 @@
 namespace Deozza\PhilarmonyBundle\Controller;
 
 use Deozza\PhilarmonyBundle\Entity\Entity;
-use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
-use Deozza\PhilarmonyBundle\Service\ProcessForm;
+use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
+use Deozza\PhilarmonyBundle\Service\FormManager\ProcessForm;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
-use Deozza\PhilarmonyBundle\Service\RuleManager;
+use Deozza\PhilarmonyBundle\Service\RulesManager\RulesManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,11 +18,12 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class EntityController extends AbstractController
 {
+
     public function __construct(ResponseMaker $responseMaker,
                                 EntityManagerInterface $em,
                                 ProcessForm $processForm,
                                 DatabaseSchemaLoader $schemaLoader,
-                                RuleManager $ruleManager)
+                                RulesManager $ruleManager)
     {
         $this->response = $responseMaker;
         $this->em = $em;
@@ -46,27 +47,27 @@ class EntityController extends AbstractController
 
         if(empty($exists))
         {
-            return $this->response->notFound("This route does not exists%s", "");
+            return $this->response->notFound("This route does not exists%s");
         }
 
-        $access_errors = $this->ruleManager->decideAccess($exists, $request);
+        $access_errors = $this->ruleManager->decideAccess($exists, $request->getMethod());
 
         if($access_errors > 0)
         {
-            return $this->response->forbiddenAccess("You can not add this property");
+            return $this->response->forbiddenAccess("You can not access to the $entity_name");
         }
 
-        $conflict_errors = $this->ruleManager->decideConflict($exists, $request,__DIR__);
+        $conflict_errors = $this->ruleManager->decideConflict($exists, $request->getMethod(),__DIR__);
 
         if($conflict_errors > 0)
         {
-            return $this->response->conflict("You can not add this property", $conflict_errors);
+            return $this->response->conflict("You can not access to the the $entity_name", $conflict_errors);
         }
 
 
         $entities = $this->em->getRepository(Entity::class)->findByKind($exists);
 
-        return $this->response->ok($entities);
+        return $this->response->ok($entities, ['entity_complete', 'property_complete']);
     }
 
     /**
@@ -84,32 +85,32 @@ class EntityController extends AbstractController
         $entity = $this->schemaLoader->loadEntityEnumeration($entity_name);
         if(empty($entity))
         {
-            return $this->response->notFound("This route does not exist%s", "");
+            return $this->response->notFound("This route does not exist%s");
         }
 
         $exist = $this->em->getRepository(Entity::class)->findOneByUuid($id);
 
         if(empty($exist))
         {
-            return $this->response->notFound("The $entity_name with the id %s does not exist", $id);
+            return $this->response->notFound("The $entity_name with the id $id does not exist");
         }
 
-        $access_errors = $this->ruleManager->decideAccess($exist, $request);
+        $access_errors = $this->ruleManager->decideAccess($exist, $request->getMethod());
 
         if($access_errors > 0)
         {
-            return $this->response->forbiddenAccess("You can not add this property");
+            return $this->response->forbiddenAccess("You can not access to this $entity_name");
         }
 
-        $conflict_errors = $this->ruleManager->decideConflict($exist, $request,__DIR__);
+        $conflict_errors = $this->ruleManager->decideConflict($exist, $request->getMethod(),__DIR__);
 
         if($conflict_errors > 0)
         {
-            return $this->response->conflict("You can not add this property", $conflict_errors);
+            return $this->response->conflict("You can not access to this $entity_name", $conflict_errors);
         }
 
 
-        return $this->response->ok($exist);
+        return $this->response->ok($exist, ['entity_basic', 'property_complete']);
     }
 
     /**
@@ -123,34 +124,46 @@ class EntityController extends AbstractController
      */
     public function postEntityAction($entity_name, Request $request)
     {
-        $entity = $this->schemaLoader->loadEntityEnumeration($entity_name, true);
+        $entity = $this->schemaLoader->loadEntityEnumeration($entity_name);
+
         if(empty($entity))
         {
-            return $this->response->notFound("This route does not exist%s", "");
+            return $this->response->notFound("This route does not exist%s");
         }
 
-        $access_errors = $this->ruleManager->decideAccess($entity, $request);
+        $access_errors = $this->ruleManager->decideAccess($entity, $request->getMethod());
 
         if($access_errors > 0)
         {
-            return $this->response->forbiddenAccess("You can not add this property");
+            return $this->response->forbiddenAccess("You can not add this $entity_name");
         }
 
-        $conflict_errors = $this->ruleManager->decideConflict($entity, $request,__DIR__);
+        if(!$entity['post'])
+        {
+            return $this->response->methodNotAllowed($request->getMethod());
+        }
+
+        $entityToPost = new Entity();
+        $entityToPost->setKind($entity_name);
+        $entityToPost->setOwner($request->getUser());
+
+        $posted = $this->processForm->generateAndProcess($formKind = 'post', $request->getContent(), $entityToPost, $entity);
+
+        $conflict_errors = $this->ruleManager->decideConflict($entity, $request->getMethod(),__DIR__);
 
         if($conflict_errors > 0)
         {
-            return $this->response->conflict("You can not add this property", $conflict_errors);
+            return $this->response->conflict("You can not add this $entity_name", $conflict_errors);
         }
 
+        if(is_object($posted))
+        {
+            return $posted;
+        }
 
-        $newEntity = new Entity();
-        $newEntity->setKind($entity);
-        $newEntity->setOwner($this->getUser());
-        $this->em->persist($newEntity);
         $this->em->flush();
 
-        return $this->response->created($newEntity);
+        return $this->response->created($entityToPost, ['entity_complete', 'property_complete']);
     }
 
     /**
@@ -175,21 +188,21 @@ class EntityController extends AbstractController
 
         if(empty($exist))
         {
-            return $this->response->notFound("The $entity_name with the id %s does not exist", $id);
+            return $this->response->notFound("The $entity_name with the id $id does not exist");
         }
 
-        $access_errors = $this->ruleManager->decideAccess($exist, $request);
+        $access_errors = $this->ruleManager->decideAccess($exist, $request->getMethod());
 
         if($access_errors > 0)
         {
-            return $this->response->forbiddenAccess("You can not add this property");
+            return $this->response->forbiddenAccess("You can not delete this $entity_name");
         }
 
-        $conflict_errors = $this->ruleManager->decideConflict($exist, $request,__DIR__);
+        $conflict_errors = $this->ruleManager->decideConflict($exist, $request->getMethod(),__DIR__);
 
         if($conflict_errors > 0)
         {
-            return $this->response->conflict("You can not add this property", $conflict_errors);
+            return $this->response->conflict("You can not delete this $entity_name", $conflict_errors);
         }
 
 

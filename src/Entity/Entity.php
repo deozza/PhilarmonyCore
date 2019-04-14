@@ -18,27 +18,32 @@ class Entity
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @JMS\Exclude()
      */
     private $id;
 
     /**
      * @ORM\Column(type="uuid", unique=true)
      * @JMS\Accessor(getter="getUuidAsString")
+     * @JMS\Groups({"entity_id", "entity_complete"})
      */
     protected $uuid;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @JMS\Groups({"entity_complete", "entity_basic"})
      */
     private $kind;
 
     /**
      * @ORM\Column(type="object")
+     * @JMS\Groups({"entity_complete", "entity_basic"})
      */
     private $owner;
 
     /**
      * @ORM\OneToMany(targetEntity="Deozza\PhilarmonyBundle\Entity\Property", mappedBy="entity")
+     * @JMS\Groups({"entity_complete", "entity_basic"})
      */
     private $properties;
 

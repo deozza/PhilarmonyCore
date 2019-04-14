@@ -8,6 +8,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ResponseMaker
 {
+    const NOT_ALLOWED = 405;
+    const NOT_ALLOWED_MESSAGE = "The method %s is not allowed on this route.";
+
     const BAD_REQUEST = 400;
     const NOT_FOUND = 404;
     const NOT_AUTHORIZED = 401;
@@ -24,6 +27,13 @@ class ResponseMaker
         $this->response->headers->add(self::CONTENT_TYPE);
         $this->serializer = $serializer;
     }
+    public function methodNotAllowed(string $method)
+    {
+        $this->response->setStatusCode(self::NOT_ALLOWED);
+        $this->response->setContent(json_encode(["error"=>sprintf(self::NOT_ALLOWED_MESSAGE, $method)]));
+        return $this->response;
+    }
+
 
     public function badRequest($message)
     {
@@ -32,26 +42,26 @@ class ResponseMaker
         return $this->response;
     }
 
-    public function notFound($message, $resource)
+    public function notFound(string $message)
     {
         $this->response->setStatusCode(self::NOT_FOUND);
         $this->response->setContent(
             json_encode(
                 [
-                    "error" => sprintf($message, $resource)
+                    "error" => sprintf($message)
                 ]
             )
         );
         return $this->response;
     }
 
-    public function notAuthorized($message = null)
+    public function notAuthorized()
     {
         $this->response->setStatusCode(self::NOT_AUTHORIZED);
         return $this->response;
     }
 
-    public function forbiddenAccess($message = null)
+    public function forbiddenAccess(string $message = null)
     {
         $this->response->setStatusCode(self::FORBIDDEN_ACCESS);
         $this->response->setContent(

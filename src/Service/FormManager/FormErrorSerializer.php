@@ -1,5 +1,5 @@
 <?php
-namespace Deozza\PhilarmonyBundle\Service;
+namespace Deozza\PhilarmonyBundle\Service\FormManager;
 
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;

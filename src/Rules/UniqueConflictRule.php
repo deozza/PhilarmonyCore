@@ -2,7 +2,7 @@
 namespace Deozza\PhilarmonyBundle\Rules;
 
 use Deozza\PhilarmonyBundle\Entity\Property;
-use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
+use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -10,9 +10,9 @@ class UniqueConflictRule
 {
     const ERROR_EXISTS = "PROPERTY_ALREADY_EXISTS";
 
-    public function supports($context, Request $request)
+    public function supports($context, $method)
     {
-        return in_array($request->getMethod(), ['POST']) && is_a($context, Property::class);
+        return false; //in_array($method, ['POST']) && is_a($context, Property::class);
     }
 
     public function decide($object, Request $request, EntityManagerInterface $em, DatabaseSchemaLoader $schemaLoader)
@@ -20,12 +20,12 @@ class UniqueConflictRule
         $propertyKind = $schemaLoader->loadPropertyEnumeration($object->getKind());
 
 
-        if($propertyKind['UNIQUE'] == true)
+        if($propertyKind['unique'] == true)
         {
             $alreadyExists = $em->getRepository(Property::class)->findOneBy(
                 [
-                    "entity" => $object->getEntity()->getId(),
-                    "kind" => $object->getKind()
+                    "kind" => $object->getKind(),
+                    "value" => $object->getValue()
                 ]
             );
 

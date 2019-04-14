@@ -1,11 +1,11 @@
 <?php
 
-namespace Deozza\PhilarmonyBundle\Service;
+namespace Deozza\PhilarmonyBundle\Service\RulesManager;
 
+use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 
-class RuleManager
+class RulesManager
 {
     public function __construct(EntityManagerInterface $entityManager, DatabaseSchemaLoader $schemaLoader, $srcPath)
     {
@@ -15,11 +15,11 @@ class RuleManager
         $this->folders = [];
     }
 
-    public function decideConflict($object,Request $request, $folder)
+    public function decideConflict($object,$method, $folder)
     {
         $this->getUsefullFolder($this->srcPath);
         $this->folders[] = [$folder."/../Rules"];
-        $errors = $this->decide($object, $request, $this->folders, $glob = "/*ConflictRule.php");
+        $errors = $this->decide($object, $method, $this->folders, $glob = "/*ConflictRule.php");
 
         if(count($errors) > 0)
         {
@@ -29,11 +29,11 @@ class RuleManager
         return count($errors);
     }
 
-    public function decideAccess($object,Request $request)
+    public function decideAccess($object,$method)
     {
         $this->getUsefullFolder($this->srcPath);
 
-        $errors = $this->decide($object, $request, $this->folders, $glob = "/*AccessRule.php");
+        $errors = $this->decide($object, $method, $this->folders, $glob = "/*AccessRule.php");
 
         if(count($errors) > 0)
         {
@@ -43,7 +43,7 @@ class RuleManager
         return count($errors);
     }
 
-    protected function decide($object, Request $request, $folders, $glob)
+    protected function decide($object, $method, $folders, $glob)
     {
         $errors = [];
         foreach($folders as $folder)
@@ -58,9 +58,9 @@ class RuleManager
 
                     $rule = new $class;
 
-                    if($rule->supports($object, $request))
+                    if($rule->supports($object, $method))
                     {
-                        $error = $rule->decide($object,$request, $this->em, $this->schemaLoader);
+                        $error = $rule->decide($object,$method, $this->em, $this->schemaLoader);
                         if(!empty($error))
                         {
                             $errors[] = $error;

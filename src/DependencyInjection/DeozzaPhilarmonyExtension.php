@@ -2,7 +2,6 @@
 
 namespace Deozza\PhilarmonyBundle\DependencyInjection;
 
-
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -21,9 +20,8 @@ class DeozzaPhilarmonyExtension extends Extension
 
         $definition = $container->getDefinition('philarmony.schema_loader');
         $definition->setArgument(0, $config['directory']['entity']);
-        $definition->setArgument(1, $config['directory']['entityJoin']);
-        $definition->setArgument(2, $config['directory']['property']);
-        $definition->setArgument(3, $config['directory']['type']);
+        $definition->setArgument(1, $config['directory']['property']);
+        $definition->setArgument(2, $config['directory']['enumeration']);
     }
 
 }

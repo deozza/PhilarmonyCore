@@ -17,27 +17,32 @@ class Property
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @JMS\Exclude()
      */
     private $id;
 
     /**
      * @ORM\Column(type="uuid", unique=true)
      * @JMS\Accessor(getter="getUuidAsString")
+     * @JMS\Groups({"property_id", "property_complete"})
      */
     protected $uuid;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="text")
+     * @JMS\Groups({"property_basic", "property_complete"})
      */
     private $value;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @JMS\Groups({"property_basic", "property_complete"})
      */
     private $kind;
 
     /**
      * @ORM\ManyToOne(targetEntity="Deozza\PhilarmonyBundle\Entity\Entity")
+     * @JMS\Groups({"property_basic", "property_complete"})
      */
     private $entity;
 

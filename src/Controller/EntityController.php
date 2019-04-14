@@ -2,18 +2,12 @@
 namespace Deozza\PhilarmonyBundle\Controller;
 
 use Deozza\PhilarmonyBundle\Entity\Entity;
-use Deozza\PhilarmonyBundle\Entity\Property;
-use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
-use Deozza\PhilarmonyBundle\Service\ProcessForm;
+use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
+use Deozza\PhilarmonyBundle\Service\FormManager\ProcessForm;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
-use Deozza\PhilarmonyBundle\Service\RuleManager;
+use Deozza\PhilarmonyBundle\Service\RulesManager\RulesManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Form\Extension\Core\Type\MoneyType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -29,7 +23,7 @@ class EntityController extends AbstractController
                                 EntityManagerInterface $em,
                                 ProcessForm $processForm,
                                 DatabaseSchemaLoader $schemaLoader,
-                                RuleManager $ruleManager)
+                                RulesManager $ruleManager)
     {
         $this->response = $responseMaker;
         $this->em = $em;

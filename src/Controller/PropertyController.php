@@ -3,11 +3,10 @@ namespace Deozza\PhilarmonyBundle\Controller;
 
 use Deozza\PhilarmonyBundle\Entity\Entity;
 use Deozza\PhilarmonyBundle\Entity\Property;
-use Deozza\PhilarmonyBundle\Form\PropertyType;
-use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
-use Deozza\PhilarmonyBundle\Service\ProcessForm;
+use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
+use Deozza\PhilarmonyBundle\Service\FormManager\ProcessForm;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
-use Deozza\PhilarmonyBundle\Service\RuleManager;
+use Deozza\PhilarmonyBundle\Service\RulesManager\RulesManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +23,7 @@ class PropertyController extends AbstractController
                                 EntityManagerInterface $em,
                                 ProcessForm $processForm,
                                 DatabaseSchemaLoader $schemaLoader,
-                                RuleManager $ruleManager)
+                                RulesManager $ruleManager)
     {
         $this->response = $responseMaker;
         $this->em = $em;

@@ -1,5 +1,5 @@
 <?php
-namespace Deozza\PhilarmonyBundle\Service;
+namespace Deozza\PhilarmonyBundle\Service\FormManager;
 
 use Deozza\PhilarmonyBundle\Entity\Entity;
 use Deozza\PhilarmonyBundle\Entity\Property;

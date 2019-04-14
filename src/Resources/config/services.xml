@@ -5,39 +5,39 @@
         http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service class="Deozza\PhilarmonyBundle\Service\ProcessForm" id="philarmony.process_form">
+        <service class="Deozza\PhilarmonyBundle\Service\FormManager\ProcessForm" id="philarmony.process_form">
             <bind key="$responseMaker" type="service" id="philarmony.response_maker"/>
             <bind key="$serializer" type="service" id="philarmony.form_error"/>
             <bind key="$formFactory" type="service" id="form.factory"/>
             <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
             <bind key="$em" type="service" id="doctrine.orm.entity_manager"/>
         </service>
-        <service id="Deozza\PhilarmonyBundle\Service\ProcessForm" alias="philarmony.process_form" />
+        <service id="Deozza\PhilarmonyBundle\Service\FormManager\ProcessForm" alias="philarmony.process_form" />
 
         <service class="Deozza\PhilarmonyBundle\Service\ResponseMaker" id="philarmony.response_maker">
             <bind key="$serializer" type="service" id="jms_serializer.serializer"/>
         </service>
         <service id="Deozza\PhilarmonyBundle\Service\ResponseMaker" alias="philarmony.response_maker"/>
 
-        <service class="Deozza\PhilarmonyBundle\Service\FormErrorSerializer" id="philarmony.form_error">
+        <service class="Deozza\PhilarmonyBundle\Service\FormManager\FormErrorSerializer" id="philarmony.form_error">
             <bind key="$translator" type="service" id="translator.default"/>
         </service>
-        <service id="Deozza\PhilarmonyBundle\Service\FormErrorSerializer" alias="philarmony.form_error" />
+        <service id="Deozza\PhilarmonyBundle\Service\FormManager\FormErrorSerializer" alias="philarmony.form_error" />
 
-        <service class="Deozza\PhilarmonyBundle\Service\RuleManager" id="philarmony.rule_manager">
+        <service class="Deozza\PhilarmonyBundle\Service\RulesManager\RulesManager" id="philarmony.rule_manager">
             <bind key="$entityManager" type="service" id="doctrine.orm.entity_manager"/>
             <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
             <argument key="$srcPath">%kernel.project_dir%/src/</argument>
         </service>
-        <service id="Deozza\PhilarmonyBundle\Service\RuleManager" alias="philarmony.rule_manager" />
+        <service id="Deozza\PhilarmonyBundle\Service\RulesManager\RulesManager" alias="philarmony.rule_manager" />
 
-        <service id="Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader" alias="philarmony.schema_loader"></service>
-        <service class="Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader" id="philarmony.schema_loader">
+        <service class="Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader" id="philarmony.schema_loader">
             <argument key="$entity"/>
             <argument key="$property"/>
             <argument key="$enumeration"/>
             <argument key="$path">%kernel.project_dir%</argument>
         </service>
+        <service id="Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader" alias="philarmony.schema_loader" />
 
     </services>
 </container>

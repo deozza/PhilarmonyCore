@@ -1,11 +1,11 @@
 <?php
 
-namespace Deozza\PhilarmonyBundle\Service;
+namespace Deozza\PhilarmonyBundle\Service\RulesManager;
 
+use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 
-class RuleManager
+class RulesManager
 {
     public function __construct(EntityManagerInterface $entityManager, DatabaseSchemaLoader $schemaLoader, $srcPath)
     {

@@ -1,10 +1,6 @@
 <?php
-namespace Deozza\PhilarmonyBundle\Service;
+namespace Deozza\PhilarmonyBundle\Service\DatabaseSchema;
 
-use Deozza\PhilarmonyBundle\Entity\EntityJoinPost;
-use Deozza\PhilarmonyBundle\Entity\EntityPost;
-use Deozza\PhilarmonyBundle\Entity\PropertyPost;
-use Deozza\PhilarmonyBundle\Entity\TypePost;
 use Symfony\Component\Yaml\Yaml;
 
 class DatabaseSchemaLoader

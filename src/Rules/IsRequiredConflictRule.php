@@ -2,7 +2,7 @@
 namespace Deozza\PhilarmonyBundle\Rules;
 
 use Deozza\PhilarmonyBundle\Entity\Property;
-use Deozza\PhilarmonyBundle\Service\DatabaseSchemaLoader;
+use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 

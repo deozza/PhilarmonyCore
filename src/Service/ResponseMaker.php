@@ -35,7 +35,7 @@ class ResponseMaker
     }
 
 
-    public function badRequest(string $message)
+    public function badRequest($message)
     {
         $this->response->setStatusCode(self::BAD_REQUEST);
         $this->response->setContent(json_encode(["error"=>$message]));

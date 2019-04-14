@@ -134,7 +134,7 @@ class PropertyController extends AbstractController
         $entityPostableProperties = $this->schemaLoader->loadEntityEnumeration($entity_name);
 
 
-        if($entityPostableProperties['patch']['properties'] === "all")
+        if($entityPostableProperties['post']['properties'] === "all")
         {
             if(!in_array($property_name, $entityPostableProperties['properties']))
             {
@@ -143,7 +143,7 @@ class PropertyController extends AbstractController
         }
         else
         {
-            if(!in_array($property_name, $entityPostableProperties['patch']['properties']))
+            if(!in_array($property_name, $entityPostableProperties['post']['properties']))
             {
                 {
                     return $this->response->notFound("$entity_name does not have a property called $property_name");
@@ -151,6 +151,22 @@ class PropertyController extends AbstractController
             }
         }
 
+        $property = $this->schemaLoader->loadPropertyEnumeration($property_name);
+
+        if(!array_key_exists('multiple', $property) || !$property['multiple'])
+        {
+            $alreadyExists = $this->em->getRepository(Property::class)->findBy(
+                [
+                    "entity" => $entity->getId(),
+                    'kind' => $property_name
+                ]
+            );
+
+            if(!empty($alreadyExists))
+            {
+                return $this->response->forbiddenAccess("$entity_name already have a $property_name");
+            }
+        }
         $propertyToPost = new Property();
         $propertyToPost->setEntity($entity);
         $propertyToPost->setKind($property_name);
@@ -161,8 +177,6 @@ class PropertyController extends AbstractController
         {
             return $posted;
         }
-
-        $propertyToPost->setValue($posted['value']);
 
         $access_errors = $this->ruleManager->decideAccess($posted, $request->getMethod());
 

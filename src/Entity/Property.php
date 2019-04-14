@@ -29,9 +29,8 @@ class Property
     protected $uuid;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="text")
      * @JMS\Groups({"property_basic", "property_complete"})
-
      */
     private $value;
 

@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ProcessForm
@@ -46,15 +47,17 @@ class ProcessForm
             }
         }
 
-        foreach($formFields as $field)
-        {
-            $hasFile = $this->addFieldToForm($field, $form, $isAnEntity);
-        }
-        if($hasFile)
+        if(is_object(json_decode($requestBody)) && !$isAnEntity)
         {
             $data = $this->saveData($requestBody, $entityToProcess);
             return $data;
         }
+
+        foreach($formFields as $field)
+        {
+            $this->addFieldToForm($field, $form, $isAnEntity);
+        }
+
 
         $data = $this->processData($requestBody, $form, $formKind);
 
@@ -73,7 +76,7 @@ class ProcessForm
         $this->type = explode(".", $property['type']);
         $class = FieldTypes::ENUMERATION[$this->type[0]];
         $constraints = [];
-
+        $formOptions = [];
         if($property['required'])
         {
             $constraints[] = new NotBlank();
@@ -83,8 +86,6 @@ class ProcessForm
         {
             $field = "value";
         }
-
-        $formOptions = ['constraints' => $constraints];
 
         switch($class)
         {
@@ -105,11 +106,28 @@ class ProcessForm
                     $formOptions['choices'] = $enumeration;
                 };break;
 
-            case FileType::class: return true;break;
-        }
+            case FileType::class: return;break;
+            default:
+                {
+                    if(array_key_exists('length', $property) && !empty($property['length']))
+                    {
+                        $length = [];
+                        if(array_key_exists('min', $property['length']) && !empty($property['length']['min']))
+                        {
+                            $length['min'] = $property['length']['min'];
+                        }
+                        if(array_key_exists('max', $property['length']) && !empty($property['length']['max']))
+                        {
+                            $length['max'] = $property['length']['max'];
+                        }
 
-        $form->add($field, $class, $constraints);
-        return false;
+                        $constraints[] = new Length($length);
+                    }
+                };break;
+        }
+        $formOptions['constraints'] = $constraints;
+
+        $form->add($field, $class, $formOptions);
     }
 
     private function processData($data, $form, $formKind)
@@ -127,7 +145,6 @@ class ProcessForm
 
     private function saveData($data, $entityToProcess)
     {
-
         if (is_a($entityToProcess, Entity::class)) {
            return $this->saveEntity($data, $entityToProcess);
         } else {

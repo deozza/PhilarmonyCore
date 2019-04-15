@@ -72,41 +72,34 @@ class EntityController extends AbstractController
 
     /**
      * @Route(
-     *     "entity/{entity_name}/{id}",
+     *     "entity/{id}",
      *     requirements={
      *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-     *          "entity_name" = "^(\w{1,50})$"
      *     },
      *     name="get_entity",
      *     methods={"GET"})
      */
-    public function getEntityAction($entity_name, $id, Request $request)
+    public function getEntityAction($id, Request $request)
     {
-        $entity = $this->schemaLoader->loadEntityEnumeration($entity_name);
-        if(empty($entity))
-        {
-            return $this->response->notFound("This route does not exist%s");
-        }
-
         $exist = $this->em->getRepository(Entity::class)->findOneByUuid($id);
 
         if(empty($exist))
         {
-            return $this->response->notFound("The $entity_name with the id $id does not exist");
+            return $this->response->notFound("The entity with the id $id does not exist");
         }
 
         $access_errors = $this->ruleManager->decideAccess($exist, $request->getMethod());
 
         if($access_errors > 0)
         {
-            return $this->response->forbiddenAccess("You can not access to this $entity_name");
+            return $this->response->forbiddenAccess("You can not access to this entity");
         }
 
         $conflict_errors = $this->ruleManager->decideConflict($exist, $request->getMethod(),__DIR__);
 
         if($conflict_errors > 0)
         {
-            return $this->response->conflict("You can not access to this $entity_name", $conflict_errors);
+            return $this->response->conflict("You can not access to this entity", $conflict_errors);
         }
 
 
@@ -168,41 +161,35 @@ class EntityController extends AbstractController
 
     /**
      * @Route(
-     *     "entity/{entity_name}/{id}",
+     *     "entity/{id}",
      *     requirements={
      *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-     *          "entity_name" = "^(\w{1,50})$"
      *      },
      *     name="delete_entity",
      *     methods={"DELETE"})
      */
-    public function deleteEntityAction($entity_name, $id, Request $request)
+    public function deleteEntityAction($id, Request $request)
     {
-        $entity = $this->schemaLoader->loadEntityEnumeration($entity_name);
-        if(empty($entity))
-        {
-            return $this->response->notFound("This route does not exist%s", "");
-        }
 
         $exist = $this->em->getRepository(Entity::class)->findOneByUuid($id);
 
         if(empty($exist))
         {
-            return $this->response->notFound("The $entity_name with the id $id does not exist");
+            return $this->response->notFound("The entity with the id $id does not exist");
         }
 
         $access_errors = $this->ruleManager->decideAccess($exist, $request->getMethod());
 
         if($access_errors > 0)
         {
-            return $this->response->forbiddenAccess("You can not delete this $entity_name");
+            return $this->response->forbiddenAccess("You can not delete this entity");
         }
 
         $conflict_errors = $this->ruleManager->decideConflict($exist, $request->getMethod(),__DIR__);
 
         if($conflict_errors > 0)
         {
-            return $this->response->conflict("You can not delete this $entity_name", $conflict_errors);
+            return $this->response->conflict("You can not delete this entity", $conflict_errors);
         }
 
 

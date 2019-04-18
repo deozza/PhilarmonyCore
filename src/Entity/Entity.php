@@ -42,6 +42,12 @@ class Entity
     private $owner;
 
     /**
+     * @ORM\Column(type="date")
+     * @JMS\Groups({"entity_complete", "entity_basic"})
+     */
+    private $dateOfCreation;
+
+    /**
      * @ORM\OneToMany(targetEntity="Deozza\PhilarmonyBundle\Entity\Property", mappedBy="entity")
      * @JMS\Groups({"entity_complete", "entity_basic"})
      */
@@ -50,6 +56,7 @@ class Entity
     public function __construct()
     {
         $this->properties = new ArrayCollection();
+        $this->dateOfCreation = new \DateTime('now');
     }
 
     public function getId(): ?int
@@ -94,6 +101,12 @@ class Entity
 
         return $this;
     }
+
+    public function getDateOfCreation(): ?\DateTime
+    {
+        return $this->dateOfCreation;
+    }
+
 
     public function getOwner()
     {

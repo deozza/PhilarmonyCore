@@ -36,6 +36,11 @@ trait SaveDataTrait{
                 {
                     $value = $value->format('yyyy-MM-dd');
                 }
+
+                if(is_array($value))
+                {
+                    $value = json_encode($value);
+                }
                 $property->setValue($value);
                 $this->em->persist($property);
             }

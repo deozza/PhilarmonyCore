@@ -33,13 +33,15 @@ class ProcessForm
 
         $form = $this->form->create(FormType::class);
 
-        if($formFields === null)
-        {
-            $formFields = $entityKind['post']['properties'];
+        $this->formFields = $formFields;
 
-            if($formFields === "all")
+        if($this->formFields === null)
+        {
+            $this->formFields = $entityKind['post']['properties'];
+
+            if($this->formFields === "all")
             {
-                $formFields = $entityKind['properties'];
+                $this->formFields = $entityKind['properties'];
             }
         }
 
@@ -49,13 +51,31 @@ class ProcessForm
             return $data;
         }
 
-        foreach($formFields as $field)
+
+        foreach($this->formFields as $field)
         {
+
             $this->addFieldToForm($field, $form, $isAnEntity);
         }
 
-
         $data = $this->processData($requestBody, $form, $formKind);
+
+        foreach ($this->formFields as $key=>$item)
+        {
+            if(is_array($item))
+            {
+                $data[$key] = [];
+
+                foreach ($item as $subkey=>$subitem)
+                {
+                    if(array_key_exists($subitem, $data))
+                    {
+                        $data[$key][$subitem ] = $data[$subitem];
+                        unset($data[$subitem]);
+                    }
+                }
+            }
+        }
 
         if(!is_object($data))
         {

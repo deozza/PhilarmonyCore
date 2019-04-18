@@ -26,7 +26,28 @@ trait AddFieldTrait{
             $field = "value";
         }
 
-        $formOptions = $this->addConstraintsToField($class, $property);
+        if($class === "embedded")
+        {
+            $embeddedEntity = $this->schemaLoader->loadEntityEnumeration($field);
+            $key = array_search($field, $this->formFields);
+            unset($this->formFields[$key]);
+
+            $this->formFields[$field] = $embeddedEntity['post']['properties'];
+
+            if($this->formFields[$field] === "all")
+            {
+                $this->formFields[$field] = $embeddedEntity['properties'];
+            }
+
+            foreach($this->formFields[$field] as $embeddedField)
+            {
+                $this->addFieldToForm($embeddedField, $form, $isAnEntity);
+            }
+        }
+        else
+        {
+            $formOptions = $this->addConstraintsToField($class, $property);
+        }
 
         if(!empty($formOptions))
         {

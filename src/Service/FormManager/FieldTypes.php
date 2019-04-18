@@ -21,6 +21,7 @@ class FieldTypes
         "price" => MoneyType::class,
         "enumeration" => ChoiceType::class,
         "entity" => EntityType::class,
-        "file" => FileType::class
+        "file" => FileType::class,
+        "embedded" => "embedded"
     ];
 }

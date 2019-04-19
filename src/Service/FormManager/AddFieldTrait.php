@@ -21,7 +21,7 @@ trait AddFieldTrait{
         $this->type = explode(".", $property['type']);
         $class = FieldTypes::ENUMERATION[$this->type[0]];
 
-        if(!$isAnEntity)
+        if(!$isAnEntity && $class!= "embedded")
         {
             $field = "value";
         }
@@ -41,7 +41,7 @@ trait AddFieldTrait{
 
             foreach($this->formFields[$field] as $embeddedField)
             {
-                $this->addFieldToForm($embeddedField, $form, $isAnEntity);
+                $this->addFieldToForm($embeddedField, $form, true);
             }
         }
         else

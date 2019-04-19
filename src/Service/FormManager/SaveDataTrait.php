@@ -69,7 +69,17 @@ trait SaveDataTrait{
             }
         }
 
-        $entityToProcess->setValue($data['value']);
+
+        if(!array_key_exists('value', $data))
+        {
+            $value = json_encode($data);
+        }
+        else
+        {
+            $value = $data['value'];
+        }
+
+        $entityToProcess->setValue($value);
         $this->em->persist($entityToProcess);
 
         return true;

@@ -45,7 +45,7 @@ class ProcessForm
             }
         }
 
-        if(is_object(json_decode($requestBody)) && !$isAnEntity)
+        if(!is_object(json_decode($requestBody)) && !$isAnEntity)
         {
             $data = $this->saveData($requestBody, $entityToProcess);
             return $data;
@@ -54,7 +54,6 @@ class ProcessForm
 
         foreach($this->formFields as $field)
         {
-
             $this->addFieldToForm($field, $form, $isAnEntity);
         }
 

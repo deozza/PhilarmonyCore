@@ -11,7 +11,7 @@ Philarmony
 
 ## About
 
-Philarmony is a bundle designed to help you creating easily a REST API, in an extensible, flexible and modular way. 
+Philarmony is a bundle designed to help you handle data easily inside a REST API, in an extensible, flexible and modular way. 
 
 ## Installation
 
@@ -26,9 +26,8 @@ In order yo use Philarmony in your project, you need to configure it. First, cre
 deozza_philarmony:
     directory:
       entity: ~
-      entityJoin: ~
       property: ~
-      type: ~
+      enumeration: ~
 ```
 
 This will be used to locate the database schema files. By default they are created and stored in `/var/Philarmony/`. 
@@ -37,24 +36,27 @@ Then, to use the embedded controllers of Philarmony, you need to enable them in 
 ```yaml
 services: 
     Deozza\PhilarmonyBundle\Controller:
-      resource: '@Deozza\PhilarmonyBundle\Controller'
+      resource: '@DeozzaPhilarmonyBundle\Controller'
       tags: ['controller.servcie_arguments']
 ```
 
 ```yaml
 philarmony_controllers:
-    resource: '@Deozza\PhilarmonyBundle\Controller'
+    resource: '@DeozzaPhilarmonyBundle\Controller'
     type: annotation
     prefix: /
 ```
 
 ## Example of usage
 
+
+
+
 ## How it works
 
 ### Database schema
 
-
+Your database schema is fully designed by 3 yaml files. 
 
 #### Entity
 

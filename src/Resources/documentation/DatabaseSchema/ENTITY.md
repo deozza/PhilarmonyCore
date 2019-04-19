@@ -9,34 +9,7 @@ The Entity kind is used to differenciate Entities between them and to tell which
 
 ### How to create a new Entity kind
 
-#### Via API (recommended) | `POST /api/databaseSchema/entity`
 
-The recommended way to add a new Entity kind is by using the dedicated API route :
-
-| JSON property |  Type  |                  Description                  |
-|:-------------:|:------:|:---------------------------------------------:|
-| name          | string | The name of the Entity kind                   |
-| properties    | array  | All the property kinds the Entity will handle |
-
-__Request example :__
-
-```
-curl --header "Content-Type: application/json"
-     --request POST
-     --data '{"name": "Character", "properties" :"['NAME', 'AGE', 'RACE']"}'
-     http://www.mysuper.app/api/databaseSchema/entity
-``` 
-__Response example :__
-
-```json
-{
-    "CHARACTER": ["NAME", "AGE", "RACE"]
-}
-```
-
-#### Manually
-
-You can also edit manually the Entity json file. It is usefull in the case you need to add a property specific to your business logic and handled by your Rules.
 
 ### Entity kind enumeration
 

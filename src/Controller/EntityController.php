@@ -165,6 +165,59 @@ class EntityController extends AbstractController
      *     requirements={
      *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *      },
+     *     name="patch_entity",
+     *      methods={"PATCH"})
+     */
+    public function patchEntityAction($id, Request $request)
+    {
+        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($id);
+
+        if(empty($entity))
+        {
+            return $this->response->notFound("This route does not exist%s");
+        }
+
+        $access_errors = $this->ruleManager->decideAccess($entity, $request->getMethod());
+
+        if($access_errors > 0)
+        {
+            return $this->response->forbiddenAccess("You can not patch this $entity->getKind()");
+        }
+
+
+        $entityProperties = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+
+
+        if(!$entityProperties['patch'])
+        {
+            return $this->response->methodNotAllowed($request->getMethod());
+        }
+
+        $patched = $this->processForm->generateAndProcess($formKind = 'patch', $request->getContent(), $entity, $entityProperties);
+
+        $conflict_errors = $this->ruleManager->decideConflict($entity, $request->getMethod(),__DIR__);
+
+        if($conflict_errors > 0)
+        {
+            return $this->response->conflict("You can not add this $entity->getKind()", $conflict_errors);
+        }
+
+        if(is_object($patched))
+        {
+            return $patched;
+        }
+
+        $this->em->flush();
+
+        return $this->response->ok($entity, ['entity_complete']);
+    }
+
+    /**
+     * @Route(
+     *     "entity/{id}",
+     *     requirements={
+     *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+     *      },
      *     name="delete_entity",
      *     methods={"DELETE"})
      */

@@ -38,7 +38,7 @@ class ProcessForm
 
         if($this->formFields === null)
         {
-            $this->formFields = $entityKind['post']['properties'];
+            $this->formFields = $entityKind[$formKind]['properties'];
 
             if($this->formFields === "all")
             {

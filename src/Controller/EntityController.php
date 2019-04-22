@@ -67,7 +67,7 @@ class EntityController extends AbstractController
 
         $entities = $this->em->getRepository(Entity::class)->findByKind($exists);
 
-        return $this->response->ok($entities, ['entity_complete', 'property_complete']);
+        return $this->response->ok($entities, ['entity_complete']);
     }
 
     /**
@@ -103,7 +103,7 @@ class EntityController extends AbstractController
         }
 
 
-        return $this->response->ok($exist, ['entity_basic', 'property_complete']);
+        return $this->response->ok($exist, ['entity_basic']);
     }
 
     /**
@@ -156,7 +156,7 @@ class EntityController extends AbstractController
 
         $this->em->flush();
 
-        return $this->response->created($entityToPost, ['entity_complete', 'property_complete']);
+        return $this->response->created($entityToPost, ['entity_complete']);
     }
 
     /**

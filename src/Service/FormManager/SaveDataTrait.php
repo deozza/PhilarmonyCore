@@ -5,83 +5,41 @@ use Deozza\PhilarmonyBundle\Entity\Entity;
 use Deozza\PhilarmonyBundle\Entity\Property;
 
 trait SaveDataTrait{
-    private function saveData($data, $entityToProcess)
+    private function saveData($data, $entityToProcess, $formKind)
     {
-        if (is_a($entityToProcess, Entity::class)) {
-            return $this->saveEntity($data, $entityToProcess);
-        } else {
-            return $this->saveProperty($data, $entityToProcess);
-        }
+        $propertiesOfEntity = $entityToProcess->getProperties();
 
-    }
-
-    private function saveEntity($data, $entityToProcess)
-    {
-        $this->em->persist($entityToProcess);
-
-        foreach($data as $key=>$value)
+        foreach($data as $property=>$value)
         {
-            if(!empty($value))
+            if($formKind ==  "patch")
             {
-                $property = new Property();
-                $property->setKind($key);
-                $property->setEntity($entityToProcess);
+                $propertiesOfEntity[$property]= $value;
+            }
+            else
+            {
+                $item = $this->schemaLoader->loadPropertyEnumeration($property);
 
-                if(is_a($value, Entity::class))
+                if(array_key_exists('multiple', $item) && $item['multiple'] == true)
                 {
-                    $value = $value->getUuidAsString();
+                   if(empty($propertiesOfEntity[$property]))
+                   {
+                       $propertiesOfEntity[$property] = [$value];
+                   }
+                   else
+                   {
+                       array_push($propertiesOfEntity[$property], $value);
+                   }
+                }
+                else
+                {
+                    $propertiesOfEntity[$property] = $value;
                 }
 
-                if(is_a($value, \DateTime::class))
-                {
-                    $value = $value->format('yyyy-MM-dd');
-                }
-
-                if(is_array($value))
-                {
-                    $value = json_encode($value);
-                }
-                $property->setValue($value);
-                $this->em->persist($property);
             }
         }
 
-        return $data;
-    }
+        $entityToProcess->setProperties($propertiesOfEntity);
 
-    private function saveProperty($data, $entityToProcess)
-    {
-        $propertySchema = $this->schemaLoader->loadPropertyEnumeration($entityToProcess->getKind());
-
-        if(array_key_exists('constraints', $propertySchema))
-        {
-            if(array_key_exists('mime', $propertySchema['constraints']))
-            {
-                $finfo = new \finfo(FILEINFO_MIME_TYPE);
-                $mimeType = $finfo->buffer($data);
-
-                if(!in_array($mimeType, $propertySchema['constraints']['mime']))
-                {
-                    return $this->response->badRequest("The file must be of one the following types ".json_encode($propertySchema['constraints']['mime']));
-                }
-
-                $data = ['value' => base64_encode($data)];
-            }
-        }
-
-
-        if(!array_key_exists('value', $data))
-        {
-            $value = json_encode($data);
-        }
-        else
-        {
-            $value = $data['value'];
-        }
-
-        $entityToProcess->setValue($value);
         $this->em->persist($entityToProcess);
-
-        return true;
     }
 }

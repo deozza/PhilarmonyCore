@@ -2,7 +2,6 @@
 
 namespace Deozza\PhilarmonyBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -48,14 +47,13 @@ class Entity
     private $dateOfCreation;
 
     /**
-     * @ORM\OneToMany(targetEntity="Deozza\PhilarmonyBundle\Entity\Property", mappedBy="entity")
+     * @ORM\Column(type="json")
      * @JMS\Groups({"entity_complete", "entity_basic"})
      */
     private $properties;
 
     public function __construct()
     {
-        $this->properties = new ArrayCollection();
         $this->dateOfCreation = new \DateTime('now');
     }
 
@@ -123,6 +121,12 @@ class Entity
     public function getProperties()
     {
         return $this->properties;
+    }
+
+    public function setProperties($properties): self
+    {
+        $this->properties = $properties;
+        return $this;
     }
 
 }

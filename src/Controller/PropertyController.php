@@ -167,11 +167,9 @@ class PropertyController extends AbstractController
                 return $this->response->forbiddenAccess("$entity_name already have a $property_name");
             }
         }
-        $propertyToPost = new Property();
-        $propertyToPost->setEntity($entity);
-        $propertyToPost->setKind($property_name);
 
-        $posted = $this->processForm->generateAndProcess($formKind = "post", $request->getContent(), $propertyToPost,null,  [$property_name]);
+
+        $posted = $this->processForm->generateAndProcess($formKind = "post", $request->getContent(), $entity,null,  [$property_name]);
 
         if(is_object($posted))
         {
@@ -192,10 +190,9 @@ class PropertyController extends AbstractController
             return $this->response->conflict("You can not add this property", $conflict_errors);
         }
 
-        $this->em->persist($propertyToPost);
         $this->em->flush();
 
-        return $this->response->created($propertyToPost, ['property_complete', "entity_id"]);
+        return $this->response->created($entity, ['entity_complete']);
     }
 
     /**

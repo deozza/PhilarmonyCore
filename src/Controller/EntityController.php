@@ -7,6 +7,7 @@ use Deozza\PhilarmonyBundle\Service\FormManager\ProcessForm;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Deozza\PhilarmonyBundle\Service\RulesManager\RulesManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,6 +22,7 @@ class EntityController extends AbstractController
 
     public function __construct(ResponseMaker $responseMaker,
                                 EntityManagerInterface $em,
+                                PaginatorInterface $paginator,
                                 ProcessForm $processForm,
                                 DatabaseSchemaLoader $schemaLoader,
                                 RulesManager $ruleManager)
@@ -30,6 +32,7 @@ class EntityController extends AbstractController
         $this->processForm = $processForm;
         $this->schemaLoader = $schemaLoader;
         $this->ruleManager = $ruleManager;
+        $this->paginator = $paginator;
     }
 
     /**
@@ -65,9 +68,15 @@ class EntityController extends AbstractController
         }
 
 
-        $entities = $this->em->getRepository(Entity::class)->findByKind($exists);
+        $filters = $request->query->get("filter", []);
+        $entitiesQuery = $this->em->getRepository(Entity::class)->findAllFiltered($filters, $exists);
+        $entities = $this->paginator->paginate(
+            $entitiesQuery,
+            $request->query->getInt("page", 1),
+            $request->query->getInt("number", 10)
+        );
 
-        return $this->response->ok($entities, ['entity_complete', 'property_complete']);
+        return $this->response->okPaginated($entities, ['entity_complete']);
     }
 
     /**
@@ -103,7 +112,7 @@ class EntityController extends AbstractController
         }
 
 
-        return $this->response->ok($exist, ['entity_basic', 'property_complete']);
+        return $this->response->ok($exist, ['entity_basic']);
     }
 
     /**
@@ -156,7 +165,60 @@ class EntityController extends AbstractController
 
         $this->em->flush();
 
-        return $this->response->created($entityToPost, ['entity_complete', 'property_complete']);
+        return $this->response->created($entityToPost, ['entity_complete']);
+    }
+
+    /**
+     * @Route(
+     *     "entity/{id}",
+     *     requirements={
+     *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+     *      },
+     *     name="patch_entity",
+     *      methods={"PATCH"})
+     */
+    public function patchEntityAction($id, Request $request)
+    {
+        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($id);
+
+        if(empty($entity))
+        {
+            return $this->response->notFound("This route does not exist%s");
+        }
+
+        $access_errors = $this->ruleManager->decideAccess($entity, $request->getMethod());
+
+        if($access_errors > 0)
+        {
+            return $this->response->forbiddenAccess("You can not patch this $entity->getKind()");
+        }
+
+
+        $entityProperties = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+
+
+        if(!$entityProperties['patch'])
+        {
+            return $this->response->methodNotAllowed($request->getMethod());
+        }
+
+        $patched = $this->processForm->generateAndProcess($formKind = 'patch', $request->getContent(), $entity, $entityProperties);
+
+        $conflict_errors = $this->ruleManager->decideConflict($entity, $request->getMethod(),__DIR__);
+
+        if($conflict_errors > 0)
+        {
+            return $this->response->conflict("You can not add this $entity->getKind()", $conflict_errors);
+        }
+
+        if(is_object($patched))
+        {
+            return $patched;
+        }
+
+        $this->em->flush();
+
+        return $this->response->ok($entity, ['entity_complete']);
     }
 
     /**

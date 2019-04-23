@@ -5,6 +5,7 @@ use Deozza\PhilarmonyBundle\Entity\Entity;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
@@ -14,19 +15,14 @@ use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 trait AddFieldTrait{
-    private function addFieldToForm($field, $form, $isAnEntity)
+    private function addFieldToForm($field, $form, $formKind)
     {
         $property = $this->schemaLoader->loadPropertyEnumeration($field);
-
         $this->type = explode(".", $property['type']);
         $class = FieldTypes::ENUMERATION[$this->type[0]];
 
-        if(!$isAnEntity && $class!= "embedded")
-        {
-            $field = "value";
-        }
 
-        if($class === "embedded")
+        if($class === "embedded" || ($class === CollectionType::class && $this->type[1] === "embedded"))
         {
             $embeddedEntity = $this->schemaLoader->loadEntityEnumeration($field);
             $key = array_search($field, $this->formFields);
@@ -39,9 +35,11 @@ trait AddFieldTrait{
                 $this->formFields[$field] = $embeddedEntity['properties'];
             }
 
+
+
             foreach($this->formFields[$field] as $embeddedField)
             {
-                $this->addFieldToForm($embeddedField, $form, true);
+                $this->addFieldToForm($embeddedField, $form, $formKind);
             }
         }
         else
@@ -94,13 +92,30 @@ trait AddFieldTrait{
                     $formOptions['format'] = "yyyy-MM-dd";
                 };break;
 
+            case CollectionType::class:
+                {
+                    $entryType = FieldTypes::ENUMERATION[$this->type[1]];
+                    $formOptions['entry_type'] = $entryType;
+                    $formOptions['allow_add'] = true;
+                    $formOptions['allow_delete'] = false;
+
+                };break;
+
             case FileType::class: return;break;
             default: break;
         }
 
         $constraints = $this->constraintGenerator($property, $constraints);
 
-        $formOptions['constraints'] = $constraints;
+        if($class == CollectionType::class)
+        {
+            $formOptions['entry_options']['constraints'] = $constraints;
+
+        }
+        else
+        {
+            $formOptions['constraints'] = $constraints;
+        }
         return $formOptions;
     }
 

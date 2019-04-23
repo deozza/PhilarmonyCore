@@ -7,6 +7,7 @@ use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ProcessForm
 {
@@ -37,7 +38,7 @@ class ProcessForm
 
         if($this->formFields === null)
         {
-            $this->formFields = $entityKind['post']['properties'];
+            $this->formFields = $entityKind[$formKind]['properties'];
 
             if($this->formFields === "all")
             {
@@ -54,10 +55,15 @@ class ProcessForm
 
         foreach($this->formFields as $field)
         {
-            $this->addFieldToForm($field, $form, $isAnEntity);
+            $this->addFieldToForm($field, $form, $formKind);
         }
 
         $data = $this->processData($requestBody, $form, $formKind);
+
+        if(is_a($data, JsonResponse::class))
+        {
+            return $data;
+        }
 
         foreach ($this->formFields as $key=>$item)
         {
@@ -69,7 +75,7 @@ class ProcessForm
                 {
                     if(array_key_exists($subitem, $data))
                     {
-                        $data[$key][$subitem ] = $data[$subitem];
+                        $data[$key][$subitem] = $data[$subitem];
                         unset($data[$subitem]);
                     }
                 }
@@ -78,7 +84,7 @@ class ProcessForm
 
         if(!is_object($data))
         {
-            $this->saveData($data, $entityToProcess);
+            $this->saveData($data, $entityToProcess, $formKind);
         }
 
         return $data;

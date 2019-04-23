@@ -152,7 +152,7 @@ class PropertyController extends AbstractController
         }
 
         $property = $this->schemaLoader->loadPropertyEnumeration($property_name);
-
+/*
         if(!array_key_exists('multiple', $property) || !$property['multiple'])
         {
             $alreadyExists = $this->em->getRepository(Property::class)->findBy(
@@ -167,11 +167,9 @@ class PropertyController extends AbstractController
                 return $this->response->forbiddenAccess("$entity_name already have a $property_name");
             }
         }
-        $propertyToPost = new Property();
-        $propertyToPost->setEntity($entity);
-        $propertyToPost->setKind($property_name);
+*/
 
-        $posted = $this->processForm->generateAndProcess($formKind = "post", $request->getContent(), $propertyToPost,null,  [$property_name]);
+        $posted = $this->processForm->generateAndProcess($formKind = "post", $request->getContent(), $entity,null,  [$property_name]);
 
         if(is_object($posted))
         {
@@ -192,91 +190,144 @@ class PropertyController extends AbstractController
             return $this->response->conflict("You can not add this property", $conflict_errors);
         }
 
-        $this->em->persist($propertyToPost);
         $this->em->flush();
 
-        return $this->response->created($propertyToPost, ['property_complete', "entity_id"]);
+        return $this->response->created($entity, ['entity_complete']);
     }
 
     /**
      * @Route(
-     *     "property/{id}",
+     *     "{entity_name}/{id}/{property_name}",
      *     requirements={
+     *          "entity_name" = "^(\w{1,50})$",
+     *          "property_name" = "^(\w{1,50})$",
      *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *      },
      *     name="patch_property",
      *      methods={"PATCH"})
      */
-    public function patchPropertyAction($id, Request $request)
+    public function patchPropertyAction($entity_name, $property_name, $id, Request $request)
     {
-        $property = $this->em->getRepository(Property::class)->findOneByUuid($id);
+        $entity = $this->em->getRepository(Entity::class)->findOneBy([
+            "uuid" => $id,
+            "kind" => $entity_name
+        ]);
 
-        if(empty($property))
+        if(empty($entity))
         {
-            return $this->response->notFound("The property with the id $id was not found");
+            return $this->response->notFound("Either the $entity_name was not found or the $property_name with the id $id was not found");
         }
 
-        $patched = $this->processForm->generateAndProcess($formKind = "patch", $request->getContent(), $property,null,  [$property->getKind()]);
+        if(!array_key_exists($property_name, $entity->getProperties()))
+        {
+            return $this->response->notFound("There is no $property_name in $entity_name");
+        }
+
+        $entityPostableProperties = $this->schemaLoader->loadEntityEnumeration($entity_name);
+
+        if($entityPostableProperties['patch']['properties'] === "all")
+        {
+            if(!in_array($property_name, $entityPostableProperties['properties']))
+            {
+                return $this->response->methodNotAllowed($request->getMethod());
+            }
+        }
+        else
+        {
+            if(!in_array($property_name, $entityPostableProperties['patch']['properties']))
+            {
+                    return $this->response->methodNotAllowed($request->getMethod());
+            }
+        }
+
+        $patched = $this->processForm->generateAndProcess($formKind = "patch", $request->getContent(), $entity,null,  [$property_name]);
+
 
         if(is_object($patched))
         {
             return $patched;
         }
 
-        $property->setValue($patched['value']);
-
         $access_errors = $this->ruleManager->decideAccess($patched, $request->getMethod());
 
         if($access_errors > 0)
         {
-            return $this->response->forbiddenAccess("You can not patch this property");
+            return $this->response->forbiddenAccess("You can not add this property");
         }
 
         $conflict_errors = $this->ruleManager->decideConflict($patched, $request->getMethod(),__DIR__);
 
         if($conflict_errors > 0)
         {
-            return $this->response->conflict("You can not patch this property", $conflict_errors);
+            return $this->response->conflict("You can not add this property", $conflict_errors);
         }
 
         $this->em->flush();
 
-        return $this->response->created($property, ['property_basic', "entity_id"]);
+
+        return $this->response->ok($patched);
     }
 
     /**
      * @Route(
-     *     "property/{id}",
+     *     "{entity_name}/{id}/{property_name}",
      *     requirements={
+     *          "entity_name" = "^(\w{1,50})$",
+     *          "property_name" = "^(\w{1,50})$",
      *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *      },
      *     name="delete_property",
      *     methods={"DELETE"})
      */
-    public function deletePropertyAction($id, Request $request)
+    public function deletePropertyAction($entity_name,$property_name, $id, Request $request)
     {
-        $exist = $this->em->getRepository(Property::class)->findOneByUuid($id);
+        $entity = $this->em->getRepository(Entity::class)->findOneBy([
+            "uuid" => $id,
+            "kind" => $entity_name
+        ]);
 
-        if(empty($exist))
+        if(empty($entity))
         {
-            return  $this->response->notFound("The property with the id $id was not found");
+            return $this->response->notFound("Either the $entity_name was not found or the $property_name with the id $id was not found");
         }
 
-        $access_errors = $this->ruleManager->decideAccess($exist, $request->getMethod());
+        if(!array_key_exists($property_name, $entity->getProperties()))
+        {
+            return $this->response->notFound("There is no $property_name in $entity_name");
+        }
+
+        $access_errors = $this->ruleManager->decideAccess($entity, $request->getMethod());
 
         if($access_errors > 0)
         {
             return $this->response->forbiddenAccess("You can not delete this property");
         }
 
-        $conflict_errors = $this->ruleManager->decideConflict($exist, $request->getMethod(),__DIR__);
+        $conflict_errors = $this->ruleManager->decideConflict($entity, $request->getMethod(),__DIR__);
 
         if($conflict_errors > 0)
         {
             return $this->response->conflict("You can not delete this property", $conflict_errors);
         }
 
-        $this->em->remove($exist);
+        $property = $this->schemaLoader->loadPropertyEnumeration($property_name);
+
+        if($property['required'])
+        {
+            return $this->response->forbiddenAccess("$property_name can not be deleted. It is a required property");
+        }
+
+        $propertiesOfEntity = $entity->getProperties();
+
+        unset($propertiesOfEntity[$property_name]);
+
+        if($property['default'] !== null)
+        {
+            $propertiesOfEntity[$property_name] = $property['default'];
+        }
+
+        $entity->setProperties($propertiesOfEntity);
+
         $this->em->flush();
         return $this->response->empty();
     }

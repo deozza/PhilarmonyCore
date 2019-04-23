@@ -5,83 +5,89 @@ use Deozza\PhilarmonyBundle\Entity\Entity;
 use Deozza\PhilarmonyBundle\Entity\Property;
 
 trait SaveDataTrait{
-    private function saveData($data, $entityToProcess)
+    private function saveData($data, $entityToProcess, $formKind)
     {
-        if (is_a($entityToProcess, Entity::class)) {
-            return $this->saveEntity($data, $entityToProcess);
-        } else {
-            return $this->saveProperty($data, $entityToProcess);
+        $this->default = [];
+
+        $propertiesOfEntity = $entityToProcess->getProperties();
+        $this->addDefaultValue($entityToProcess->getKind());
+
+        $data = array_merge_recursive($data, $this->default);
+
+        foreach($data as $property=>$value)
+        {
+
+            if($formKind ==  "patch")
+            {
+                $propertiesOfEntity[$property] = $value;
+            }
+            else
+            {
+                if(!empty($propertiesOfEntity[$property]))
+                {
+                    if($propertiesOfEntity[$property] != $value){
+
+                    }
+
+                    if(is_array($value))
+                    {
+                        array_push($propertiesOfEntity[$property], $value);
+                    }
+                }
+                else
+                {
+                    if(is_array($value))
+                    {
+                        $value = [$value];
+                    }
+                    $propertiesOfEntity[$property] = $value;
+                }
+
+            }
+
         }
 
+
+        $entityToProcess->setProperties($propertiesOfEntity);
+        $this->em->persist($entityToProcess);
     }
 
-    private function saveEntity($data, $entityToProcess)
+    private function addDefaultValue($kind, $embedded = false)
     {
-        $this->em->persist($entityToProcess);
-
-        foreach($data as $key=>$value)
+        $defaultProperties = $this->schemaLoader->loadEntityEnumeration($kind);
+        foreach($defaultProperties['properties'] as $value)
         {
-            if(!empty($value))
+            $property = explode('.', $this->schemaLoader->loadPropertyEnumeration($value)['type']);
+
+            $isEmbedded = array_search("embedded", $property);
+            if($isEmbedded)
             {
-                $property = new Property();
-                $property->setKind($key);
-                $property->setEntity($entityToProcess);
+                $keyToRemove = array_search($value, $defaultProperties['properties']);
+                unset($defaultProperties['properties'][$keyToRemove]);
 
-                if(is_a($value, Entity::class))
-                {
-                    $value = $value->getUuidAsString();
-                }
+                $this->default[$property[$isEmbedded + 1]] = [];
+                $this->addDefaultValue($property[$isEmbedded + 1], true);
+            }
 
-                if(is_a($value, \DateTime::class))
-                {
-                    $value = $value->format('yyyy-MM-dd');
-                }
+            $property = $this->schemaLoader->loadPropertyEnumeration($value);
+            if(isset($property['default']) && $property['default'] !== null)
+            {
+                $defaultValue = explode('.', $property['default']);
 
-                if(is_array($value))
+                if($defaultValue[0] === "date")
                 {
-                    $value = json_encode($value);
+                    $defaultValue[0] = new \DateTime($defaultValue[1]);
+                    $defaultValue[0] = $defaultValue[0]->format('Y-m-d H:i:s');
                 }
-                $property->setValue($value);
-                $this->em->persist($property);
+                if($embedded)
+                {
+                    $this->default[$kind][$value] = $defaultValue[0];
+                }
+                else
+                {
+                    $this->default[$value] = $defaultValue[0];
+                }
             }
         }
-
-        return $data;
-    }
-
-    private function saveProperty($data, $entityToProcess)
-    {
-        $propertySchema = $this->schemaLoader->loadPropertyEnumeration($entityToProcess->getKind());
-
-        if(array_key_exists('constraints', $propertySchema))
-        {
-            if(array_key_exists('mime', $propertySchema['constraints']))
-            {
-                $finfo = new \finfo(FILEINFO_MIME_TYPE);
-                $mimeType = $finfo->buffer($data);
-
-                if(!in_array($mimeType, $propertySchema['constraints']['mime']))
-                {
-                    return $this->response->badRequest("The file must be of one the following types ".json_encode($propertySchema['constraints']['mime']));
-                }
-
-                $data = ['value' => base64_encode($data)];
-            }
-        }
-
-
-        if(!array_key_exists('value', $data))
-        {
-            $value = json_encode($data);
-        }
-        else
-        {
-            $value = $data['value'];
-        }
-
-        $entityToProcess->setValue($value);
-        $this->em->persist($entityToProcess);
-
-        return true;
     }
 }

@@ -6,6 +6,7 @@ namespace Deozza\PhilarmonyBundle\Service\FormManager;
 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -22,6 +23,7 @@ class FieldTypes
         "enumeration" => ChoiceType::class,
         "entity" => EntityType::class,
         "file" => FileType::class,
-        "embedded" => "embedded"
+        "embedded" => "embedded",
+        "array" => CollectionType::class
     ];
 }

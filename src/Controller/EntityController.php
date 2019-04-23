@@ -7,6 +7,7 @@ use Deozza\PhilarmonyBundle\Service\FormManager\ProcessForm;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Deozza\PhilarmonyBundle\Service\RulesManager\RulesManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,6 +22,7 @@ class EntityController extends AbstractController
 
     public function __construct(ResponseMaker $responseMaker,
                                 EntityManagerInterface $em,
+                                PaginatorInterface $paginator,
                                 ProcessForm $processForm,
                                 DatabaseSchemaLoader $schemaLoader,
                                 RulesManager $ruleManager)
@@ -30,6 +32,7 @@ class EntityController extends AbstractController
         $this->processForm = $processForm;
         $this->schemaLoader = $schemaLoader;
         $this->ruleManager = $ruleManager;
+        $this->paginator = $paginator;
     }
 
     /**
@@ -65,9 +68,15 @@ class EntityController extends AbstractController
         }
 
 
-        $entities = $this->em->getRepository(Entity::class)->findByKind($exists);
+        $filters = $request->query->get("filter", []);
+        $entitiesQuery = $this->em->getRepository(Entity::class)->findAllFiltered($filters, $exists);
+        $entities = $this->paginator->paginate(
+            $entitiesQuery,
+            $request->query->getInt("page", 1),
+            $request->query->getInt("number", 10)
+        );
 
-        return $this->response->ok($entities, ['entity_complete']);
+        return $this->response->okPaginated($entities, ['entity_complete']);
     }
 
     /**

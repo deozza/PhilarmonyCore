@@ -70,7 +70,7 @@ trait SaveDataTrait{
             }
 
             $property = $this->schemaLoader->loadPropertyEnumeration($value);
-            if(array_key_exists('default', $property) && $property['default'] !== null)
+            if(isset($property['default']) && $property['default'] !== null)
             {
                 $defaultValue = explode('.', $property['default']);
 

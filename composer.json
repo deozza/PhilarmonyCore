@@ -23,7 +23,8 @@
         "symfony/translation": "4.2.*",
         "symfony/validator": "4.2.*",
         "symfony/yaml": "4.2.*",
-        "knplabs/knp-paginator-bundle": "^3.0"
+        "knplabs/knp-paginator-bundle": "^3.0",
+        "scienta/doctrine-json-functions": "^4.0"
     },
     "require-dev": {
         "symfony/profiler-pack": "^1.0",

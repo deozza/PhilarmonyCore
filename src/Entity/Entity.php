@@ -8,7 +8,7 @@ use Ramsey\Uuid\UuidInterface;
 use JMS\Serializer\Annotation as JMS;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Deozza\PhilarmonyBundle\Repository\EntityRepository")
  * @ORM\HasLifecycleCallbacks()
  */
 class Entity

@@ -7,23 +7,19 @@ use Deozza\PhilarmonyBundle\Entity\Property;
 trait SaveDataTrait{
     private function saveData($data, $entityToProcess, $formKind)
     {
-        $propertiesOfEntity = $entityToProcess->getProperties();
+        $this->default = [];
 
+        $propertiesOfEntity = $entityToProcess->getProperties();
+        $this->addDefaultValue($entityToProcess->getKind());
+
+        $data = array_merge_recursive($data, $this->default);
 
         foreach($data as $property=>$value)
         {
-            $item = $this->schemaLoader->loadPropertyEnumeration($property);
 
             if($formKind ==  "patch")
             {
-                if(array_key_exists('multiple', $item) && $item['multiple'] == true)
-                {
-                    array_push($propertiesOfEntity[$property], $value);
-                }
-                else
-                {
-                    $propertiesOfEntity[$property] = $value;
-                }
+                $propertiesOfEntity[$property] = $value;
             }
             else
             {
@@ -51,47 +47,47 @@ trait SaveDataTrait{
 
         }
 
-        $kind = $entityToProcess->getKind();
-
-        if(is_array($propertiesOfEntity))
-        {
-            $kind = key($propertiesOfEntity);
-        }
-
-        $defaultProperties = $this->schemaLoader->loadEntityEnumeration($kind);
-
-
-        foreach($defaultProperties['properties'] as $defaultProperty)
-        {
-            $hasDefault = $this->schemaLoader->loadPropertyEnumeration($defaultProperty);
-
-            if(array_key_exists('default', $hasDefault) && $hasDefault['default'] !== null)
-            {
-                if(!array_key_exists($defaultProperty, $propertiesOfEntity) || empty($propertiesOfEntity[$defaultProperty]))
-                {
-
-                    $default = explode('.', $hasDefault['default']);
-
-                    if($default[0] === "date")
-                    {
-                        $default[0] = new \DateTime($default[1]);
-                        $default[0] = $default[0]->format('Y-m-d H:i:s');
-                    }
-
-
-                    if(is_array($propertiesOfEntity))
-                    {
-                        $propertiesOfEntity[$kind][0] = array_merge($propertiesOfEntity[$kind][0], [$defaultProperty => $default[0]]) ;
-                    }
-                    else
-                    {
-                        $propertiesOfEntity[$defaultProperty] = $default[0];
-                    }
-                }
-            }
-        }
 
         $entityToProcess->setProperties($propertiesOfEntity);
         $this->em->persist($entityToProcess);
+    }
+
+    private function addDefaultValue($kind, $embedded = false)
+    {
+        $defaultProperties = $this->schemaLoader->loadEntityEnumeration($kind);
+        foreach($defaultProperties['properties'] as $value)
+        {
+            $property = explode('.', $this->schemaLoader->loadPropertyEnumeration($value)['type']);
+
+            $isEmbedded = array_search("embedded", $property);
+            if($isEmbedded)
+            {
+                $keyToRemove = array_search($value, $defaultProperties['properties']);
+                unset($defaultProperties['properties'][$keyToRemove]);
+
+                $this->default[$property[$isEmbedded + 1]] = [];
+                $this->addDefaultValue($property[$isEmbedded + 1], true);
+            }
+
+            $property = $this->schemaLoader->loadPropertyEnumeration($value);
+            if(array_key_exists('default', $property) && $property['default'] !== null)
+            {
+                $defaultValue = explode('.', $property['default']);
+
+                if($defaultValue[0] === "date")
+                {
+                    $defaultValue[0] = new \DateTime($defaultValue[1]);
+                    $defaultValue[0] = $defaultValue[0]->format('Y-m-d H:i:s');
+                }
+                if($embedded)
+                {
+                    $this->default[$kind][$value] = $defaultValue[0];
+                }
+                else
+                {
+                    $this->default[$value] = $defaultValue[0];
+                }
+            }
+        }
     }
 }

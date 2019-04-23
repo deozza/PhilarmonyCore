@@ -33,8 +33,8 @@ class EntityRepository extends ServiceEntityRepository
         {
             foreach ($filters as $filter=>$value)
             {
-                $queryBuilder->andWhere("JSON_CONTAINS(e.properties, :$filter, '$.".$filter."') = 1");
-                $parameters[$filter] = json_encode($value);
+                $queryBuilder->andWhere("JSON_EXTRACT(e.properties,'$.".$filter."') LIKE :$filter");
+                $parameters[$filter] = "%$value%";
             }
 
         }

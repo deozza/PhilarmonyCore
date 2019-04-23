@@ -55,7 +55,7 @@ class ProcessForm
 
         foreach($this->formFields as $field)
         {
-            $this->addFieldToForm($field, $form, $isAnEntity);
+            $this->addFieldToForm($field, $form, $formKind);
         }
 
         $data = $this->processData($requestBody, $form, $formKind);

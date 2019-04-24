@@ -77,9 +77,6 @@ class PropertyController extends AbstractController
             }
         }
 
-        $property = $this->schemaLoader->loadPropertyEnumeration($property_name);
-
-
         $posted = $this->processForm->generateAndProcess($formKind = "post", $request->getContent(), $entity,null,  [$property_name]);
 
         if(is_object($posted))
@@ -230,14 +227,37 @@ class PropertyController extends AbstractController
 
         $propertiesOfEntity = $entity->getProperties();
 
-        unset($propertiesOfEntity[$property_name]);
+        $key = $request->query->get("key");
 
-        if($property['default'] !== null)
+        if(empty($key))
         {
-            $propertiesOfEntity[$property_name] = $property['default'];
+            $key = "all";
+        }
+
+        if($key === "all")
+        {
+            unset($propertiesOfEntity[$property_name]);
+        }
+        else
+        {
+            unset($propertiesOfEntity[$property_name][$key]);
+        }
+
+        if(array_key_exists("default", $property) && $property['default'] !== null)
+        {
+            $default = explode('.', $property['default']);
+
+            $defaultValue = $default[0];
+
+            if($defaultValue === "date")
+            {
+                $defaultValue = new \DateTime($default[1]);
+            }
+            $propertiesOfEntity[$property_name] = $defaultValue;
         }
 
         $entity->setProperties($propertiesOfEntity);
+
 
         $this->em->flush();
         return $this->response->empty();

@@ -16,37 +16,37 @@ trait SaveDataTrait{
 
         foreach($data as $property=>$value)
         {
-
-            if($formKind ==  "patch")
+            if(!empty($value))
             {
-                $propertiesOfEntity[$property] = $value;
-            }
-            else
-            {
-                if(!empty($propertiesOfEntity[$property]))
+                if ($formKind == "patch")
                 {
-                    if($propertiesOfEntity[$property] != $value){
-
-                    }
-
-                    if(is_array($value))
-                    {
-                        array_push($propertiesOfEntity[$property], $value);
-                    }
+                    $propertiesOfEntity[$property] = $value;
                 }
                 else
                 {
-                    if(is_array($value))
+                    if (!empty($propertiesOfEntity[$property]))
                     {
-                        $value = [$value];
+                        if(in_array($value, $propertiesOfEntity[$property]))
+                        {
+                            continue;
+                        }
+
+                        if (is_array($value))
+                        {
+                            array_push($propertiesOfEntity[$property], $value);
+                        }
                     }
-                    $propertiesOfEntity[$property] = $value;
+                    else
+                    {
+                        if (is_array($value))
+                        {
+                            $value = [$value];
+                        }
+                        $propertiesOfEntity[$property] = $value;
+                    }
                 }
-
             }
-
         }
-
 
         $entityToProcess->setProperties($propertiesOfEntity);
         $this->em->persist($entityToProcess);

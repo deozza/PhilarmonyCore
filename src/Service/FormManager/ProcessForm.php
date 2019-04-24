@@ -65,6 +65,7 @@ class ProcessForm
             return $data;
         }
 
+
         foreach ($this->formFields as $key=>$item)
         {
             if(is_array($item))
@@ -95,6 +96,9 @@ class ProcessForm
     private function processData($data, $form, $formKind)
     {
         $data = json_decode($data, true);
+
+
+
         $form->submit($data, $formKind==="post");
 
         if(!$form->isValid())

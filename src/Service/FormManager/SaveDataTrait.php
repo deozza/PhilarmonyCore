@@ -14,7 +14,18 @@ trait SaveDataTrait{
 
         if(!is_array($data))
         {
-            $data = [$this->formFields[0]=> [base64_encode($data)]];
+
+            $file = base64_encode($data);
+
+            $isPropertyMultiple = $this->schemaLoader->loadPropertyEnumeration($this->formFields[0]);
+            $isMultiple = explode('.', $isPropertyMultiple['type']);
+
+            if($isMultiple[0] === "array")
+            {
+                $file = [$file];
+            }
+
+            $data = [$this->formFields[0]=> $file];
         }
 
         $data = array_merge_recursive($data, $this->default);

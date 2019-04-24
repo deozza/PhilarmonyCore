@@ -6,6 +6,7 @@ use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\PhilarmonyBundle\Service\FormManager\ProcessForm;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Deozza\PhilarmonyBundle\Service\RulesManager\RulesManager;
+use Deozza\PhilarmonyBundle\Service\Validation\Validate;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,7 +26,8 @@ class EntityController extends AbstractController
                                 PaginatorInterface $paginator,
                                 ProcessForm $processForm,
                                 DatabaseSchemaLoader $schemaLoader,
-                                RulesManager $ruleManager)
+                                RulesManager $ruleManager,
+                                Validate $validate)
     {
         $this->response = $responseMaker;
         $this->em = $em;
@@ -33,6 +35,7 @@ class EntityController extends AbstractController
         $this->schemaLoader = $schemaLoader;
         $this->ruleManager = $ruleManager;
         $this->paginator = $paginator;
+        $this->validator = $validate;
     }
 
     /**
@@ -172,8 +175,23 @@ class EntityController extends AbstractController
             return $posted;
         }
 
+        $isValid = $this->validator->processValidation($entityToPost);
+
+        die;
+/*
+        if(is_array($isValid))
+        {
+            $posted->setValidationState(false);
+        }
+
+        $posted->setValidationState($isValid);
         $this->em->flush();
 
+        if($isValid === false)
+        {
+            return $this->response->conflict("To pass to the next validation state, you need to correct : ", $isValid['context']);
+        }
+*/
         return $this->response->created($entityToPost, ['entity_complete']);
     }
 

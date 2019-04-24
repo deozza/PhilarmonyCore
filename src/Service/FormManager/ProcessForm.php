@@ -1,7 +1,6 @@
 <?php
 namespace Deozza\PhilarmonyBundle\Service\FormManager;
 
-use Deozza\PhilarmonyBundle\Entity\Entity;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;

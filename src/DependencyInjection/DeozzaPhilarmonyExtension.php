@@ -22,6 +22,7 @@ class DeozzaPhilarmonyExtension extends Extension
         $definition->setArgument(0, $config['directory']['entity']);
         $definition->setArgument(1, $config['directory']['property']);
         $definition->setArgument(2, $config['directory']['enumeration']);
+        $definition->setArgument(3, $config['directory']['validation']);
     }
 
 }

@@ -14,6 +14,13 @@
         </service>
         <service id="Deozza\PhilarmonyBundle\Service\FormManager\ProcessForm" alias="philarmony.process_form" />
 
+        <service class="Deozza\PhilarmonyBundle\Service\Validation\Validate" id="philarmony.validate">
+            <bind key="$responseMaker" type="service" id="philarmony.response_maker"/>
+            <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
+            <bind key="$em" type="service" id="doctrine.orm.entity_manager"/>
+        </service>
+        <service id="Deozza\PhilarmonyBundle\Service\Validation\Validate" alias="philarmony.validate" />
+
         <service class="Deozza\PhilarmonyBundle\Service\ResponseMaker" id="philarmony.response_maker">
             <bind key="$serializer" type="service" id="jms_serializer.serializer"/>
         </service>
@@ -35,6 +42,7 @@
             <argument key="$entity"/>
             <argument key="$property"/>
             <argument key="$enumeration"/>
+            <argument key="$validation"/>
             <argument key="$path">%kernel.project_dir%</argument>
         </service>
         <service id="Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader" alias="philarmony.schema_loader" />

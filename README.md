@@ -143,30 +143,30 @@ Your database schema is fully designed by 3 yaml files.
 
 An Entity is what could be view as a MySQL table, a main container of data. By default, it is defined by an owner (the User who created the entity), a kind, the date it was create and its properties.
 
- * [Read more](Resources/documentation/DatabaseSchema/ENTITY.md)
+ * [Read more](src/Resources/documentation/DatabaseSchema/ENTITY.md)
 
 #### Property
 
 The property is what could be view as a MySQL column, the container of a specific data. By default, it is defined by a type, a `unique` paremeter and a `required` parameter.
 
- * [Read more](Resources/documentation/DatabaseSchema/PROPERTY.md)
+ * [Read more](src/Resources/documentation/DatabaseSchema/PROPERTY.md)
 
 #### Enumeration
 
 The EntityJoin is used to create relation between entities. As the Entity, it is defined by default by its owner, a kind and its properties but also a relation kind and 1 or 2 entities associated.
 
- * [Read more](Resources/documentation/DatabaseSchema/ENTITYJOIN.md)
+ * [Read more](src/Resources/documentation/DatabaseSchema/ENTITYJOIN.md)
 
 
 ### Rule manager
 
 #### Access rules
 
- * [Read more](Resources/documentation/RuleManager/ACCESSRULE.md)
+ * [Read more](src/Resources/documentation/RuleManager/ACCESSRULE.md)
 
 #### Forbidden rules
 
- * [Read more](Resources/documentation/RuleManager/FORBIDDENRULE.md)
+ * [Read more](src/Resources/documentation/RuleManager/FORBIDDENRULE.md)
  
 
 ## Road map

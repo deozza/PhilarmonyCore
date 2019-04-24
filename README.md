@@ -153,10 +153,9 @@ The property is what could be view as a MySQL column, the container of a specifi
 
 #### Enumeration
 
-The EntityJoin is used to create relation between entities. As the Entity, it is defined by default by its owner, a kind and its properties but also a relation kind and 1 or 2 entities associated.
+The enumeration is a list of possible values handled by of property. 
 
- * [Read more](src/Resources/documentation/DatabaseSchema/ENTITYJOIN.md)
-
+ * [Read more](src/Resources/documentation/DatabaseSchema/ENUMERATION.md)
 
 ### Rule manager
 

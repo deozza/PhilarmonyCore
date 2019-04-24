@@ -35,6 +35,69 @@ class PropertyController extends AbstractController
     /**
      * @Route(
      *     "{entity_name}/{id}/{property_name}",
+     *     requirements={
+     *          "entity_name" = "^(\w{1,50})$",
+     *          "property_name" = "^(\w{1,50})$",
+     *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+     *      },
+     *     name="get_property_from_entity",
+     *     methods={"GET"})
+     */
+    public function getPropertyFromEntityAction($entity_name,$property_name, $id, Request $request)
+    {
+        $entity = $this->em->getRepository(Entity::class)->findOneBy([
+            "uuid" => $id,
+            "kind" => $entity_name
+        ]);
+
+        if(empty($entity))
+        {
+            return $this->response->notFound("Either the $entity_name was not found or the $property_name with the id $id was not found");
+        }
+
+        if(!array_key_exists($property_name, $entity->getProperties()))
+        {
+            return $this->response->notFound("There is no $property_name in $entity_name");
+        }
+
+        $access_errors = $this->ruleManager->decideAccess($entity, $request->getMethod());
+
+        if($access_errors > 0)
+        {
+            return $this->response->forbiddenAccess("You can not delete this property");
+        }
+
+        $conflict_errors = $this->ruleManager->decideConflict($entity, $request->getMethod(),__DIR__);
+
+        if($conflict_errors > 0)
+        {
+            return $this->response->conflict("You can not delete this property", $conflict_errors);
+        }
+
+        $propertiesOfEntity = $entity->getProperties();
+
+        $key = $request->query->get("key");
+
+        if(empty($key))
+        {
+            $key = "all";
+        }
+
+        $data = $propertiesOfEntity[$property_name];
+
+
+        if($key !== "all")
+        {
+            $data = $propertiesOfEntity[$property_name][$key];
+        }
+
+        return $this->response->ok($data);
+    }
+
+
+    /**
+     * @Route(
+     *     "{entity_name}/{id}/{property_name}",
      *      requirements={
      *          "entity_name" = "^(\w{1,50})$",
      *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",

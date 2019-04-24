@@ -30,8 +30,6 @@ class ProcessForm
             return;
         }
 
-        $isAnEntity = is_a($entityToProcess, Entity::class);
-
         $form = $this->form->create(FormType::class);
 
         $this->formFields = $formFields;
@@ -46,9 +44,10 @@ class ProcessForm
             }
         }
 
-        if(!is_object(json_decode($requestBody)) && !$isAnEntity)
+
+        if(!is_object(json_decode($requestBody)))
         {
-            $data = $this->saveData($requestBody, $entityToProcess);
+            $data = $this->saveData($requestBody, $entityToProcess, $formKind);
             return $data;
         }
 

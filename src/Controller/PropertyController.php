@@ -78,22 +78,7 @@ class PropertyController extends AbstractController
         }
 
         $property = $this->schemaLoader->loadPropertyEnumeration($property_name);
-/*
-        if(!array_key_exists('multiple', $property) || !$property['multiple'])
-        {
-            $alreadyExists = $this->em->getRepository(Property::class)->findBy(
-                [
-                    "entity" => $entity->getId(),
-                    'kind' => $property_name
-                ]
-            );
 
-            if(!empty($alreadyExists))
-            {
-                return $this->response->forbiddenAccess("$entity_name already have a $property_name");
-            }
-        }
-*/
 
         $posted = $this->processForm->generateAndProcess($formKind = "post", $request->getContent(), $entity,null,  [$property_name]);
 

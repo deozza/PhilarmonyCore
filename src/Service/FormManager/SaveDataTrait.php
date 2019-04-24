@@ -12,6 +12,11 @@ trait SaveDataTrait{
         $propertiesOfEntity = $entityToProcess->getProperties();
         $this->addDefaultValue($entityToProcess->getKind());
 
+        if(!is_array($data))
+        {
+            $data = [$this->formFields[0]=> [base64_encode($data)]];
+        }
+
         $data = array_merge_recursive($data, $this->default);
 
         foreach($data as $property=>$value)
@@ -26,6 +31,11 @@ trait SaveDataTrait{
                 {
                     if (!empty($propertiesOfEntity[$property]))
                     {
+                        if(!is_array($propertiesOfEntity[$property]))
+                        {
+                            continue;
+                        }
+
                         if(in_array($value, $propertiesOfEntity[$property]))
                         {
                             continue;

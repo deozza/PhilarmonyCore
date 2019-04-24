@@ -4,7 +4,7 @@ An Entity is what could be view as a MySQL table, a main container of data. By d
 
 ## Entity kind
 
-The Entity kind is used to differenciate Entities between them and to tell which properties are handled by the Entity. It is then unique. All the Entity kinds are stored in the json file you pointed in the Philarmony configuration (by default, it is `/var/Philarmony/entity.json`).
+The Entity kind is used to differenciate Entities between them and to tell which properties are handled by the Entity. It is then unique. All the Entity kinds are stored in the yaml file you pointed in the Philarmony configuration (by default, it is `/var/Philarmony/entity.json`).
 
 ### How to create a new Entity kind
 

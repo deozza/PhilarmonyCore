@@ -5,7 +5,7 @@ The property is what could be view as a MySQL column, the container of a specifi
 
 ## Property kind
 
-The Property kind is used to differenciate Properties between them and to tell which type of data is handled by the the Property. It is then unique. All the Property kinds are stored in the json file you pointed in the Philarmony configuration (by default, it is `/var/Philarmony/property.json`).
+The Property kind is used to differenciate Properties between them and to tell which type of data is handled by the the Property. It is then unique. All the Property kinds are stored in the yaml file you pointed in the Philarmony configuration (by default, it is `/var/Philarmony/property.json`).
 
 ### How to create a new Property kind
 

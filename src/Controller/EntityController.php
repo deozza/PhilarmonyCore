@@ -68,13 +68,22 @@ class EntityController extends AbstractController
         }
 
 
-        $filters = $request->query->get("filter", []);
-        $entitiesQuery = $this->em->getRepository(Entity::class)->findAllFiltered($filters, $exists);
-        $entities = $this->paginator->paginate(
-            $entitiesQuery,
-            $request->query->getInt("page", 1),
-            $request->query->getInt("number", 10)
-        );
+        $propertyFilter = $request->query->get("property", []);
+        $entityFilter = $request->query->get("entity", []);
+        try
+        {
+            $entitiesQuery = $this->em->getRepository(Entity::class)->findAllFiltered($propertyFilter, $entityFilter, $exists);
+            $entities = $this->paginator->paginate(
+                $entitiesQuery,
+                $request->query->getInt("page", 1),
+                $request->query->getInt("number", 10)
+            );
+
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->notFound("No entity was found with these filters");
+        }
 
         return $this->response->okPaginated($entities, ['entity_complete']);
     }

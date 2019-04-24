@@ -20,7 +20,7 @@ class EntityRepository extends ServiceEntityRepository
     }
 
 
-    public function findAllFiltered(Array $filters, $kind)
+    public function findAllFiltered(Array $propertyFilters,Array $entityFilters, $kind)
     {
         $queryBuilder = $this->createQueryBuilder('e');
         $queryBuilder->select('e');
@@ -29,11 +29,21 @@ class EntityRepository extends ServiceEntityRepository
         $parameters["kind"] = $kind;
 
 
-        if(!empty($filters))
+        if(!empty($propertyFilters))
         {
-            foreach ($filters as $filter=>$value)
+            foreach ($propertyFilters as $filter=>$value)
             {
                 $queryBuilder->andWhere("JSON_EXTRACT(e.properties,'$.".$filter."') LIKE :$filter");
+                $parameters[$filter] = "%$value%";
+            }
+
+        }
+
+        if(!empty($entityFilters))
+        {
+            foreach ($entityFilters as $filter=>$value)
+            {
+                $queryBuilder->andWhere("e.$filter LIKE :$filter");
                 $parameters[$filter] = "%$value%";
             }
 

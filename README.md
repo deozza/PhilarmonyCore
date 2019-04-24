@@ -108,10 +108,10 @@ curl --header "Content-Type: application/json"
    "date_of_Creation": "2019-01-01T12:00:00+02:00",
    "properties": {
      "title": "Stunning appartment in Tokyo",
-     "description": {
-        "1":"Located in central Tokyo. 2 bedrooms, bathroom, wifi.",
-        "2":"Animals are allowed"
-        },
+     "description": [
+        "Located in central Tokyo. 2 bedrooms, bathroom, wifi.",
+        "Animals are allowed"
+        ],
      "price": 82,
      "house_category": "appartment"
      }

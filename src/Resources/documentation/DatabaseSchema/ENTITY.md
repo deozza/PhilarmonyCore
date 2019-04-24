@@ -41,13 +41,13 @@ Also, you can set other constraints to an entity assuming it will be handled by 
 
 ### Entity routes
 
-| Method |            Route           |                  Description                  |                 Details                |
-|:------:|:--------------------------:|:---------------------------------------------:|:--------------------------------------:|
-|  POST  | /entity/{entity_name}      | Post a new entity with the specified kind     | [More](#post-an-entity)                |
-|   GET  | /entity/{entity_name}      | Get all the entries of a specific entity kind | [More](#get-all-the-entries-of-a-kind) |
-|   GET  | /entity/{entity_name}/{id} | Get a specific entity                         | [More](#get-a-specific-entity)         |
-|  PATCH | /entity/{entity_name}/{id} | Edit an entity                                | [More](#edit-an-entity)                |
-| DELETE | /entity/{entity_name}/{id} | Delete an Entity                              | [More](#delete-an-entity)              |
+| Method |              Route             |                  Description                  |                 Details                |
+|:------:|:------------------------------:|:---------------------------------------------:|:--------------------------------------:|
+|  POST  | /api/entity/{entity_name}      | Post a new entity with the specified kind     | [More](#post-an-entity)                |
+|   GET  | /api/entity/{entity_name}      | Get all the entries of a specific entity kind | [More](#get-all-the-entries-of-a-kind) |
+|   GET  | /api/entity/{entity_name}/{id} | Get a specific entity                         | [More](#get-a-specific-entity)         |
+|  PATCH | /api/entity/{entity_name}/{id} | Edit an entity                                | [More](#edit-an-entity)                |
+| DELETE | /api/entity/{entity_name}/{id} | Delete an Entity                              | [More](#delete-an-entity)              |
 
 #### Post an entity
 

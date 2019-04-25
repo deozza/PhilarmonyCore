@@ -152,9 +152,25 @@ class EntityController extends AbstractController
             return $this->response->methodNotAllowed($request->getMethod());
         }
 
+        $userRoles = $this->getUser()->getRoles();
+        $isAllowed = false;
+
+        foreach ($userRoles as $role)
+        {
+            if(in_array($role, $state['methods']['POST']['by']['roles']))
+            {
+                $isAllowed = true;
+            }
+        }
+
+        if($isAllowed === false)
+        {
+            return $this->response->forbiddenAccess("Access to this resource is forbidden");
+        }
+
         $entityToPost = new Entity();
         $entityToPost->setKind($entity_name);
-        $entityToPost->setOwner($request->getUser());
+        $entityToPost->setOwner($this->getUser());
         $entityToPost->setValidationState("__default");
 
         $formFields = $state['methods'][$request->getMethod()]['properties'];
@@ -178,10 +194,10 @@ class EntityController extends AbstractController
 
         if(is_array($state))
         {
-            return $this->response->conflict($state['errors'],$entityToPost, ['entity_complete']);
+            return $this->response->conflict($state['errors'],$entityToPost, ['entity_complete', 'user_basic']);
         }
 
-        return $this->response->created($entityToPost, ['entity_complete']);
+        return $this->response->created($entityToPost, ['entity_complete', 'user_basic']);
     }
 
     /**

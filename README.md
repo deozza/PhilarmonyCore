@@ -17,7 +17,7 @@ Philarmony is a bundle made to help you create a modular REST API. From database
 
 You can install using composer, assuming it is already installed globally :
 
-`composer require deozza\philarmony-bundle`
+`composer require deozza/philarmony-bundle`
 
 ## Configuration
 
@@ -50,6 +50,18 @@ philarmony_controllers:
     resource: '@DeozzaPhilarmonyBundle\Controller'
     type: annotation
     prefix: /
+```
+
+Finally, in order to use filters inside your query, add the following functions inside the `doctrine.yaml` configuration file :
+
+```yaml
+doctrine:
+    orm:
+        dql:
+            string_functions:
+                JSON_CONTAINS: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonContains
+                JSON_CONTAINS_PATH: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonContainsPath
+                JSON_EXTRACT: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonExtract
 ```
 
 ## Example of usage

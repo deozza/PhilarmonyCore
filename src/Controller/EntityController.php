@@ -102,6 +102,7 @@ class EntityController extends AbstractController
      */
     public function getEntityAction($id, Request $request)
     {
+
         $exist = $this->em->getRepository(Entity::class)->findOneByUuid($id);
 
         if(empty($exist))
@@ -109,11 +110,44 @@ class EntityController extends AbstractController
             return $this->response->notFound("The entity with the id $id does not exist");
         }
 
-        $access_errors = $this->ruleManager->decideAccess($exist, $request->getMethod());
+        $state = $exist->getValidationState();
 
-        if($access_errors > 0)
+        $entityConfig = $this->schemaLoader->loadEntityEnumeration($exist->getKind());
+
+        $authorized = ($entityConfig['states'][$state]['methods'][$request->getMethod()]['by']);
+
+        $isAuthorized = false;
+
+        if($authorized === "all")
         {
-            return $this->response->forbiddenAccess("You can not access to this entity");
+            return $this->response->ok($exist, ['entity_basic', 'user_basic']);
+        }
+
+        if(empty($this->getUser()->getUsername()))
+        {
+            return $this->response->notAuthorized();
+        }
+
+        if(isset($authorized['roles']))
+        {
+
+            foreach ($authorized['roles'] as $role)
+            {
+                if(in_array($role, $this->getUser()->getRoles()))
+                {
+                    $isAuthorized = true;
+                }
+            }
+        }
+
+        if(isset($authorized['user']))
+        {
+
+        }
+
+        if($isAuthorized === false)
+        {
+            return $this->response->forbiddenAccess("Access to this resource is forbidden");
         }
 
         $conflict_errors = $this->ruleManager->decideConflict($exist, $request->getMethod(),__DIR__);
@@ -124,7 +158,7 @@ class EntityController extends AbstractController
         }
 
 
-        return $this->response->ok($exist, ['entity_basic']);
+        return $this->response->ok($exist, ['entity_basic', 'user_basic']);
     }
 
     /**

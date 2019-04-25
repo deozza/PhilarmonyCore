@@ -42,7 +42,6 @@
             <argument key="$entity"/>
             <argument key="$property"/>
             <argument key="$enumeration"/>
-            <argument key="$validation"/>
             <argument key="$path">%kernel.project_dir%</argument>
         </service>
         <service id="Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader" alias="philarmony.schema_loader" />

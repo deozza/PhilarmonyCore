@@ -142,17 +142,12 @@ class EntityController extends AbstractController
 
         if(empty($entity))
         {
-            return $this->response->notFound("This route does not exist%s");
+            return $this->response->notFound("This route does not exists");
         }
 
-        $access_errors = $this->ruleManager->decideAccess($entity, $request->getMethod());
+        $state = $entity['states']['__default'];
 
-        if($access_errors > 0)
-        {
-            return $this->response->forbiddenAccess("You can not add this $entity_name");
-        }
-
-        if(!$entity['post'])
+        if(!array_key_exists($request->getMethod(), $state['methods']))
         {
             return $this->response->methodNotAllowed($request->getMethod());
         }
@@ -160,8 +155,11 @@ class EntityController extends AbstractController
         $entityToPost = new Entity();
         $entityToPost->setKind($entity_name);
         $entityToPost->setOwner($request->getUser());
+        $entityToPost->setValidationState("__default");
 
-        $posted = $this->processForm->generateAndProcess($formKind = 'post', $request->getContent(), $entityToPost, $entity);
+        $formFields = $state['methods'][$request->getMethod()]['properties'];
+
+        $posted = $this->processForm->generateAndProcess($formKind = 'post', $request->getContent(), $entityToPost, $entity, $formFields);
 
         $conflict_errors = $this->ruleManager->decideConflict($entity, $request->getMethod(),__DIR__);
 
@@ -175,23 +173,14 @@ class EntityController extends AbstractController
             return $posted;
         }
 
-        $isValid = $this->validator->processValidation($entityToPost);
-
-        die;
-/*
-        if(is_array($isValid))
-        {
-            $posted->setValidationState(false);
-        }
-
-        $posted->setValidationState($isValid);
+        $state = $this->validator->processValidation($entityToPost,$entityToPost->getValidationState(), $entity['states'], $this->getUser());
         $this->em->flush();
 
-        if($isValid === false)
+        if(is_array($state))
         {
-            return $this->response->conflict("To pass to the next validation state, you need to correct : ", $isValid['context']);
+            return $this->response->conflict($state['errors'],$entityToPost, ['entity_complete']);
         }
-*/
+
         return $this->response->created($entityToPost, ['entity_complete']);
     }
 

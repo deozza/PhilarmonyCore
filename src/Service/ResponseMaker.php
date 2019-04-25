@@ -48,7 +48,7 @@ class ResponseMaker
         $this->response->setContent(
             json_encode(
                 [
-                    "error" => sprintf($message)
+                    "error" => $message
                 ]
             )
         );
@@ -74,16 +74,17 @@ class ResponseMaker
         return $this->response;
     }
 
-    public function conflict($message = null, $context = null)
+    public function conflict($message, $context, $serializerGroups = ['Default'])
     {
         $this->response->setStatusCode(self::CONFLICT);
+        $serializedContext = $this->serializer->serialize($context, 'json', SerializationContext::create()->setGroups($serializerGroups));
+
+
         $this->response->setContent(
             json_encode(
-                [
-                    "error" => $message,
-                    "context" => $context
-                ]
-            )
+                    ["conflicts" => $message, "context"=>json_decode($serializedContext)]
+
+                )
         );
         return $this->response;
     }

@@ -6,18 +6,18 @@ use Symfony\Component\Yaml\Yaml;
 class DatabaseSchemaLoader
 {
 
-    public function __construct(string $entity, string $property, string $enumeration, string $validation, string $path)
+    public function __construct(string $entity, string $property, string $enumeration, string $path)
     {
         $this->entityPath = $entity;
         $this->propertyPath = $property;
         $this->enumerationPath = $enumeration;
-        $this->validationPath = $validation;
         $this->rootPath = $path;
     }
 
     public function loadEntityEnumeration($entity_name = null, $returnKey = false)
     {
         $entities = file_get_contents($this->rootPath.$this->entityPath.".yaml");
+
 
         try
         {
@@ -82,60 +82,22 @@ class DatabaseSchemaLoader
 
     public function loadEnumerationEnumeration($enumeration_name = null, $returnKey = false)
     {
-        $enumerations = file_get_contents($this->rootPath.$this->enumerationPath.".yaml");
-        try
-        {
+        $enumerations = file_get_contents($this->rootPath . $this->enumerationPath . ".yaml");
+        try {
             $values = Yaml::parse($enumerations);
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             return null;
         }
-        if(empty($enumeration_name))
-        {
+        if (empty($enumeration_name)) {
             return $values;
         }
 
-        foreach (array_keys($values['enumerations']) as $key)
-        {
-            if($key == $enumeration_name)
-            {
-                if($returnKey)
-                {
+        foreach (array_keys($values['enumerations']) as $key) {
+            if ($key == $enumeration_name) {
+                if ($returnKey) {
                     return $key;
                 }
                 return $values['enumerations'][$key];
-            }
-        }
-
-        return null;
-    }
-
-    public function loadValidationEnumeration($validation_name = null, $returnKey = false)
-    {
-        $validation = file_get_contents($this->rootPath.$this->validationPath.".yaml");
-        try
-        {
-            $values = Yaml::parse($validation);
-        }
-        catch(\Exception $e)
-        {
-            return null;
-        }
-        if(empty($validation_name))
-        {
-            return $values;
-        }
-
-        foreach (array_keys($values['validations']) as $key)
-        {
-            if($key == $validation_name)
-            {
-                if($returnKey)
-                {
-                    return $key;
-                }
-                return $values['validations'][$key];
             }
         }
 

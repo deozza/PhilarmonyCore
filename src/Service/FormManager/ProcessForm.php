@@ -22,25 +22,20 @@ class ProcessForm
         $this->em = $em;
     }
 
-    public function generateAndProcess($formKind, $requestBody, $entityToProcess, $entityKind, $formFields = null)
+    public function generateAndProcess($formKind, $requestBody, $entityToProcess, $entityKind, $formFields)
     {
         if(!is_object($entityToProcess))
         {
             return;
         }
 
-        $form = $this->form->create(FormType::class);
+        $form = $this->form->create(FormType::class, null, ['csrf_protection' => false]);
 
         $this->formFields = $formFields;
 
-        if($this->formFields === null)
+        if($this->formFields === "all")
         {
-            $this->formFields = $entityKind[$formKind]['properties'];
-
-            if($this->formFields === "all")
-            {
-                $this->formFields = $entityKind['properties'];
-            }
+            $this->formFields = $entityKind['properties'];
         }
 
 

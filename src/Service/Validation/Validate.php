@@ -17,75 +17,98 @@ class Validate
         $this->em = $em;
     }
 
-    public function processValidation(Entity $entity)
+    public function processValidation(Entity $entity,$state, $entityStates, $user, $lastState = null, $manual = false)
     {
-        $hasValidation = $this->schemaLoader->loadValidationEnumeration();
-        $state = null;
 
-        if(!array_key_exists($entity->getKind(), $hasValidation['validations']))
+        $possibleStates = array_keys($entityStates);
+        $currentState = array_search($state, $possibleStates);
+        if(!array_key_exists("constraints", $entityStates[$state]))
         {
-            return $state;
-        }
-
-        foreach($hasValidation['validations'][$entity->getKind()] as $key=>$value)
-        {
-            if($value['constraints'] === null)
+            if(isset($possibleStates[$currentState +1]))
             {
-                $state = $key;
-                continue;
+                $nextState = $possibleStates[$currentState +1];
+                return $this->processValidation($entity, $nextState, $entityStates, $user, $state, $manual);
             }
-
-            $isValid = $this->validateEntity($entity, $value['constraints']);
+            return $lastState;
         }
-
-        die;
-        return ["state" =>$state, "context" =>$isValid];
+        else if($entityStates[$state]['constraints'] === null)
+        {
+            if(isset($possibleStates[$currentState +1]))
+            {
+                $nextState = $possibleStates[$currentState +1];
+                return $this->processValidation($entity, $nextState, $entityStates, $user, $state, $manual);
+            }
+            return $lastState;
+        }
+        else
+        {
+            $isValid = $this->validateEntity($entity, $user, $entityStates[$state]['constraints'], true);
+            if(!is_array($isValid))
+            {
+                if(isset($possibleStates[$currentState +1]))
+                {
+                    $nextState = $possibleStates[$currentState +1];
+                    return $this->processValidation($entity, $nextState, $entityStates, $user, $state, $manual);
+                }
+                return $lastState;
+            }
+            $entity->setValidationState($lastState);
+            return ["state"=>$lastState, "errors"=>$isValid];
+        }
     }
 
-    private function validateEntity(Entity $entity, array $constraints)
+    private function validateEntity(Entity $entity, $user, array $constraints, $manual)
     {
-        $this->errors = [];
-        foreach($constraints as $property=>$constraint)
+        $errors = [];
+        foreach($constraints as $type=>$constraint)
         {
-
-            $support = explode('.', $property);
-            if($support[0] === "properties")
+            if($type === "manual")
             {
-                if(!isset($entity->getProperties()[$support[1]]))
+                if($manual !== true)
                 {
-                    $this->errors = [$support[1] => "This value cannot be null"];
-                    continue;
+                    $errors[] = [
+                        $type=>"The ".$entity->getKind()." needs to be approved to pass to the next state."
+                        ];
                 }
-                $valueSubmited = $entity->getProperties()[$support[1]];
+                else
+                {
+                    $validUser = false;
+                    $validRole = false;
+                    if(isset($constraint['by']['roles']))
+                    {
+                        foreach($constraint['by']['roles'] as $role)
+                        {
+                            if(in_array($role, $user->getRoles()))
+                            {
+                                $validRole = true;
+                            }
+                        }
+                    }
 
-                $this->choseFunction($valueSubmited, $constraint);
+                    if(isset($constraint['by']['users']))
+                    {
 
+                    }
+
+                    if(!$validRole && !$validUser)
+                    {
+                        $errors[] = [$type=>"FORBIDDEN"];
+                    }
+                }
             }
-
         }
+
+        return $errors;
     }
 
     private function choseFunction($submited, $functionName)
     {
-        
 
-
-
-        if(sizeof($functionName) == 1)
-        {
-            $function = explode('(', $function)[0];
-        }
-
-        $this->$function($submited, $function);
     }
 
     private function greaterThanOrEqual($submited, $constraint)
     {
-        if($submited instanceof \DateTime)
-        {
-            $dateSubmited = $submited->format('y-m-d');
-        }
-        var_dump($constraint);die;
+
 
     }
 

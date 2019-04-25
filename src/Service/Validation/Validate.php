@@ -33,16 +33,19 @@ class Validate
         else
         {
             $isValid = $this->validateEntity($entity, $user, $entityStates[$state]['constraints'], $manual);
-            if(!is_array($isValid))
+            if(empty($isValid))
             {
                 if(isset($possibleStates[$currentState +1]))
                 {
                     $nextState = $possibleStates[$currentState +1];
                     return $this->processValidation($entity, $nextState, $entityStates, $user, $state, $manual);
                 }
-                return $lastState;
+                $entity->setValidationState($state);
+
+                return $state;
             }
             $entity->setValidationState($lastState);
+
             return ["state"=>$lastState, "errors"=>$isValid];
         }
     }

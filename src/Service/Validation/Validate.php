@@ -19,7 +19,6 @@ class Validate
 
     public function processValidation(Entity $entity,$state, $entityStates, $user, $lastState = null, $manual = false)
     {
-
         $possibleStates = array_keys($entityStates);
         $currentState = array_search($state, $possibleStates);
         if(!array_key_exists("constraints", $entityStates[$state]))
@@ -31,18 +30,9 @@ class Validate
             }
             return $lastState;
         }
-        else if($entityStates[$state]['constraints'] === null)
-        {
-            if(isset($possibleStates[$currentState +1]))
-            {
-                $nextState = $possibleStates[$currentState +1];
-                return $this->processValidation($entity, $nextState, $entityStates, $user, $state, $manual);
-            }
-            return $lastState;
-        }
         else
         {
-            $isValid = $this->validateEntity($entity, $user, $entityStates[$state]['constraints'], true);
+            $isValid = $this->validateEntity($entity, $user, $entityStates[$state]['constraints'], $manual);
             if(!is_array($isValid))
             {
                 if(isset($possibleStates[$currentState +1]))

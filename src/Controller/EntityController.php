@@ -114,36 +114,26 @@ class EntityController extends AbstractController
 
         $entityConfig = $this->schemaLoader->loadEntityEnumeration($exist->getKind());
 
-        $authorized = ($entityConfig['states'][$state]['methods'][$request->getMethod()]['by']);
+        if(!isset($entityConfig['states'][$state]['methods'][$request->getMethod()]))
+        {
+            return $this->response->methodNotAllowed($request->getMethod());
+        }
 
-        $isAuthorized = false;
+        $constraints = $entityConfig['states'][$state]['methods'][$request->getMethod()]['by'];
 
-        if($authorized === "all")
+        if($constraints === "all")
         {
             return $this->response->ok($exist, ['entity_basic', 'user_basic']);
         }
+
 
         if(empty($this->getUser()->getUsername()))
         {
             return $this->response->notAuthorized();
         }
 
-        if(isset($authorized['roles']))
-        {
+        $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $exist);
 
-            foreach ($authorized['roles'] as $role)
-            {
-                if(in_array($role, $this->getUser()->getRoles()))
-                {
-                    $isAuthorized = true;
-                }
-            }
-        }
-
-        if(isset($authorized['user']))
-        {
-
-        }
 
         if($isAuthorized === false)
         {
@@ -172,16 +162,16 @@ class EntityController extends AbstractController
      */
     public function postEntityAction($entity_name, Request $request)
     {
-        $entity = $this->schemaLoader->loadEntityEnumeration($entity_name);
+        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity_name);
 
-        if(empty($entity))
+        if(empty($entityConfig))
         {
             return $this->response->notFound("This route does not exists");
         }
 
-        $state = $entity['states']['__default'];
+        $stateConfig = $entityConfig['states']['__default'];
 
-        if(!array_key_exists($request->getMethod(), $state['methods']))
+        if(!array_key_exists($request->getMethod(), $stateConfig['methods']))
         {
             return $this->response->methodNotAllowed($request->getMethod());
         }
@@ -191,7 +181,7 @@ class EntityController extends AbstractController
 
         foreach ($userRoles as $role)
         {
-            if(in_array($role, $state['methods']['POST']['by']['roles']))
+            if(in_array($role, $stateConfig['methods']['POST']['by']['roles']))
             {
                 $isAllowed = true;
             }
@@ -207,23 +197,16 @@ class EntityController extends AbstractController
         $entityToPost->setOwner($this->getUser());
         $entityToPost->setValidationState("__default");
 
-        $formFields = $state['methods'][$request->getMethod()]['properties'];
+        $formFields = $stateConfig['methods'][$request->getMethod()]['properties'];
 
-        $posted = $this->processForm->generateAndProcess($formKind = 'post', $request->getContent(), $entityToPost, $entity, $formFields);
-
-        $conflict_errors = $this->ruleManager->decideConflict($entity, $request->getMethod(),__DIR__);
-
-        if($conflict_errors > 0)
-        {
-            return $this->response->conflict("You can not add this $entity_name", $conflict_errors);
-        }
+        $posted = $this->processForm->generateAndProcess($formKind = 'post', $request->getContent(), $entityToPost, $entityConfig, $formFields);
 
         if(is_object($posted))
         {
             return $posted;
         }
 
-        $state = $this->validator->processValidation($entityToPost,$entityToPost->getValidationState(), $entity['states'], $this->getUser());
+        $state = $this->validator->processValidation($entityToPost,$entityToPost->getValidationState(), $entityConfig['states'], $this->getUser());
         $this->em->flush();
 
         if(is_array($state))
@@ -252,29 +235,38 @@ class EntityController extends AbstractController
             return $this->response->notFound("This route does not exist%s");
         }
 
-        $access_errors = $this->ruleManager->decideAccess($entity, $request->getMethod());
-
-        if($access_errors > 0)
+        if(empty($this->getUser()->getUsername()))
         {
-            return $this->response->forbiddenAccess("You can not patch this $entity->getKind()");
+            return $this->response->notAuthorized();
         }
 
+        $state = $entity->getValidationState();
 
-        $entityProperties = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+        $stateConfig = $entityConfig['states'][$state];
 
 
-        if(!$entityProperties['patch'])
+        if(!isset($stateConfig['methods'][$request->getMethod()]))
         {
             return $this->response->methodNotAllowed($request->getMethod());
         }
 
-        $patched = $this->processForm->generateAndProcess($formKind = 'patch', $request->getContent(), $entity, $entityProperties);
+        $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
 
-        $conflict_errors = $this->ruleManager->decideConflict($entity, $request->getMethod(),__DIR__);
+        $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $entity);
 
-        if($conflict_errors > 0)
+        if($isAuthorized === false)
         {
-            return $this->response->conflict("You can not add this $entity->getKind()", $conflict_errors);
+            return $this->response->forbiddenAccess("Access to this resource is forbidden");
+        }
+
+        $formFields = $stateConfig['methods'][$request->getMethod()]['properties'];
+
+        $patched = $this->processForm->generateAndProcess($formKind = 'patch', $request->getContent(), $entity, $entityConfig, $formFields);
+
+        if(empty($patched))
+        {
+            return $this->response->badRequest("Request content must not be empty");
         }
 
         if(is_object($patched))
@@ -282,9 +274,18 @@ class EntityController extends AbstractController
             return $patched;
         }
 
+
+        $state = $this->validator->processValidation($entity,$entity->getValidationState(), $entityConfig['states'], $this->getUser());
         $this->em->flush();
 
-        return $this->response->ok($entity, ['entity_complete']);
+        if(is_array($state))
+        {
+            return $this->response->conflict($state['errors'],$entity, ['entity_complete', 'user_basic']);
+        }
+        $entity->setValidationState($state);
+
+
+        return $this->response->ok($entity, ['entity_complete', 'user_basic']);
     }
 
     /**

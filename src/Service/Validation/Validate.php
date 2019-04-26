@@ -65,33 +65,56 @@ class Validate
                 }
                 else
                 {
-                    $validUser = false;
-                    $validRole = false;
-                    if(isset($constraint['by']['roles']))
-                    {
-                        foreach($constraint['by']['roles'] as $role)
-                        {
-                            if(in_array($role, $user->getRoles()))
-                            {
-                                $validRole = true;
-                            }
-                        }
-                    }
+                    $authorized = $this->validateUserPermission($constraint['by'], $user, $entity);
 
-                    if(isset($constraint['by']['users']))
+                    if($authorized === false)
                     {
-
-                    }
-
-                    if(!$validRole && !$validUser)
-                    {
-                        $errors[] = [$type=>"FORBIDDEN"];
+                        $errors[] = [$type => "FORBIDDEN"];
                     }
                 }
             }
         }
 
         return $errors;
+    }
+
+
+    public function validateUserPermission($constraint, $user, Entity $entity)
+    {
+        $isAuthorized = false;
+
+
+        if(isset($constraint['roles']))
+        {
+            foreach($constraint['roles'] as $role)
+            {
+                if(in_array($role, $user->getRoles()))
+                {
+                    $isAuthorized = true;
+                }
+            }
+        }
+
+        if(isset($constraint['users']))
+        {
+            foreach($constraint['users'] as $userKind)
+            {
+
+                $userPath = explode('.', $userKind);
+                if($userPath[0] === "owner")
+                {
+                    if($entity->getOwner()->getId() === $user->getId())
+                    {
+                        $isAuthorized = true;
+                    }
+                }
+                else
+                {
+
+                }
+            }
+        }
+        return $isAuthorized;
     }
 
     private function choseFunction($submited, $functionName)

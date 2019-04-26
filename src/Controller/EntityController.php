@@ -307,6 +307,11 @@ class EntityController extends AbstractController
             return $this->response->notFound("The entity with the id $id does not exist");
         }
 
+        if(empty($this->getUser()->getUsername()))
+        {
+            return $this->response->notAuthorized();
+        }
+
         $state = $entity->getValidationState();
 
         $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
@@ -334,8 +339,6 @@ class EntityController extends AbstractController
         {
             return $this->response->conflict("You can not delete this entity", $conflict_errors);
         }
-
-
 
         $this->em->remove($entity);
         $this->em->flush();

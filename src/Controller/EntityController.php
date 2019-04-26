@@ -300,21 +300,35 @@ class EntityController extends AbstractController
     public function deleteEntityAction($id, Request $request)
     {
 
-        $exist = $this->em->getRepository(Entity::class)->findOneByUuid($id);
+        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($id);
 
-        if(empty($exist))
+        if(empty($entity))
         {
             return $this->response->notFound("The entity with the id $id does not exist");
         }
 
-        $access_errors = $this->ruleManager->decideAccess($exist, $request->getMethod());
+        $state = $entity->getValidationState();
 
-        if($access_errors > 0)
+        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+        $stateConfig = $entityConfig['states'][$state];
+
+
+        if(!isset($stateConfig['methods'][$request->getMethod()]))
         {
-            return $this->response->forbiddenAccess("You can not delete this entity");
+            return $this->response->methodNotAllowed($request->getMethod());
         }
 
-        $conflict_errors = $this->ruleManager->decideConflict($exist, $request->getMethod(),__DIR__);
+        $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
+
+        $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $entity);
+
+        if($isAuthorized === false)
+        {
+            return $this->response->forbiddenAccess("Access to this resource is forbidden");
+        }
+
+
+        $conflict_errors = $this->ruleManager->decideConflict($entity, $request->getMethod(),__DIR__);
 
         if($conflict_errors > 0)
         {
@@ -322,17 +336,8 @@ class EntityController extends AbstractController
         }
 
 
-        $propertiesLinked = $exist->getProperties();
 
-        if(!empty($propertiesLinked))
-        {
-            foreach ($propertiesLinked as $property)
-            {
-                $this->em->remove($property);
-            }
-        }
-
-        $this->em->remove($exist);
+        $this->em->remove($entity);
         $this->em->flush();
         return $this->response->empty();
     }

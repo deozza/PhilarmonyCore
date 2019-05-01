@@ -49,6 +49,11 @@ class ValidationController extends AbstractController
      */
     public function postManualValidationAction($id, Request $request)
     {
+        if(empty($this->getUser()->getUsername()))
+        {
+            return $this->response->notAuthorized();
+        }
+
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($id);
 
         if(empty($entity))
@@ -59,8 +64,13 @@ class ValidationController extends AbstractController
         $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
 
         $state = $this->validator->processValidation($entity,$entity->getValidationState(), $entityConfig['states'], $this->getUser(), null, true);
+
         if(is_array($state))
         {
+            if(array_key_exists("FORBIDDEN",$state['errors']))
+            {
+                return $this->response->forbiddenAccess($state['errors']['FORBIDDEN']);
+            }
             return $this->response->conflict($state['errors'],$entity, ['entity_complete', 'user_basic']);
         }
 

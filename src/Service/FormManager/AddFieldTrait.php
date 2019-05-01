@@ -15,12 +15,12 @@ use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 trait AddFieldTrait{
+
     private function addFieldToForm($field, $form, $formKind)
     {
         $property = $this->schemaLoader->loadPropertyEnumeration($field);
         $this->type = explode(".", $property['type']);
         $class = FieldTypes::ENUMERATION[$this->type[0]];
-
 
         if($class === "embedded" || ($class === CollectionType::class && $this->type[1] === "embedded"))
         {
@@ -34,8 +34,6 @@ trait AddFieldTrait{
             {
                 $this->formFields[$field] = $embeddedEntity['properties'];
             }
-
-
 
             foreach($this->formFields[$field] as $embeddedField)
             {
@@ -110,7 +108,6 @@ trait AddFieldTrait{
         if($class == CollectionType::class)
         {
             $formOptions['entry_options']['constraints'] = $constraints;
-
         }
         else
         {

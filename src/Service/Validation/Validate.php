@@ -59,7 +59,7 @@ class Validate
             {
                 if($manual !== true)
                 {
-                    $errors[] = [
+                    $errors = [
                         $type=>"The ".$entity->getKind()." needs to be approved to pass to the next state."
                         ];
                 }
@@ -69,7 +69,7 @@ class Validate
 
                     if($authorized === false)
                     {
-                        $errors[] = [$type => "FORBIDDEN"];
+                        $errors= ["FORBIDDEN"=> "Access to this resource is forbidden."];
                     }
                 }
             }

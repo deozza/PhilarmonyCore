@@ -102,7 +102,6 @@ class EntityController extends AbstractController
      */
     public function getEntityAction($id, Request $request)
     {
-
         $exist = $this->em->getRepository(Entity::class)->findOneByUuid($id);
 
         if(empty($exist))
@@ -126,14 +125,12 @@ class EntityController extends AbstractController
             return $this->response->ok($exist, ['entity_basic', 'user_basic']);
         }
 
-
         if(empty($this->getUser()->getUsername()))
         {
             return $this->response->notAuthorized();
         }
 
         $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $exist);
-
 
         if($isAuthorized === false)
         {
@@ -146,8 +143,6 @@ class EntityController extends AbstractController
         {
             return $this->response->conflict("You can not access to this entity", $conflict_errors);
         }
-
-
         return $this->response->ok($exist, ['entity_basic', 'user_basic']);
     }
 
@@ -176,6 +171,11 @@ class EntityController extends AbstractController
             return $this->response->methodNotAllowed($request->getMethod());
         }
 
+        if(empty($this->getUser()->getUsername()))
+        {
+            return $this->response->notAuthorized();
+        }
+
         $userRoles = $this->getUser()->getRoles();
         $isAllowed = false;
 
@@ -190,6 +190,11 @@ class EntityController extends AbstractController
         if($isAllowed === false)
         {
             return $this->response->forbiddenAccess("Access to this resource is forbidden");
+        }
+
+        if(empty($request->getContent()))
+        {
+            return $this->response->badRequest("Post content must not be empty");
         }
 
         $entityToPost = new Entity();
@@ -244,7 +249,6 @@ class EntityController extends AbstractController
 
         $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
         $stateConfig = $entityConfig['states'][$state];
-
 
         if(!isset($stateConfig['methods'][$request->getMethod()]))
         {

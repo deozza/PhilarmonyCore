@@ -3,11 +3,13 @@ Philarmony
 
 ## Table of contents
 
- * [About](#About)
- * [Installation](#Installation)
- * [Configuration](#Configuration)
- * [Example of usage](#Example-of-usage)
- * [How it works](#How-it-works)
+ * [About](#about)
+ * [Installation](#installation)
+ * [Configuration](#configuration)
+ * [Example of usage](#example-of-usage)
+ * [How it works](#how-it-works)
+ * [Tests](#tests)
+ * [Road map](#road-map)
 
 ## About
 
@@ -179,8 +181,12 @@ The enumeration is a list of possible values handled by of property.
 
  * [Read more](src/Resources/documentation/RuleManager/FORBIDDENRULE.md)
  
+ 
+## Tests 
+
+A demo app has been developped and is visible [here](https://github.com/deozza/atypikhouse). Through the tests of this app, we ensure that every feature of Philarmony is tested and we garanty the stability of the bundle.T
 
 ## Road map
 
 * Data validation : in some cases, the data of an entity must pass through validation (either automatic or manual) before being set public and accessible
-* Test the bundle : to ensure the quality of the bundle and its sturdyness, tests will be written
+* Event handler : in some case, manipulating the data could trigger events

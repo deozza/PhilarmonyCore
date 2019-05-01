@@ -34,6 +34,14 @@ class Entity
      */
     private $kind;
 
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @JMS\Groups({"entity_complete", "entity_basic"})
+     */
+    private $validationState;
+
+
     /**
      * @ORM\Column(type="object")
      * @JMS\Groups({"entity_complete", "entity_basic"})
@@ -96,6 +104,18 @@ class Entity
     public function setKind(string $kind): self
     {
         $this->kind = $kind;
+
+        return $this;
+    }
+
+    public function getValidationState(): ?string
+    {
+        return $this->validationState;
+    }
+
+    public function setValidationState(string $validationState): self
+    {
+        $this->validationState = $validationState;
 
         return $this;
     }

@@ -2,11 +2,11 @@
 namespace Deozza\PhilarmonyBundle\Controller;
 
 use Deozza\PhilarmonyBundle\Entity\Entity;
-use Deozza\PhilarmonyBundle\Entity\Property;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\PhilarmonyBundle\Service\FormManager\ProcessForm;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Deozza\PhilarmonyBundle\Service\RulesManager\RulesManager;
+use Deozza\PhilarmonyBundle\Service\Validation\Validate;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,13 +23,16 @@ class PropertyController extends AbstractController
                                 EntityManagerInterface $em,
                                 ProcessForm $processForm,
                                 DatabaseSchemaLoader $schemaLoader,
-                                RulesManager $ruleManager)
+                                RulesManager $ruleManager,
+                                Validate $validate)
     {
         $this->response = $responseMaker;
         $this->em = $em;
         $this->processForm = $processForm;
         $this->schemaLoader = $schemaLoader;
         $this->ruleManager = $ruleManager;
+        $this->validator = $validate;
+
     }
 
     /**
@@ -60,18 +63,30 @@ class PropertyController extends AbstractController
             return $this->response->notFound("There is no $property_name in $entity_name");
         }
 
-        $access_errors = $this->ruleManager->decideAccess($entity, $request->getMethod());
+        $state = $entity->getValidationState();
 
-        if($access_errors > 0)
+        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+
+        if(!isset($entityConfig['states'][$state]['methods'][$request->getMethod()]))
         {
-            return $this->response->forbiddenAccess("You can not delete this property");
+            return $this->response->methodNotAllowed($request->getMethod());
         }
 
-        $conflict_errors = $this->ruleManager->decideConflict($entity, $request->getMethod(),__DIR__);
+        $constraints = $entityConfig['states'][$state]['methods'][$request->getMethod()]['by'];
 
-        if($conflict_errors > 0)
+        if($constraints !== "all")
         {
-            return $this->response->conflict("You can not delete this property", $conflict_errors);
+            if(empty($this->getUser()->getUsername()))
+            {
+                return $this->response->notAuthorized();
+            }
+
+            $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $entity);
+
+            if($isAuthorized === false)
+            {
+                return $this->response->forbiddenAccess("Access to this resource is forbidden");
+            }
         }
 
         $propertiesOfEntity = $entity->getProperties();
@@ -108,6 +123,11 @@ class PropertyController extends AbstractController
      */
     public function postPropertyAction($entity_name, $id, $property_name, Request $request)
     {
+        if(empty($this->getUser()->getUsername()))
+        {
+            return $this->response->notAuthorized();
+        }
+
         $entity = $this->em->getRepository(Entity::class)->findOneBy(
             [
                 "uuid" => $id,
@@ -120,24 +140,29 @@ class PropertyController extends AbstractController
             return $this->response->notFound("The $entity_name with the id $id was not found");
         }
 
-        $entityPostableProperties = $this->schemaLoader->loadEntityEnumeration($entity_name);
+        $state = $entity->getValidationState();
 
+        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
 
-        if($entityPostableProperties['post']['properties'] === "all")
+        if(!isset($entityConfig['states'][$state]['methods'][$request->getMethod()]) ||
+            !in_array($property_name, $entityConfig['states'][$state]['methods'][$request->getMethod()]['properties']))
         {
-            if(!in_array($property_name, $entityPostableProperties['properties']))
-            {
-                return $this->response->notFound("$entity_name does not have a property called $property_name");
-            }
+            return $this->response->methodNotAllowed($request->getMethod());
         }
-        else
+
+        if(empty($request->getContent()))
         {
-            if(!in_array($property_name, $entityPostableProperties['post']['properties']))
-            {
-                {
-                    return $this->response->notFound("$entity_name does not have a property called $property_name");
-                }
-            }
+            return $this->response->badRequest("Post content must not be empty");
+        }
+
+        $stateConfig = $entityConfig['states'][$state];
+        $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
+
+        $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $entity);
+
+        if($isAuthorized === false)
+        {
+            return $this->response->forbiddenAccess("Access to this resource is forbidden");
         }
 
         $posted = $this->processForm->generateAndProcess($formKind = "post", $request->getContent(), $entity,null,  [$property_name]);
@@ -147,19 +172,6 @@ class PropertyController extends AbstractController
             return $posted;
         }
 
-        $access_errors = $this->ruleManager->decideAccess($posted, $request->getMethod());
-
-        if($access_errors > 0)
-        {
-            return $this->response->forbiddenAccess("You can not add this property");
-        }
-
-        $conflict_errors = $this->ruleManager->decideConflict($posted, $request->getMethod(),__DIR__);
-
-        if($conflict_errors > 0)
-        {
-            return $this->response->conflict("You can not add this property", $conflict_errors);
-        }
 
         $this->em->flush();
 
@@ -179,6 +191,11 @@ class PropertyController extends AbstractController
      */
     public function patchPropertyAction($entity_name, $property_name, $id, Request $request)
     {
+        if(empty($this->getUser()->getUsername()))
+        {
+            return $this->response->notAuthorized();
+        }
+
         $entity = $this->em->getRepository(Entity::class)->findOneBy([
             "uuid" => $id,
             "kind" => $entity_name
@@ -194,47 +211,44 @@ class PropertyController extends AbstractController
             return $this->response->notFound("There is no $property_name in $entity_name");
         }
 
-        $entityPostableProperties = $this->schemaLoader->loadEntityEnumeration($entity_name);
+        $state = $entity->getValidationState();
 
-        if($entityPostableProperties['patch']['properties'] === "all")
+        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+
+        if(!isset($entityConfig['states'][$state]['methods'][$request->getMethod()]))
         {
-            if(!in_array($property_name, $entityPostableProperties['properties']))
-            {
-                return $this->response->methodNotAllowed($request->getMethod());
-            }
+            return $this->response->methodNotAllowed($request->getMethod());
         }
-        else
+
+        if($entityConfig['states'][$state]['methods'][$request->getMethod()]['properties'] !== "all" &&
+            !in_array($property_name, $entityConfig['states'][$state]['methods'][$request->getMethod()]['properties']))
         {
-            if(!in_array($property_name, $entityPostableProperties['patch']['properties']))
-            {
-                    return $this->response->methodNotAllowed($request->getMethod());
-            }
+            return $this->response->methodNotAllowed($request->getMethod());
+        }
+
+        if(empty($request->getContent()))
+        {
+            return $this->response->badRequest("Post content must not be empty");
+        }
+
+        $stateConfig = $entityConfig['states'][$state];
+        $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
+
+        $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $entity);
+
+        if($isAuthorized === false)
+        {
+            return $this->response->forbiddenAccess("Access to this resource is forbidden");
         }
 
         $patched = $this->processForm->generateAndProcess($formKind = "patch", $request->getContent(), $entity,null,  [$property_name]);
-
 
         if(is_object($patched))
         {
             return $patched;
         }
 
-        $access_errors = $this->ruleManager->decideAccess($patched, $request->getMethod());
-
-        if($access_errors > 0)
-        {
-            return $this->response->forbiddenAccess("You can not add this property");
-        }
-
-        $conflict_errors = $this->ruleManager->decideConflict($patched, $request->getMethod(),__DIR__);
-
-        if($conflict_errors > 0)
-        {
-            return $this->response->conflict("You can not add this property", $conflict_errors);
-        }
-
         $this->em->flush();
-
 
         return $this->response->ok($patched);
     }
@@ -252,6 +266,11 @@ class PropertyController extends AbstractController
      */
     public function deletePropertyAction($entity_name,$property_name, $id, Request $request)
     {
+        if(empty($this->getUser()->getUsername()))
+        {
+            return $this->response->notAuthorized();
+        }
+
         $entity = $this->em->getRepository(Entity::class)->findOneBy([
             "uuid" => $id,
             "kind" => $entity_name
@@ -266,26 +285,28 @@ class PropertyController extends AbstractController
         {
             return $this->response->notFound("There is no $property_name in $entity_name");
         }
+        $state = $entity->getValidationState();
 
-        $access_errors = $this->ruleManager->decideAccess($entity, $request->getMethod());
+        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
 
-        if($access_errors > 0)
+        if(!isset($entityConfig['states'][$state]['methods'][$request->getMethod()]))
         {
-            return $this->response->forbiddenAccess("You can not delete this property");
+            return $this->response->methodNotAllowed($request->getMethod());
         }
 
-        $conflict_errors = $this->ruleManager->decideConflict($entity, $request->getMethod(),__DIR__);
-
-        if($conflict_errors > 0)
+        if($entityConfig['states'][$state]['methods'][$request->getMethod()]['properties'] !== "all" &&
+            !in_array($property_name, $entityConfig['states'][$state]['methods'][$request->getMethod()]['properties']))
         {
-            return $this->response->conflict("You can not delete this property", $conflict_errors);
+            return $this->response->methodNotAllowed($request->getMethod());
         }
 
-        $property = $this->schemaLoader->loadPropertyEnumeration($property_name);
+        $stateConfig = $entityConfig['states'][$state];
+        $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
 
-        if($property['required'])
+        $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $entity);
+        if($isAuthorized === false)
         {
-            return $this->response->forbiddenAccess("$property_name can not be deleted. It is a required property");
+            return $this->response->forbiddenAccess("Access to this resource is forbidden");
         }
 
         $propertiesOfEntity = $entity->getProperties();
@@ -303,9 +324,14 @@ class PropertyController extends AbstractController
         }
         else
         {
+            if(!isset($propertiesOfEntity[$property_name][$key]))
+            {
+                return $this->response->notFound("The $entity_name with the $property_name and the key $id was not found");
+            }
             unset($propertiesOfEntity[$property_name][$key]);
         }
 
+        $property = $this->schemaLoader->loadPropertyEnumeration($property_name);
         if(array_key_exists("default", $property) && $property['default'] !== null)
         {
             $default = explode('.', $property['default']);

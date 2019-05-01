@@ -1,7 +1,6 @@
 <?php
 namespace Deozza\PhilarmonyBundle\Service\FormManager;
 
-use Deozza\PhilarmonyBundle\Entity\Entity;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,34 +22,27 @@ class ProcessForm
         $this->em = $em;
     }
 
-    public function generateAndProcess($formKind, $requestBody, $entityToProcess, $entityKind, $formFields = null)
+    public function generateAndProcess($formKind, $requestBody, $entityToProcess, $entityKind, $formFields)
     {
         if(!is_object($entityToProcess))
         {
             return;
         }
 
-        $form = $this->form->create(FormType::class);
+        $form = $this->form->create(FormType::class, null, ['csrf_protection' => false]);
 
         $this->formFields = $formFields;
 
-        if($this->formFields === null)
+        if($this->formFields === "all")
         {
-            $this->formFields = $entityKind[$formKind]['properties'];
-
-            if($this->formFields === "all")
-            {
-                $this->formFields = $entityKind['properties'];
-            }
+            $this->formFields = $entityKind['properties'];
         }
-
 
         if(!is_object(json_decode($requestBody)))
         {
             $data = $this->saveData($requestBody, $entityToProcess, $formKind);
             return $data;
         }
-
 
         foreach($this->formFields as $field)
         {
@@ -63,7 +55,6 @@ class ProcessForm
         {
             return $data;
         }
-
 
         foreach ($this->formFields as $key=>$item)
         {
@@ -95,8 +86,6 @@ class ProcessForm
     private function processData($data, $form, $formKind)
     {
         $data = json_decode($data, true);
-
-
 
         $form->submit($data, $formKind==="post");
 

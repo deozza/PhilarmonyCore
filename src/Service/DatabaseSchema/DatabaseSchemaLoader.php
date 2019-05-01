@@ -18,6 +18,7 @@ class DatabaseSchemaLoader
     {
         $entities = file_get_contents($this->rootPath.$this->entityPath.".yaml");
 
+
         try
         {
             $values = Yaml::parse($entities);
@@ -81,26 +82,19 @@ class DatabaseSchemaLoader
 
     public function loadEnumerationEnumeration($enumeration_name = null, $returnKey = false)
     {
-        $enumerations = file_get_contents($this->rootPath.$this->enumerationPath.".yaml");
-        try
-        {
+        $enumerations = file_get_contents($this->rootPath . $this->enumerationPath . ".yaml");
+        try {
             $values = Yaml::parse($enumerations);
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             return null;
         }
-        if(empty($enumeration_name))
-        {
+        if (empty($enumeration_name)) {
             return $values;
         }
 
-        foreach (array_keys($values['enumerations']) as $key)
-        {
-            if($key == $enumeration_name)
-            {
-                if($returnKey)
-                {
+        foreach (array_keys($values['enumerations']) as $key) {
+            if ($key == $enumeration_name) {
+                if ($returnKey) {
                     return $key;
                 }
                 return $values['enumerations'][$key];

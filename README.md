@@ -173,16 +173,14 @@ The enumeration is a list of possible values handled by of property.
 
  * [Read more](src/Resources/documentation/DatabaseSchema/ENUMERATION.md)
 
-### Rule manager
+### Validation
 
-#### Access rules
+#### With configuration
 
- * [Read more](src/Resources/documentation/RuleManager/ACCESSRULE.md)
+#### With rules 
 
-#### Forbidden rules
-
- * [Read more](src/Resources/documentation/RuleManager/FORBIDDENRULE.md)
- 
+ * [Conflict rules](src/Resources/documentation/RuleManager/ACCESSRULE.md)
+ * [Forbidden rules](src/Resources/documentation/RuleManager/FORBIDDENRULE.md)
  
 ## Tests 
 
@@ -190,5 +188,4 @@ A demo app has been developped and is visible [here](https://github.com/deozza/a
 
 ## Road map
 
-* Data validation : in some cases, the data of an entity must pass through validation (either automatic or manual) before being set public and accessible
 * Event handler : in some case, manipulating the data could trigger events

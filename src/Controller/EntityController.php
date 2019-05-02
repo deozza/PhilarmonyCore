@@ -234,7 +234,11 @@ class EntityController extends AbstractController
         }
 
         $state = $this->validator->processValidation($entityToPost,$entityToPost->getValidationState(), $entityConfig['states'], $this->getUser());
-        $this->em->flush();
+
+        if(!is_array($state) || $state['state'] != $entityToPost->getValidationState())
+        {
+            $this->em->flush();
+        }
 
         if(is_array($state))
         {
@@ -302,7 +306,12 @@ class EntityController extends AbstractController
 
 
         $state = $this->validator->processValidation($entity,$entity->getValidationState(), $entityConfig['states'], $this->getUser());
-        $this->em->flush();
+
+        if($state['context']['validation_state'] != $entity->getValidationState())
+        {
+            var_dump("coucou");die;
+            $this->em->flush();
+        }
 
         if(is_array($state))
         {

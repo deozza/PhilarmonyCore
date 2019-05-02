@@ -54,4 +54,37 @@ class EntityRepository extends ServiceEntityRepository
 
     }
 
+    public function findAllForValidate($kind, $property, $value, $operator)
+    {
+        $parameters = [];
+
+        $queryBuilder = $this->createQueryBuilder('e');
+        $queryBuilder->select('e');
+        $queryBuilder->andWhere('e.kind = :kind');
+        $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$property."') $operator :value");
+
+        $parameters["kind"] = $kind;
+        $parameters["value"] = $value;
+
+        $queryBuilder->setParameters($parameters);
+        return $queryBuilder->getQuery()->execute();
+    }
+
+    public function findAllBetweenForValidate($kind, $propertyMin, $propertyMax, $value)
+    {
+        $parameters = [];
+
+        $queryBuilder = $this->createQueryBuilder('e');
+        $queryBuilder->select('e');
+        $queryBuilder->andWhere('e.kind = :kind');
+        $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$propertyMin."')>= :value");
+        $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$propertyMax."')<= :value");
+
+        $parameters["kind"] = $kind;
+        $parameters["value"] = $value;
+
+        $queryBuilder->setParameters($parameters);
+        return $queryBuilder->getQuery()->execute();
+    }
+
 }

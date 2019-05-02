@@ -6,9 +6,18 @@ use Deozza\PhilarmonyBundle\Entity\Entity;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;
+use function Symfony\Component\VarDumper\Tests\Fixtures\bar;
 
 class Validate
 {
+    const OPERATOR_TABLE = [
+        ">" => "<=",
+        "<" => ">=",
+        ">=" => "<",
+        "<=" => ">",
+        "!=" => "=="
+
+    ];
 
     public function __construct(ResponseMaker $responseMaker, DatabaseSchemaLoader $schemaLoader, EntityManagerInterface $em)
     {
@@ -61,7 +70,7 @@ class Validate
                 {
                     $errors = [
                         $type=>"The ".$entity->getKind()." needs to be approved to pass to the next state."
-                        ];
+                    ];
                 }
                 else
                 {
@@ -72,6 +81,39 @@ class Validate
                         $errors= ["FORBIDDEN"=> "Access to this resource is forbidden."];
                     }
                 }
+            }
+            else
+            {
+                foreach ($constraint as $cons)
+                {
+                    $constraintFunction = explode('(',$cons);
+                    $functionName = explode(".",$constraintFunction[0]);
+
+                    $property = explode(".",$type);
+
+                    if($property[0]=== "properties")
+                    {
+                        $submited = $entity->getProperties();
+                        for($i = 1; $i < count($property); $i++)
+                        {
+                            if(is_object($submited))
+                            {
+                                $get = "get".ucfirst($property[$i]);
+                                $submited = $submited->$get();
+                            }
+                            else
+                            {
+                                $submited = $submited[$property[$i]];
+                            }
+                        }
+                    }
+                    $error = $this->choseFunction($submited, $constraintFunction, $entity);
+                    if(!empty($error))
+                    {
+                        $errors[$type] = $error;
+                    }
+                }
+
             }
         }
 
@@ -117,34 +159,113 @@ class Validate
         return $isAuthorized;
     }
 
-    private function choseFunction($submited, $functionName)
+    private function choseFunction($submited, $functionName, $entity)
     {
+        $function = explode(".", $functionName[0]);
+        $method = $function[0];
+        $entityToCompare = null;
+        $valueToCompare = $functionName[1];
+        if(isset($function[1]) && $function[1] === "self")
+        {
+            $entityToCompare = $entity;
+        }
+        if(isset($function[1]) && $function[1] !== "self")
+        {
+            $entityToCompare = $function[1];
+        }
 
+        $operator = "";
+        switch($method)
+        {
+            case "greaterThanOrEqual": $operator = "<" ;break;
+            case "lesserThanOrEqual" : $operator = ">" ;break;
+            case "greaterThan"       : $operator = "<=";break;
+            case "lesserThan"        : $operator = ">=";break;
+            case "equal"             : $operator = "!=";break;
+            case "notBetween"        : $operator = "!between";break;
+
+        }
+
+        return $this->method($submited, $valueToCompare, $operator, $entityToCompare);
     }
 
-    private function greaterThanOrEqual($submited, $constraint)
+    private function method($submited, $valueToCompare, $operator, $entityToCompare = null)
     {
+        $valueToCompare = substr($valueToCompare, 0, strlen($valueToCompare)-1);
 
+        $startOfCompare = substr($valueToCompare, 0, 1);
+        if($startOfCompare === "#")
+        {
+            $valueToCompare = substr($valueToCompare, 1);
+        }
 
-    }
+        if(!empty($entityToCompare))
+        {
+            if(!is_a($entityToCompare, Entity::class))
+            {
+                if(is_a($submited, \DateTime::class))
+                {
+                    $submited = $submited->format("Y-m-d");
+                }
+                if(strpos($operator, "between"))
+                {
+                    $valuesToCompare = explode(',', $valueToCompare);
+                    $result = $this->em->getRepository(Entity::class)->findAllBetweenForValidate($entityToCompare, $valuesToCompare[0], $valuesToCompare[1], $submited);
+                }
+                else
+                {
+                    $result = $this->em->getRepository(Entity::class)->findAllForValidate($entityToCompare, $valueToCompare, $submited, $operator);
+                }
 
-    private function lesserThanOrEqual($submited, $constraint)
-    {
+                if(substr($operator, 0, 1) === "!" && count($result) > 0)
+                {
+                    return "Must be ".self::OPERATOR_TABLE[$operator]." to others $valueToCompare";
+                }
+                elseif (substr($operator, 0, 1) !== "!" && count($result) === 0)
+                {
+                    return "Must be ".self::OPERATOR_TABLE[$operator]." to others $valueToCompare";
+                }
+            }
+            else
+            {
+                if(is_a($submited, \DateTime::class))
+                {
+                    $submited = $submited->getTimestamp();
+                }
+                $properties = explode(".", $valueToCompare);
+                $compareTo = $entityToCompare->getProperties();
+                for($i = 0; $i < count($properties); $i++)
+                {
+                    if(is_object($compareTo))
+                    {
+                        $get = "get".ucfirst($properties[$i]);
+                        $compareTo = $compareTo->getProperties()[$properties[$i]];
+                    }
+                    else
+                    {
+                        $compareTo = $compareTo[$properties[$i]];
+                    }
+                }
+                if(is_a($compareTo, \DateTime::class))
+                {
+                    $compareTo = $compareTo->getTimestamp();
+                }
+                eval("\$result =  $submited $operator $compareTo;");
+                if($result === true)
+                {
+                    return "Must be ".self::OPERATOR_TABLE[$operator]." to $compareTo";
+                }
+            }
+        }
+        else
+        {
+            eval("\$result =  '".$submited."' $operator '".$valueToCompare."';");
+            if($result === true)
+            {
+                return "Must be ".self::OPERATOR_TABLE[$operator]." to $valueToCompare";
+            }
+        }
 
-    }
-
-    private function greaterThan($submited, $constraint)
-    {
-
-    }
-
-    private function lesserThan($submited, $constraint)
-    {
-
-    }
-
-    private function equal($submited, $constraint)
-    {
-
+        return null;
     }
 }

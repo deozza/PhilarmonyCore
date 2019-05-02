@@ -49,7 +49,7 @@ class EntityController extends AbstractController
      */
     public function getEntityListAction($entity_name, Request $request)
     {
-        $exists= $this->schemaLoader->loadEntityEnumeration($entity_name, true);
+        $exists= $this->schemaLoader->loadEntityEnumeration($entity_name);
 
         if(empty($exists))
         {
@@ -75,7 +75,7 @@ class EntityController extends AbstractController
         $entityFilter = $request->query->get("entity", []);
         try
         {
-            $entitiesQuery = $this->em->getRepository(Entity::class)->findAllFiltered($propertyFilter, $entityFilter, $exists);
+            $entitiesQuery = $this->em->getRepository(Entity::class)->findAllFiltered($propertyFilter, $entityFilter, $entity_name);
 
             foreach($entitiesQuery as $key=>$item)
             {

@@ -76,6 +76,28 @@ class EntityController extends AbstractController
         try
         {
             $entitiesQuery = $this->em->getRepository(Entity::class)->findAllFiltered($propertyFilter, $entityFilter, $exists);
+
+            foreach($entitiesQuery as $key=>$item)
+            {
+                $constraints = $exists['states'][$item->getValidationState()]['methods'][$request->getMethod()]['by'];
+                if($constraints !== "all")
+                {
+                    if(empty($this->getUser()->getUsername()))
+                    {
+                        unset($entitiesQuery[$key]);
+                        continue;
+                    }
+
+                    $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $item);
+
+                    if($isAuthorized === false)
+                    {
+                        unset($entitiesQuery[$key]);
+                        continue;
+                    }
+                }
+            }
+
             $entities = $this->paginator->paginate(
                 $entitiesQuery,
                 $request->query->getInt("page", 1),

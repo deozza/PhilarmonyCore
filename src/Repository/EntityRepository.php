@@ -50,7 +50,7 @@ class EntityRepository extends ServiceEntityRepository
         }
 
         $queryBuilder->setParameters($parameters);
-        return $queryBuilder->getQuery();
+        return $queryBuilder->getQuery()->execute();
 
     }
 

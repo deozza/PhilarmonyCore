@@ -6,6 +6,7 @@ use Deozza\PhilarmonyBundle\Entity\Entity;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;
+use function Sodium\compare;
 use function Symfony\Component\VarDumper\Tests\Fixtures\bar;
 
 class Validate
@@ -113,7 +114,6 @@ class Validate
                         $errors[$type] = $error;
                     }
                 }
-
             }
         }
 
@@ -185,7 +185,6 @@ class Validate
             case "notBetween"        : $operator = "!between";break;
 
         }
-
         return $this->method($submited, $valueToCompare, $operator, $entityToCompare);
     }
 
@@ -228,44 +227,64 @@ class Validate
             }
             else
             {
-                if(is_a($submited, \DateTime::class))
+                $compareTo = $this->getCompareTo($valueToCompare, $entityToCompare->getProperties());
+                if(is_a($submited, \DateTime::class) && is_a($compareTo, \DateTime::class))
                 {
-                    $submited = $submited->getTimestamp();
-                }
-                $properties = explode(".", $valueToCompare);
-                $compareTo = $entityToCompare->getProperties();
-                for($i = 0; $i < count($properties); $i++)
-                {
-                    if(is_object($compareTo))
+                    if($this->compareDate($submited, $operator, $compareTo) === true)
                     {
-                        $get = "get".ucfirst($properties[$i]);
-                        $compareTo = $compareTo->getProperties()[$properties[$i]];
-                    }
-                    else
-                    {
-                        $compareTo = $compareTo[$properties[$i]];
+                        return "Must be ".self::OPERATOR_TABLE[$operator]." to ".$compareTo->format('Y-m-d');
                     }
                 }
-                if(is_a($compareTo, \DateTime::class))
+                else
                 {
-                    $compareTo = $compareTo->getTimestamp();
-                }
-                eval("\$result =  $submited $operator $compareTo;");
-                if($result === true)
-                {
-                    return "Must be ".self::OPERATOR_TABLE[$operator]." to $compareTo";
+                    if($this->compareWithEval($submited, $operator, $compareTo) === true)
+                    {
+                        return "Must be ".self::OPERATOR_TABLE[$operator]." to $compareTo";
+                    }
                 }
             }
         }
         else
         {
-            eval("\$result =  '".$submited."' $operator '".$valueToCompare."';");
-            if($result === true)
+            if($this->compareWithEval($submited, $operator, $valueToCompare) === true)
             {
                 return "Must be ".self::OPERATOR_TABLE[$operator]." to $valueToCompare";
             }
         }
 
         return null;
+    }
+
+
+    private function getCompareTo($valueToCompare, $compareTo)
+    {
+        $properties = explode(".", $valueToCompare);
+        for($i = 0; $i < count($properties); $i++)
+        {
+            if(is_object($compareTo))
+            {
+                $get = "get".ucfirst($properties[$i]);
+                $compareTo = $compareTo->getProperties()[$properties[$i]];
+            }
+            else
+            {
+                $compareTo = $compareTo[$properties[$i]];
+            }
+        }
+
+        return $compareTo;
+    }
+
+    private function compareDate($submited, $operator, $compareTo)
+    {
+        $submited = $submited->getTimestamp();
+        $compareTo = $compareTo->getTimestamp();
+        return $this->compareWithEval($submited, $operator, $compareTo);
+    }
+
+    private function compareWithEval($submited, $operator, $compareTo)
+    {
+        eval("\$result =  '$submited' $operator '$compareTo';");
+        return $result;
     }
 }

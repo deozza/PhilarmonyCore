@@ -305,11 +305,7 @@ class EntityController extends AbstractController
         }
 
         $state = $this->validator->processValidation($entity,$entity->getValidationState(), $entityConfig['states'], $this->getUser());
-
-        if(!is_array($state) || $state['state'] != $entity->getValidationState() || isset($state['errors']['manual']))
-        {
-            $this->em->flush();
-        }
+        $this->em->flush();
 
         if(is_array($state))
         {

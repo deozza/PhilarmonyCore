@@ -16,7 +16,9 @@ class Validate
         "<" => ">=",
         ">=" => "<",
         "<=" => ">",
-        "!=" => "=="
+        "!=" => "==",
+        "!between" => "not between",
+        "between" => "between"
 
     ];
 
@@ -202,10 +204,6 @@ class Validate
         {
             if(!is_a($entityToCompare, Entity::class))
             {
-                if(is_a($submited, \DateTime::class))
-                {
-                    $submited = $submited->format("Y-m-d");
-                }
                 if(strpos($operator, "between"))
                 {
                     $valuesToCompare = explode(',', $valueToCompare);
@@ -218,11 +216,11 @@ class Validate
 
                 if(substr($operator, 0, 1) === "!" && count($result) > 0)
                 {
-                    return "Must be ".self::OPERATOR_TABLE[$operator]." to others $valueToCompare";
+                    return "Must be ".self::OPERATOR_TABLE[$operator]." others $valueToCompare";
                 }
                 elseif (substr($operator, 0, 1) !== "!" && count($result) === 0)
                 {
-                    return "Must be ".self::OPERATOR_TABLE[$operator]." to others $valueToCompare";
+                    return "Must be ".self::OPERATOR_TABLE[$operator]." others $valueToCompare";
                 }
             }
             else

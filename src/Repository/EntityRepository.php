@@ -74,14 +74,30 @@ class EntityRepository extends ServiceEntityRepository
     {
         $parameters = [];
 
+
+
         $queryBuilder = $this->createQueryBuilder('e');
         $queryBuilder->select('e');
         $queryBuilder->andWhere('e.kind = :kind');
-        $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$propertyMin."')>= :value");
-        $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$propertyMax."')<= :value");
+
+        if(is_a($value, \DateTime::class))
+        {
+            $value = $value->format("Y-m-d")." 00:00:00.000000";
+            $queryBuilder->andWhere("JSON_UNQUOTE(JSON_EXTRACT(e.properties, '$.".$propertyMin.".date'))  <= :value");
+            $queryBuilder->andWhere("JSON_UNQUOTE(JSON_EXTRACT(e.properties, '$.".$propertyMax.".date'))  >= :value");
+            $parameters["value"] = $value;
+
+        }
+        else
+        {
+            $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$propertyMin."')>= :value");
+            $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$propertyMax."')<= :value");
+            $parameters["value"] = $value;
+
+        }
+
 
         $parameters["kind"] = $kind;
-        $parameters["value"] = $value;
 
         $queryBuilder->setParameters($parameters);
         return $queryBuilder->getQuery()->execute();

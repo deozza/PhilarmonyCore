@@ -1,7 +1,11 @@
 Philarmony
 =
 
+[![php](https://img.shields.io/badge/php-%5E7.2-blue.svg)]()
+[![symfony](https://img.shields.io/badge/symfony-%5E4.2-blue.svg)](https://symfony.com/doc/current/index.html#gsc.tab=0)
 [![Build Status](https://travis-ci.org/deozza/atypikhouse.svg?branch=master)](https://travis-ci.org/deozza/atypikhouse)
+[![Stable](https://img.shields.io/badge/stable-1.0-brightgreen.svg)](https://github.com/deozza/Philarmony/tree/1.0.0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]()
 
 ## Table of contents
 
@@ -184,7 +188,7 @@ The enumeration is a list of possible values handled by of property.
  
 ## Tests 
 
-A demo app has been developped and is visible [here](https://github.com/deozza/atypikhouse). Through the tests of this app, we ensure that every feature of Philarmony is tested and we garanty the stability of the bundle.T
+A demo app has been developped and is visible [here](https://github.com/deozza/atypikhouse). Through the tests of this app, we ensure that every feature of Philarmony is tested and we garanty the stability of the bundle.
 
 ## Road map
 

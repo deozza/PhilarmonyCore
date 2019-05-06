@@ -4,37 +4,33 @@ An Entity is what could be view as a MySQL table, a main container of data. By d
 
 ## Entity kind
 
-The Entity kind is used to differenciate Entities between them and to tell which properties are handled by the Entity. It is then unique. All the Entity kinds are stored in the yaml file you pointed in the Philarmony configuration (by default, it is `/var/Philarmony/entity.json`).
+The Entity kind is used to differentiate Entities between them. An entity is defined by it name, its properties and the validation states it could have (more about the validation [here](../../Validaton/VALIDATIONSTATE.md) ). An entity kind is unique thoughout all the API. All the Entity kinds are stored in the yaml file you pointed in the Philarmony configuration (by default, it is `/var/Philarmony/entity.json`).
 
 ### How to create a new Entity kind
 
 In order to create a new entity kind, simply add it to your entity `yaml` file configuration.
 ```yaml
 entities:
-     offer:
-            properties: ['title', 'description', 'price', 'annonce_category', 'photo']
-            visible: ['all']
-            post:
-                  properties: 'all'
-                  by: ['owner', 'admin']
-            patch:
-                  properties: 'all'
-                  by : ['owner', 'admin']
+    offer:
+        properties: ['title', 'description', 'price', 'annonce_category', 'photo']
+        states:
+            __default:
+                methods:
+                    POST:
+                        properties: [title, description, price, annonce_category, nbPersonMax]
+                        by:
+                          roles: [ROLE_USER]
 ```
 
-|     Property     |                                                         Description                                                         |                       Example                       |
-|:----------------:|:---------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------:|
-|    entity name   | The name of you entity kind. It must be unique through all your system                                                      | offer                                               |
-|    properties    | The list of the properties the entity is carrying. They must be defined in the yaml config file dedicated to the properties | ['title', 'description', 'price', 'place_category'] |
-|      visible     | Which user has access to the entity                                                                                         | ['all']                                             |
-|  post.properties | Which properties are meant to be in the post form                                                                           | 'all'                                               |
-|      post.by     | Who is able to create an entity or add properties to it                                                                     | ['owner', 'admin']                                  |
-| patch.properties | Which properties are meant to be in the patch form                                                                          | 'all'                                               |
-|     patch.by     | Who is able to edit an entity                                                                                               | ['owner', 'admin']                                  |
+|                       Property                       |                                                         Description                                                         |                            Example                           |
+|:----------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------:|
+| entity name                                          | The name of you entity kind. It must be unique through all your system                                                      | offer                                                        |
+| properties                                           | The list of the properties the entity is carrying. They must be defined in the yaml config file dedicated to the properties | ['title', 'description', 'price', 'place_category', 'photo'] |
+| states.{state_name}                                  | The list of all possible states of the entity                                                                               | __default                                                    |
+| states.{state_name}.methods.{method_name}            | The methods available in that states                                                                                        | POST                                                         |
+| states.{state_name}.methods.{method_name}.properties | Which properties are handled by the method                                                                                  | ['title', 'description', 'price', 'place_category']          |
+| states.{state_name}.methods.{method_name}.by         | Which users or group of user is able to use that method                                                                     | roles:[ROLE_USER]                                            |
 
-The values of `visible`, `post.by` and `patch.by` are define by your business logic.
-
-Also, you can set other constraints to an entity assuming it will be handled by your business logic.
 
 &#9888; ___Once you set the entity name, it is not advised to modify it later. You will need to ensure the migration in your database to stay relevant with your configuration___
 
@@ -76,6 +72,7 @@ __Response example :__
   "kind": "offer",
   "owner": "00100000-0000-4000-a000-000000000000",
   "date_of_Creation": "2019-01-01T12:00:00+02:00",
+  "validationState": "__default",
   "properties": {
     "title": "Stunning appartment in Tokyo",
     "description": "Located in central Tokyo. 2 bedrooms, bathroom, wifi.",
@@ -112,6 +109,7 @@ __Response example :__
       "kind": "offer",
       "owner": "00100000-0000-4000-a000-000000000000",
       "date_of_Creation": "2019-01-01T12:00:00+02:00",
+      "validationState": "__default",
       "properties": {
         "title": "Stunning appartment in Tokyo",
         "description": "Located in central Tokyo. 2 bedrooms, bathroom, wifi.",
@@ -124,6 +122,7 @@ __Response example :__
       "kind": "offer",
       "owner": "00100000-0000-4000-a000-000000000000",
       "date_of_Creation": "2019-01-02T12:00:00+02:00",
+      "validationState": "__default",
       "properties": {
         "title": "Villa in Corsica",
         "description": "Near the beach.",
@@ -157,6 +156,7 @@ __Response example :__
   "kind": "offer",
   "owner": "00100000-0000-4000-a000-000000000000",
   "date_of_Creation": "2019-01-01T12:00:00+02:00",
+  "validationState": "__default",
   "properties": {
     "title": "Stunning appartment in Tokyo",
     "description": "Located in central Tokyo. 2 bedrooms, bathroom, wifi.",
@@ -193,6 +193,7 @@ __Response example :__
   "kind": "offer",
   "owner": "00100000-0000-4000-a000-000000000000",
   "date_of_Creation": "2019-01-01T12:00:00+02:00",
+  "validationState": "__default",
   "properties": {
     "title": "The best appartment in Tokyo",
     "description": "Located in central Tokyo. 2 bedrooms, bathroom, wifi.",

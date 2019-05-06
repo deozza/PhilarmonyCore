@@ -70,6 +70,7 @@ doctrine:
                 JSON_CONTAINS: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonContains
                 JSON_CONTAINS_PATH: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonContainsPath
                 JSON_EXTRACT: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonExtract
+                JSON_UNQUOTE: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonUnquote
 ```
 
 ## Example of usage
@@ -177,14 +178,23 @@ The enumeration is a list of possible values handled by of property.
 
  * [Read more](src/Resources/documentation/DatabaseSchema/ENUMERATION.md)
 
-### Validation
+### Validation state
 
-#### With configuration
+Validation state is used in order to assert an entity is in good conditions to be used. Each state defines specific methods usable by specific users.
 
-#### With rules 
+ * [Read more](src/Resources/documentation/Validation/VALIDATIONSTATE.md)
 
- * [Conflict rules](src/Resources/documentation/RuleManager/ACCESSRULE.md)
- * [Forbidden rules](src/Resources/documentation/RuleManager/FORBIDDENRULE.md)
+#### Authorization
+
+To assure the right user is manipulating a resource, authorization is handled by the validation state. It determines which users are allowed to send the different requests.
+
+ * [Read more](src/Resources/documentation/Validation/AUTHORIZATION.md)
+
+#### Constraints
+
+In order to pass from one state to the next, the entity and its data must be valid according to constraints.
+
+ * [Read more](src/Resources/documentation/Validation/CONSTRAINS.md)
  
 ## Tests 
 

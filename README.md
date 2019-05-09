@@ -44,18 +44,18 @@ This will be used to locate the database schema files. By default they are creat
 Then, to use the embedded services, as the controllers and the repositories, of Philarmony, you need to enable them in your `/config/services.yaml` and in your `config/routes/annotations.yaml` :
 ```yaml
 services: 
-    Deozza\PhilarmonyBundle\Controller:
-      resource: '@DeozzaPhilarmonyBundle\Controller'
+    Deozza\PhilarmonyBundle\Controller\:
+      resource: '@DeozzaPhilarmonyBundle/Controller'
       tags: ['controller.service_arguments']
       
-    Deozza\PhilarmonyBundle\Repository:
-      resource: '@DeozzaPhilarmonyBundle\Repository'
+    Deozza\PhilarmonyBundle\Repository\:
+      resource: '@DeozzaPhilarmonyBundle/Repository'
       tags: ['doctrine.service_entity']  
 ```
 
 ```yaml
 philarmony_controllers:
-    resource: '@DeozzaPhilarmonyBundle\Controller'
+    resource: '@DeozzaPhilarmonyBundle/Controller'
     type: annotation
     prefix: /
 ```

@@ -1,6 +1,7 @@
 <?php
 namespace Deozza\PhilarmonyBundle\Service\DatabaseSchema;
 
+use Deozza\PhilarmonyBundle\Exceptions\FileNotFound;
 use Symfony\Component\Yaml\Yaml;
 
 class DatabaseSchemaLoader
@@ -18,14 +19,18 @@ class DatabaseSchemaLoader
     {
         $entities = file_get_contents($this->rootPath.$this->entityPath.".yaml");
 
-
         try
         {
             $values = Yaml::parse($entities);
         }
         catch(\Exception $e)
         {
-            return null;
+            throw new FileNotFound();
+        }
+
+        if(!isset($values['entities']))
+        {
+            throw new FileNotFound("Root node of ".$this->rootPath.$this->entityPath.".yaml must be 'entities'.");
         }
 
         if(empty($entity_name))
@@ -58,8 +63,14 @@ class DatabaseSchemaLoader
         }
         catch(\Exception $e)
         {
-            return null;
+            throw new FileNotFound();
         }
+
+        if(!isset($values['properties']))
+        {
+            throw new FileNotFound("Root node of ".$this->rootPath.$this->propertyPath.".yaml must be 'properties'.");
+        }
+
         if(empty($property_name))
         {
             return $values;
@@ -83,10 +94,19 @@ class DatabaseSchemaLoader
     public function loadEnumerationEnumeration($enumeration_name = null, $returnKey = false)
     {
         $enumerations = file_get_contents($this->rootPath . $this->enumerationPath . ".yaml");
-        try {
+
+        try
+        {
             $values = Yaml::parse($enumerations);
-        } catch (\Exception $e) {
-            return null;
+        }
+        catch (\Exception $e)
+        {
+            throw new FileNotFound();
+        }
+
+        if(!isset($values['enumerations']))
+        {
+            throw new FileNotFound("Root node of ".$this->rootPath.$this->enumerationPath.".yaml must be 'enumeration'.");
         }
         if (empty($enumeration_name)) {
             return $values;

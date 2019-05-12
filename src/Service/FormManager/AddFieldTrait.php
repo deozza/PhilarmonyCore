@@ -77,7 +77,15 @@ trait AddFieldTrait{
 
             case ChoiceType::class:
                 {
-                    $enumeration = $this->schemaLoader->loadEnumerationEnumeration($this->subType);
+                    try
+                    {
+                        $enumeration = $this->schemaLoader->loadEnumerationEnumeration($this->subType);
+                    }
+                    catch(\Exception $e)
+                    {
+                        return $this->response->badRequest($e->getMessage());
+                    }
+
                     $formOptions['choices'] = $enumeration;
                 };break;
 

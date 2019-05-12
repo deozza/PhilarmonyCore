@@ -16,7 +16,15 @@ trait SaveDataTrait{
         {
             $file = base64_encode($data);
 
-            $isPropertyMultiple = $this->schemaLoader->loadPropertyEnumeration($formFields[0]);
+            try
+            {
+                $isPropertyMultiple = $this->schemaLoader->loadPropertyEnumeration($formFields[0]);
+            }
+            catch(\Exception $e)
+            {
+                return $this->response->badRequest($e->getMessage());
+            }
+
             $isMultiple = explode('.', $isPropertyMultiple['type']);
 
             if($isMultiple[0] === "array")
@@ -74,10 +82,25 @@ trait SaveDataTrait{
 
     private function addDefaultValue($kind, $embedded = false)
     {
-        $defaultProperties = $this->schemaLoader->loadEntityEnumeration($kind);
+        try
+        {
+            $defaultProperties = $this->schemaLoader->loadEntityEnumeration($kind);
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
+
         foreach($defaultProperties['properties'] as $value)
         {
-            $property = explode('.', $this->schemaLoader->loadPropertyEnumeration($value)['type']);
+            try
+            {
+                $property = explode('.', $this->schemaLoader->loadPropertyEnumeration($value)['type']);
+            }
+            catch(\Exception $e)
+            {
+                return $this->response->badRequest($e->getMessage());
+            }
 
             $isEmbedded = array_search("embedded", $property);
             if($isEmbedded)
@@ -89,7 +112,15 @@ trait SaveDataTrait{
                 $this->addDefaultValue($property[$isEmbedded + 1], true);
             }
 
-            $property = $this->schemaLoader->loadPropertyEnumeration($value);
+            try
+            {
+                $property = $this->schemaLoader->loadPropertyEnumeration($value);
+            }
+            catch(\Exception $e)
+            {
+                return $this->response->badRequest($e->getMessage());
+            }
+
             if(isset($property['default']) && $property['default'] !== null)
             {
                 $defaultValue = explode('.', $property['default']);

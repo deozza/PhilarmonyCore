@@ -91,7 +91,15 @@ class Validate
             {
                 foreach($constraint as $entityKind)
                 {
-                    $embeddedEntity = $this->schemaLoader->loadEntityEnumeration($entityKind);
+                    try
+                    {
+                        $embeddedEntity = $this->schemaLoader->loadEntityEnumeration($entityKind);
+                    }
+                    catch(\Exception $e)
+                    {
+                        return $this->response->badRequest($e->getMessage());
+                    }
+
                     if(isset($embeddedEntity['constraints']))
                     {
                         return $this->validateEntity($entity, $user, $embeddedEntity['constraints'], $manual);

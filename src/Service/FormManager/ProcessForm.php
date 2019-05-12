@@ -1,6 +1,7 @@
 <?php
 namespace Deozza\PhilarmonyBundle\Service\FormManager;
 
+use Deozza\PhilarmonyBundle\Exceptions\BadFileTree;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;
@@ -35,7 +36,14 @@ class ProcessForm
         {
             $formFields = $entityKind['properties'];
         }
-        $this->formFields = $this->selectFormFields($formFields);
+        try
+        {
+            $this->formFields = $this->selectFormFields($formFields);
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
         if(!is_object(json_decode($requestBody)))
         {
             $data = $this->saveData($requestBody, $entityToProcess, $formKind, $formFields);
@@ -66,12 +74,33 @@ class ProcessForm
     {
         foreach($properties as $property)
         {
-            $propertyConfig = $this->schemaLoader->loadPropertyEnumeration($property);
+            try
+            {
+                $propertyConfig = $this->schemaLoader->loadPropertyEnumeration($property);
+            }
+            catch(\Exception $e)
+            {
+                return $this->response->badRequest($e->getMessage());
+            }
+
+            if(!isset($config['type']))
+            {
+                throw new BadFileTree("Property $property must have a type");
+            }
+
             $type = explode('.',$propertyConfig['type']);
 
             if(in_array("embedded", $type))
             {
-                $embeddedPropertyConfig = $this->schemaLoader->loadEntityEnumeration($type[1])['properties'];
+                try
+                {
+                    $embeddedPropertyConfig = $this->schemaLoader->loadEntityEnumeration($type[1])['properties'];
+                }
+                catch(\Exception $e)
+                {
+                    return $this->response->badRequest($e->getMessage());
+                }
+
                 $isRequired = ($propertyConfig['constraints']['required'] === false) ? false : null;
                 $fields = array_merge($fields, $this->selectFormFields($embeddedPropertyConfig, $fields, $isRequired));
             }
@@ -103,11 +132,32 @@ class ProcessForm
     {
         foreach($formFields as $field)
         {
-            $config = $this->schemaLoader->loadPropertyEnumeration($field);
+            try
+            {
+                $config = $this->schemaLoader->loadPropertyEnumeration($field);
+            }
+            catch(\Exception $e)
+            {
+                return $this->response->badRequest($e->getMessage());
+            }
+
+            if(!isset($config['type']))
+            {
+                throw new BadFileTree("Property $field must have a type");
+            }
+
             $isEmbedded = explode("embedded.", $config['type']);
             if(count($isEmbedded)>1)
             {
-                $embeddedProperties = $this->schemaLoader->loadEntityEnumeration($isEmbedded[1])['properties'];
+                try
+                {
+                    $embeddedProperties = $this->schemaLoader->loadEntityEnumeration($isEmbedded[1])['properties'];
+                }
+                catch(\Exception $e)
+                {
+                    return $this->response->badRequest($e->getMessage());
+                }
+
                 foreach($embeddedProperties as $property)
                 {
                     if(isset($data[$property]))

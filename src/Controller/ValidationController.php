@@ -61,7 +61,14 @@ class ValidationController extends AbstractController
             return $this->response->notFound("Entity with the id $id was not found");
         }
 
-        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+        try
+        {
+            $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
 
         $state = $this->validator->processValidation($entity,$entity->getValidationState(), $entityConfig['states'], $this->getUser(), null, true);
 

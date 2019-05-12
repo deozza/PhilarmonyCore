@@ -38,7 +38,7 @@ class ProcessForm
         $this->formFields = $this->selectFormFields($formFields);
         if(!is_object(json_decode($requestBody)))
         {
-            $data = $this->saveData($requestBody, $entityToProcess, $formKind);
+            $data = $this->saveData($requestBody, $entityToProcess, $formKind, $formFields);
             return $data;
         }
 
@@ -60,7 +60,7 @@ class ProcessForm
 
         if(!is_object($data))
         {
-            $this->saveData($data, $entityToProcess, $formKind);
+            $this->saveData($data, $entityToProcess, $formKind, $formFields);
         }
 
         return $data;
@@ -83,7 +83,7 @@ class ProcessForm
             {
                 $realType = $type[0];
                 $isArray = false;
-                if($realType === "enumeration")
+                if($realType === "enumeration" || $realType === "entity")
                 {
                     $realType .= ".".$type[1];
                 }

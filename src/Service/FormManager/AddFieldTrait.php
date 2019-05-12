@@ -35,9 +35,9 @@ trait AddFieldTrait{
         else
         {
             $type = explode(".", $config['type']);
-            if(isset($type[1])) $enumeration = $type[1];
+            if(isset($type[1])) $this->subType = $type[1];
             $class = FieldTypes::ENUMERATION[$type[0]];
-            $formOptions = array_merge($formOptions,$this->addTypeConstraints($class, $enumeration));
+            $formOptions = array_merge($formOptions,$this->addTypeConstraints($class));
             $formOptions['constraints'] = [];
             foreach($config['constraints'] as $constraint=>$value)
             {
@@ -48,7 +48,7 @@ trait AddFieldTrait{
         $form->add($field, $class, $formOptions);
     }
 
-    private function addTypeConstraints($class, $enumeration)
+    private function addTypeConstraints($class)
     {
         $formOptions = [];
 
@@ -61,7 +61,7 @@ trait AddFieldTrait{
                     {
                         return $er->createQueryBuilder('e')
                             ->where("e.kind = :kind")
-                            ->setParameter(':kind', $this->type[1]);
+                            ->setParameter(':kind', $this->subType);
                     };
                     $formOptions['choice_value'] = function(Entity $entity = null)
                     {
@@ -72,7 +72,7 @@ trait AddFieldTrait{
 
             case ChoiceType::class:
                 {
-                    $enumeration = $this->schemaLoader->loadEnumerationEnumeration($enumeration);
+                    $enumeration = $this->schemaLoader->loadEnumerationEnumeration($this->subType);
                     $formOptions['choices'] = $enumeration;
                 };break;
 

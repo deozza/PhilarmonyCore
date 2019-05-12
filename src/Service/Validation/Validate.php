@@ -85,13 +85,22 @@ class Validate
                     }
                 }
             }
+            elseif ($type === "embedded")
+            {
+                foreach($constraint as $entityKind)
+                {
+                    $embeddedEntity = $this->schemaLoader->loadEntityEnumeration($entityKind);
+                    if(isset($embeddedEntity['constraints']))
+                    {
+                        return $this->validateEntity($entity, $user, $embeddedEntity['constraints'], $manual);
+                    }
+                }
+            }
             else
             {
                 foreach ($constraint as $cons)
                 {
                     $constraintFunction = explode('(',$cons);
-                    $functionName = explode(".",$constraintFunction[0]);
-
                     $property = explode(".",$type);
 
                     if($property[0]=== "properties")

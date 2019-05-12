@@ -242,7 +242,7 @@ class EntityController extends AbstractController
 
         if(is_array($state))
         {
-            return $this->response->conflict($state['errors'],$entityToPost, ['entity_complete', 'user_basic']);
+            return $this->response->conflict($state['errors'],$entityToPost, ['entity_property', "entity_basic"]);
         }
 
         return $this->response->created($entityToPost, ['entity_complete', 'user_basic']);

@@ -54,10 +54,6 @@ class ProcessForm
             return $data;
         }
 
-        $data = $this->formatData($data, $formFields);
-
-        $data = $this->cleanData($data);
-
         if(!is_object($data))
         {
             $this->saveData($data, $entityToProcess, $formKind, $formFields);

@@ -56,7 +56,7 @@ class Entity
 
     /**
      * @ORM\Column(type="json")
-     * @JMS\Groups({"entity_complete", "entity_basic"})
+     * @JMS\Groups({"entity_complete", "entity_basic", "entity_property"})
      */
     private $properties;
 

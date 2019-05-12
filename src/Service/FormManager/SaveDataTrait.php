@@ -5,7 +5,7 @@ use Deozza\PhilarmonyBundle\Entity\Entity;
 use Deozza\PhilarmonyBundle\Entity\Property;
 
 trait SaveDataTrait{
-    private function saveData($data, $entityToProcess, $formKind)
+    private function saveData($data, $entityToProcess, $formKind, $formFields)
     {
         $this->default = [];
 
@@ -14,10 +14,9 @@ trait SaveDataTrait{
 
         if(!is_array($data))
         {
-
             $file = base64_encode($data);
 
-            $isPropertyMultiple = $this->schemaLoader->loadPropertyEnumeration($this->formFields[0]);
+            $isPropertyMultiple = $this->schemaLoader->loadPropertyEnumeration($formFields[0]);
             $isMultiple = explode('.', $isPropertyMultiple['type']);
 
             if($isMultiple[0] === "array")
@@ -25,7 +24,7 @@ trait SaveDataTrait{
                 $file = [$file];
             }
 
-            $data = [$this->formFields[0]=> $file];
+            $data = [$formFields[0]=> $file];
         }
 
         $data = array_merge_recursive($data, $this->default);

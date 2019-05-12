@@ -11,6 +11,8 @@ use function Symfony\Component\VarDumper\Tests\Fixtures\bar;
 
 class Validate
 {
+    use CompareTrait;
+
     const OPERATOR_TABLE = [
         ">" => "<=",
         "<" => ">=",
@@ -85,13 +87,22 @@ class Validate
                     }
                 }
             }
+            elseif ($type === "embedded")
+            {
+                foreach($constraint as $entityKind)
+                {
+                    $embeddedEntity = $this->schemaLoader->loadEntityEnumeration($entityKind);
+                    if(isset($embeddedEntity['constraints']))
+                    {
+                        return $this->validateEntity($entity, $user, $embeddedEntity['constraints'], $manual);
+                    }
+                }
+            }
             else
             {
                 foreach ($constraint as $cons)
                 {
                     $constraintFunction = explode('(',$cons);
-                    $functionName = explode(".",$constraintFunction[0]);
-
                     $property = explode(".",$type);
 
                     if($property[0]=== "properties")
@@ -106,9 +117,20 @@ class Validate
                             }
                             else
                             {
-                                $submited = $submited[$property[$i]];
+                                if(isset($submited[$property[$i]]))
+                                {
+                                    $submited = $submited[$property[$i]];
+                                }
+                                else
+                                {
+                                    $submited = null;
+                                }
                             }
                         }
+                    }
+                    if($submited === null)
+                    {
+                        continue;
                     }
                     $error = $this->choseFunction($submited, $constraintFunction, $entity);
                     if(!empty($error))
@@ -122,11 +144,9 @@ class Validate
         return $errors;
     }
 
-
     public function validateUserPermission($constraint, $user, Entity $entity)
     {
         $isAuthorized = false;
-
 
         if(isset($constraint['roles']))
         {
@@ -185,6 +205,7 @@ class Validate
             case "lesserThan"        : $operator = ">=";break;
             case "equal"             : $operator = "!=";break;
             case "notBetween"        : $operator = "!between";break;
+            case "between"           : $operator = "between";break;
 
         }
         return $this->method($submited, $valueToCompare, $operator, $entityToCompare);
@@ -204,85 +225,28 @@ class Validate
         {
             if(!is_a($entityToCompare, Entity::class))
             {
-                if(strpos($operator, "between"))
-                {
-                    $valuesToCompare = explode(',', $valueToCompare);
-                    $result = $this->em->getRepository(Entity::class)->findAllBetweenForValidate($entityToCompare, $valuesToCompare[0], $valuesToCompare[1], $submited);
-                }
-                else
-                {
-                    $result = $this->em->getRepository(Entity::class)->findAllForValidate($entityToCompare, $valueToCompare, $submited, $operator);
-                }
-
-                if(substr($operator, 0, 1) === "!" && count($result) > 0)
-                {
-                    return "Must be ".self::OPERATOR_TABLE[$operator]." others $valueToCompare";
-                }
-                elseif (substr($operator, 0, 1) !== "!" && count($result) === 0)
-                {
-                    return "Must be ".self::OPERATOR_TABLE[$operator]." others $valueToCompare";
-                }
+                return $this->compareEntities($operator, $valueToCompare, $entityToCompare, $submited);
             }
             else
             {
+                if(strpos($operator, "between") !==  false)
+                {
+                    return $this->compareSelfBetween($operator, $valueToCompare, $entityToCompare, $submited);
+                }
                 $compareTo = $this->getCompareTo($valueToCompare, $entityToCompare->getProperties());
                 if(is_a($submited, \DateTime::class) && is_a($compareTo, \DateTime::class))
                 {
-                    if($this->compareDate($submited, $operator, $compareTo) === true)
-                    {
-                        return "Must be ".self::OPERATOR_TABLE[$operator]." to ".$compareTo->format('Y-m-d');
-                    }
+                    return $this->compareDate($submited, $operator, $compareTo);
                 }
                 else
                 {
-                    if($this->compareWithEval($submited, $operator, $compareTo) === true)
-                    {
-                        return "Must be ".self::OPERATOR_TABLE[$operator]." to $compareTo";
-                    }
+                    return $this->compareWithEval($submited, $operator, $compareTo);
                 }
             }
         }
         else
         {
-            if($this->compareWithEval($submited, $operator, $valueToCompare) === true)
-            {
-                return "Must be ".self::OPERATOR_TABLE[$operator]." to $valueToCompare";
-            }
+            return $this->compareWithEval($submited, $operator, $valueToCompare);
         }
-
-        return null;
-    }
-
-
-    private function getCompareTo($valueToCompare, $compareTo)
-    {
-        $properties = explode(".", $valueToCompare);
-        for($i = 0; $i < count($properties); $i++)
-        {
-            if(is_object($compareTo))
-            {
-                $get = "get".ucfirst($properties[$i]);
-                $compareTo = $compareTo->getProperties()[$properties[$i]];
-            }
-            else
-            {
-                $compareTo = $compareTo[$properties[$i]];
-            }
-        }
-
-        return $compareTo;
-    }
-
-    private function compareDate($submited, $operator, $compareTo)
-    {
-        $submited = $submited->getTimestamp();
-        $compareTo = $compareTo->getTimestamp();
-        return $this->compareWithEval($submited, $operator, $compareTo);
-    }
-
-    private function compareWithEval($submited, $operator, $compareTo)
-    {
-        eval("\$result =  '$submited' $operator '$compareTo';");
-        return $result;
     }
 }

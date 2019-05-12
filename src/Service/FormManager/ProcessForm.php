@@ -31,22 +31,20 @@ class ProcessForm
 
         $form = $this->form->create(FormType::class, null, ['csrf_protection' => false]);
 
-        $this->formFields = $formFields;
-
-        if($this->formFields === "all")
+        if($formFields === "all")
         {
-            $this->formFields = $entityKind['properties'];
+            $formFields = $entityKind['properties'];
         }
-
+        $this->formFields = $this->selectFormFields($formFields);
         if(!is_object(json_decode($requestBody)))
         {
-            $data = $this->saveData($requestBody, $entityToProcess, $formKind);
+            $data = $this->saveData($requestBody, $entityToProcess, $formKind, $formFields);
             return $data;
         }
 
-        foreach($this->formFields as $field)
+        foreach($this->formFields as $field=>$config)
         {
-            $this->addFieldToForm($field, $form, $formKind);
+            $this->addFieldToForm($field, $config, $form);
         }
 
         $data = $this->processData($requestBody, $form, $formKind);
@@ -56,32 +54,84 @@ class ProcessForm
             return $data;
         }
 
-        foreach ($this->formFields as $key=>$item)
-        {
-            if(is_array($item))
-            {
-                $data[$key] = [];
-
-                foreach ($item as $subkey=>$subitem)
-                {
-                    if(array_key_exists($subitem, $data))
-                    {
-                        $data[$key][$subitem] = $data[$subitem];
-                        unset($data[$subitem]);
-                    }
-                }
-            }
-        }
-
         if(!is_object($data))
         {
-            $this->saveData($data, $entityToProcess, $formKind);
+            $this->saveData($data, $entityToProcess, $formKind, $formFields);
         }
 
         return $data;
     }
 
+    private function selectFormFields(array $properties, $fields = [], $isRequired = null)
+    {
+        foreach($properties as $property)
+        {
+            $propertyConfig = $this->schemaLoader->loadPropertyEnumeration($property);
+            $type = explode('.',$propertyConfig['type']);
 
+            if(in_array("embedded", $type))
+            {
+                $embeddedPropertyConfig = $this->schemaLoader->loadEntityEnumeration($type[1])['properties'];
+                $isRequired = ($propertyConfig['constraints']['required'] === false) ? false : null;
+                $fields = array_merge($fields, $this->selectFormFields($embeddedPropertyConfig, $fields, $isRequired));
+            }
+            else
+            {
+                $realType = $type[0];
+                $isArray = false;
+                if($realType === "enumeration" || $realType === "entity")
+                {
+                    $realType .= ".".$type[1];
+                }
+                if($isRequired !== null)
+                {
+                    $propertyConfig['constraints']['required'] = $isRequired;
+                }
+
+                if(isset($propertyConfig['array']))
+                {
+                    $isArray = $propertyConfig['array'];
+                }
+
+                $fields[$property] = ["type"=>$realType, "array"=>$isArray, "constraints"=>$propertyConfig['constraints']];
+            }
+        }
+        return $fields;
+    }
+
+    private function formatData($data, $formFields)
+    {
+        foreach($formFields as $field)
+        {
+            $config = $this->schemaLoader->loadPropertyEnumeration($field);
+            $isEmbedded = explode("embedded.", $config['type']);
+            if(count($isEmbedded)>1)
+            {
+                $embeddedProperties = $this->schemaLoader->loadEntityEnumeration($isEmbedded[1])['properties'];
+                foreach($embeddedProperties as $property)
+                {
+                    if(isset($data[$property]))
+                    {
+                        $data[$isEmbedded[1]][$property] = $data[$property];
+                        unset($data[$property]);
+                    }
+                }
+            }
+        }
+        return $data;
+    }
+
+    private function cleanData($datas)
+    {
+        foreach ($datas as $key=>$data)
+        {
+            if(empty($data))
+            {
+                unset($datas[$key]);
+            }
+        }
+        return $datas;
+    }
 
     private function processData($data, $form, $formKind)
     {

@@ -16,49 +16,41 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 trait AddFieldTrait{
 
-    private function addFieldToForm($field, $form, $formKind)
+    private function addFieldToForm($field, $config, $form)
     {
-        $property = $this->schemaLoader->loadPropertyEnumeration($field);
-        $this->type = explode(".", $property['type']);
-        $class = FieldTypes::ENUMERATION[$this->type[0]];
-
-        if($class === "embedded" || ($class === CollectionType::class && $this->type[1] === "embedded"))
+        $formOptions = [];
+        $enumeration = null;
+        if($config['array'] === true)
         {
-            $embeddedEntity = $this->schemaLoader->loadEntityEnumeration($field);
-            $key = array_search($field, $this->formFields);
-            unset($this->formFields[$key]);
-
-            $this->formFields[$field] = $embeddedEntity['post']['properties'];
-
-            if($this->formFields[$field] === "all")
+            $class = CollectionType::class;
+            $formOptions['entry_type'] = FieldTypes::ENUMERATION[$config['type']];
+            $formOptions['entry_options']['constraints'] = [];
+            foreach($config['constraints'] as $constraint=>$value)
             {
-                $this->formFields[$field] = $embeddedEntity['properties'];
+                $formOptions['entry_options']['constraints'] = array_merge($formOptions['entry_options']['constraints'], $this->addValueConstraint(explode('.', $constraint), $value));
             }
-
-            foreach($this->formFields[$field] as $embeddedField)
-            {
-                $this->addFieldToForm($embeddedField, $form, $formKind);
-            }
+            $formOptions['allow_add'] = true;
+            $formOptions['allow_delete'] = false;
         }
         else
         {
-            $formOptions = $this->addConstraintsToField($class, $property);
+            $type = explode(".", $config['type']);
+            if(isset($type[1])) $enumeration = $type[1];
+            $class = FieldTypes::ENUMERATION[$type[0]];
+            $formOptions = array_merge($formOptions,$this->addTypeConstraints($class, $enumeration));
+            $formOptions['constraints'] = [];
+            foreach($config['constraints'] as $constraint=>$value)
+            {
+                $formOptions['constraints'] = array_merge($formOptions['constraints'], $this->addValueConstraint(explode('.', $constraint), $value));
+            }
         }
 
-        if(!empty($formOptions))
-        {
-            $form->add($field, $class, $formOptions);
-        }
+        $form->add($field, $class, $formOptions);
     }
 
-    private function addConstraintsToField($class, $property)
+    private function addTypeConstraints($class, $enumeration)
     {
-        $constraints = [];
         $formOptions = [];
-        if($property['required'])
-        {
-            $constraints[] = new NotBlank();
-        }
 
         switch($class)
         {
@@ -80,7 +72,7 @@ trait AddFieldTrait{
 
             case ChoiceType::class:
                 {
-                    $enumeration = $this->schemaLoader->loadEnumerationEnumeration($this->type[1]);
+                    $enumeration = $this->schemaLoader->loadEnumerationEnumeration($enumeration);
                     $formOptions['choices'] = $enumeration;
                 };break;
 
@@ -90,86 +82,49 @@ trait AddFieldTrait{
                     $formOptions['format'] = "yyyy-MM-dd";
                 };break;
 
-            case CollectionType::class:
-                {
-                    $entryType = FieldTypes::ENUMERATION[$this->type[1]];
-                    $formOptions['entry_type'] = $entryType;
-                    $formOptions['allow_add'] = true;
-                    $formOptions['allow_delete'] = false;
-
-                };break;
 
             case FileType::class: return;break;
             default: break;
         }
 
-        $constraints = $this->constraintGenerator($property, $constraints);
-
-        if($class == CollectionType::class)
-        {
-            $formOptions['entry_options']['constraints'] = $constraints;
-        }
-        else
-        {
-            $formOptions['constraints'] = $constraints;
-        }
         return $formOptions;
     }
 
-    private function constraintGenerator($property, $constraints)
+    private function addValueConstraint($property, $value)
     {
-        if(array_key_exists('length', $property) && !empty($property['length']))
+        $constraints = [];
+        if(in_array('length', $property) && !empty($value))
         {
             $length = [];
-            if(array_key_exists('min', $property['length']) && !empty($property['length']['min']))
+            if(in_array('min', $property) && !empty($value))
             {
-                $length['min'] = $property['length']['min'];
+                $length['min'] = $value;
             }
-            if(array_key_exists('max', $property['length']) && !empty($property['length']['max']))
+            if(in_array('max', $property) && !empty($value))
             {
-                $length['max'] = $property['length']['max'];
+                $length['max'] = $value;
             }
             $constraints[] = new Length($length);
         }
 
-        if(array_key_exists('greaterThanOrEqual', $property) && !empty($property['greaterThanOrEqual']))
+        if(in_array('greaterThanOrEqual', $property) && !empty($value))
         {
-            $gtoe = $property['greaterThanOrEqual'];
-            if(is_array($gtoe) && array_key_exists('propertyPath', $gtoe) && !empty($gtoe['propertyPath']))
-            {
-                $gtoe = $gtoe['propertyPath'];
-            }
-            $constraints[] = new GreaterThanOrEqual($gtoe);
+            $constraints[] = new GreaterThanOrEqual($value);
         }
 
-        if(array_key_exists('lessThanOrEqual', $property) && !empty($property['lessThanOrEqual']))
+        if(in_array('lesserThanOrEqual', $property) && !empty($value))
         {
-            $ltoe = $property['lessThanOrEqual'];
-            if(is_array($ltoe) && array_key_exists('propertyPath', $ltoe) && !empty($ltoe['propertyPath']))
-            {
-                $ltoe = $ltoe['propertyPath'];
-            }
-            $constraints[] = new LessThanOrEqual($ltoe);
+            $constraints[] = new LessThanOrEqual($value);
         }
 
-        if(array_key_exists('greaterThan', $property) && !empty($property['greaterThan']))
+        if(in_array('greaterThan', $property) && !empty($value))
         {
-            $gt = $property['greaterThan'];
-            if(is_array($gt) && array_key_exists('propertyPath', $gt) && !empty($gt['propertyPath']))
-            {
-                $gt = $gt['propertyPath'];
-            }
-            $constraints[] = new GreaterThan($gt);
+            $constraints[] = new GreaterThan($value);
         }
 
-        if(array_key_exists('lessThan', $property) && !empty($property['lessThan']))
+        if(in_array('lesserThan', $property) && !empty($value))
         {
-            $lt = $property['lessThan'];
-            if(is_array($lt) && array_key_exists('propertyPath', $lt) && !empty($lt['propertyPath']))
-            {
-                $lt = $lt['propertyPath'];
-            }
-            $constraints[] = new LessThanOrEqual($lt);
+            $constraints[] = new LessThanOrEqual($value);
         }
 
         return $constraints;

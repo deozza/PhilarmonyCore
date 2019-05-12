@@ -83,7 +83,7 @@ class ProcessForm
                 return $this->response->badRequest($e->getMessage());
             }
 
-            if(!isset($config['type']))
+            if(!isset($propertyConfig['type']))
             {
                 throw new BadFileTree("Property $property must have a type");
             }

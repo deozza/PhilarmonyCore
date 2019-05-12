@@ -37,11 +37,16 @@ trait AddFieldTrait{
             $type = explode(".", $config['type']);
             if(isset($type[1])) $this->subType = $type[1];
             $class = FieldTypes::ENUMERATION[$type[0]];
-            $formOptions = array_merge($formOptions,$this->addTypeConstraints($class));
             $formOptions['constraints'] = [];
+            $formOptions = array_merge($formOptions,$this->addTypeConstraints($class));
             foreach($config['constraints'] as $constraint=>$value)
             {
                 $formOptions['constraints'] = array_merge($formOptions['constraints'], $this->addValueConstraint(explode('.', $constraint), $value));
+            }
+
+            if(isset($config['constraints']['required']) && $config['constraints']['required'] === true)
+            {
+                array_push($formOptions['constraints'], new NotBlank());
             }
         }
 

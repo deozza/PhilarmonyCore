@@ -50,9 +50,13 @@ class ProcessForm
             return $data;
         }
 
+
         foreach($this->formFields as $field=>$config)
         {
-            $this->addFieldToForm($field, $config, $form);
+            if(!isset($config['constraints']['automatic']))
+            {
+                $this->addFieldToForm($field, $config, $form);
+            }
         }
 
         $data = $this->processData($requestBody, $form, $formKind);
@@ -64,13 +68,13 @@ class ProcessForm
 
         if(!is_object($data))
         {
-            $this->saveData($data, $entityToProcess, $formKind, $formFields);
+            $this->saveData($data, $entityToProcess, $formKind, $this->formFields);
         }
 
         return $data;
     }
 
-    private function selectFormFields(array $properties, $fields = [], $isRequired = null)
+    private function selectFormFields(array $properties, $fields = [], $isRequired = null, $arrayOf = null)
     {
         foreach($properties as $property)
         {
@@ -101,8 +105,13 @@ class ProcessForm
                     return $this->response->badRequest($e->getMessage());
                 }
 
+                if(isset($propertyConfig['array']))
+                {
+                    $arrayOf = $property;
+                }
+
                 $isRequired = ($propertyConfig['constraints']['required'] === false) ? false : null;
-                $fields = array_merge($fields, $this->selectFormFields($embeddedPropertyConfig, $fields, $isRequired));
+                $fields = array_merge($fields, $this->selectFormFields($embeddedPropertyConfig, $fields, $isRequired, $arrayOf));
             }
             else
             {
@@ -122,7 +131,7 @@ class ProcessForm
                     $isArray = $propertyConfig['array'];
                 }
 
-                $fields[$property] = ["type"=>$realType, "array"=>$isArray, "constraints"=>$propertyConfig['constraints']];
+                $fields[$property] = ["type"=>$realType, "array"=>$isArray, "constraints"=>$propertyConfig['constraints'], "arrayOf"=>$arrayOf];
             }
         }
         return $fields;

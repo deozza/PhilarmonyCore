@@ -274,9 +274,21 @@ class EntityController extends AbstractController
             return $this->response->badRequest($e->getMessage());
         }
 
-        if(!array_key_exists($request->getMethod(), $stateConfig['methods']))
+        try
         {
-            return $this->response->methodNotAllowed($request->getMethod());
+            if(!isset($stateConfig['methods']))
+            {
+                throw new BadFileTree("__default state of $entity_name must have a 'methods' node");
+            }
+
+            if(!array_key_exists($request->getMethod(), $stateConfig['methods']))
+            {
+                return $this->response->methodNotAllowed($request->getMethod());
+            }
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
         }
 
         if(empty($this->getUser()->getUsername()))

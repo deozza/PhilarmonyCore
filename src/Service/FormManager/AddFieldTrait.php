@@ -62,17 +62,20 @@ trait AddFieldTrait{
             case EntityType::class:
                 {
                     $formOptions['class'] = Entity::class;
-                    $formOptions['query_builder'] = function(EntityRepository $er)
-                    {
-                        return $er->createQueryBuilder('e')
-                            ->where("e.kind = :kind")
-                            ->setParameter(':kind', $this->subType);
-                    };
-                    $formOptions['choice_value'] = function(Entity $entity = null)
-                    {
-                        return $entity ? $entity->getUuidAsString() : '';
-                    };
 
+                    if($this->subType != "user")
+                    {
+                        $formOptions['query_builder'] = function(EntityRepository $er)
+                        {
+                            return $er->createQueryBuilder('e')
+                                ->where("e.kind = :kind")
+                                ->setParameter(':kind', $this->subType);
+                        };
+                        $formOptions['choice_value'] = function(Entity $entity = null)
+                        {
+                            return $entity ? $entity->getUuidAsString() : '';
+                        };
+                    }
                 };break;
 
             case ChoiceType::class:

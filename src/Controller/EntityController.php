@@ -103,7 +103,7 @@ class EntityController extends AbstractController
 
                 if(!isset($exists['states'][$item->getValidationState()]['methods'][$request->getMethod()]))
                 {
-                    throw new BadFileTree("Method ".$request->getMethod()." was not found in the state ".$item->getValidationState()." in $entity_name");
+                    unset($entitiesQuery[$key]);
                 }
 
                 if(!isset($exists['states'][$item->getValidationState()]['methods'][$request->getMethod()]['by']))

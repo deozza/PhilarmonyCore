@@ -8,15 +8,31 @@ trait SaveDataTrait{
     private function saveData($data, $entityToProcess, $formKind, $formFields)
     {
         $this->default = [];
-
         $propertiesOfEntity = $entityToProcess->getProperties();
-        $this->addDefaultValue($entityToProcess->getKind());
+        if(empty($propertiesOfEntity))
+        {
+            $data = $this->saveNewData($data, $formFields);
+        }
+        else
+        {
+            $data = $this->mergeData($data,$propertiesOfEntity, $formFields, $formKind);
+        }
+
+/*
 
         if(!is_array($data))
         {
             $file = base64_encode($data);
 
-            $isPropertyMultiple = $this->schemaLoader->loadPropertyEnumeration($formFields[0]);
+            try
+            {
+                $isPropertyMultiple = $this->schemaLoader->loadPropertyEnumeration($formFields[0]);
+            }
+            catch(\Exception $e)
+            {
+                return $this->response->badRequest($e->getMessage());
+            }
+
             $isMultiple = explode('.', $isPropertyMultiple['type']);
 
             if($isMultiple[0] === "array")
@@ -67,47 +83,97 @@ trait SaveDataTrait{
                 }
             }
         }
-
-        $entityToProcess->setProperties($propertiesOfEntity);
+        */
+        $entityToProcess->setProperties($data);
         $this->em->persist($entityToProcess);
     }
 
-    private function addDefaultValue($kind, $embedded = false)
+    private function saveNewData($data, $formFields)
     {
-        $defaultProperties = $this->schemaLoader->loadEntityEnumeration($kind);
-        foreach($defaultProperties['properties'] as $value)
+        $subData = [];
+        foreach($formFields as $field=>$config)
         {
-            $property = explode('.', $this->schemaLoader->loadPropertyEnumeration($value)['type']);
 
-            $isEmbedded = array_search("embedded", $property);
-            if($isEmbedded)
+            if(isset($config['constraints']['automatic']))
             {
-                $keyToRemove = array_search($value, $defaultProperties['properties']);
-                unset($defaultProperties['properties'][$keyToRemove]);
-
-                $this->default[$property[$isEmbedded + 1]] = [];
-                $this->addDefaultValue($property[$isEmbedded + 1], true);
+                $value = $this->addDefaultValue($config['constraints']['automatic']);
+                $data = array_merge($data, [$field=>$value]);
             }
 
-            $property = $this->schemaLoader->loadPropertyEnumeration($value);
-            if(isset($property['default']) && $property['default'] !== null)
+            if(isset($config['constraints']['default']) && !isset($data[$field]))
             {
-                $defaultValue = explode('.', $property['default']);
 
-                if($defaultValue[0] === "date")
+                $value = $this->addDefaultValue($config['constraints']['default']);
+                $data = array_merge($data, [$field=>$value]);
+            }
+
+            if(isset($config['arrayOf']))
+            {
+                $data[$config['arrayOf']] = [];
+            }
+        }
+
+        foreach ($formFields as $field=>$config)
+        {
+            if(isset($config['arrayOf']))
+            {
+                if(!isset($subData[$config['arrayOf']]))
                 {
-                    $defaultValue[0] = new \DateTime($defaultValue[1]);
-                    $defaultValue[0] = $defaultValue[0]->format('Y-m-d H:i:s');
+                    $subData[$config['arrayOf']] = [];
                 }
-                if($embedded)
+                    $subData[$config['arrayOf']][$field] = $data[$field];
+                    unset($data[$field]);
+            }
+        }
+
+        if(!empty($subData))
+        {
+            foreach ($subData as $key=>$value)
+            {
+                $data[$key] = [$value];
+            }
+        }
+
+        return $data;
+    }
+
+    private function mergeData($data, $propertiesOfEntity, $formFields, $formKind)
+    {
+        $data = $this->saveNewData($data, $formFields);
+        foreach($data as $key=>$value)
+        {
+            if(!isset($propertiesOfEntity[$key]))
+            {
+                $propertiesOfEntity[$key] = $value;
+            }
+            else if(is_array($propertiesOfEntity[$key]))
+            {
+                if($formKind === "post")
                 {
-                    $this->default[$kind][$value] = $defaultValue[0];
+                    $propertiesOfEntity[$key] = array_merge($propertiesOfEntity[$key], $value);
                 }
                 else
                 {
-                    $this->default[$value] = $defaultValue[0];
+                    $propertiesOfEntity[$key] = $value;
                 }
             }
+            else
+            {
+                $propertiesOfEntity[$key] = $value;
+            }
         }
+        return $propertiesOfEntity;
+    }
+
+    private function addDefaultValue($default)
+    {
+        $default = explode('.', $default);
+        $value = $default[0];
+        if($value === "date")
+        {
+            $value = new \DateTime($default[1]);
+            $value = $value->format('Y-m-d H:i:s');
+        }
+        return $value;
     }
 }

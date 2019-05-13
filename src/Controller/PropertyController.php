@@ -65,7 +65,14 @@ class PropertyController extends AbstractController
 
         $state = $entity->getValidationState();
 
-        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+        try
+        {
+            $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
 
         if(!isset($entityConfig['states'][$state]['methods'][$request->getMethod()]))
         {
@@ -142,7 +149,14 @@ class PropertyController extends AbstractController
 
         $state = $entity->getValidationState();
 
-        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+        try
+        {
+            $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
 
         if(!isset($entityConfig['states'][$state]['methods'][$request->getMethod()]) ||
             !in_array($property_name, $entityConfig['states'][$state]['methods'][$request->getMethod()]['properties']))
@@ -213,7 +227,14 @@ class PropertyController extends AbstractController
 
         $state = $entity->getValidationState();
 
-        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+        try
+        {
+            $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
 
         if(!isset($entityConfig['states'][$state]['methods'][$request->getMethod()]))
         {
@@ -287,7 +308,14 @@ class PropertyController extends AbstractController
         }
         $state = $entity->getValidationState();
 
-        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+        try
+        {
+            $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
 
         if(!isset($entityConfig['states'][$state]['methods'][$request->getMethod()]))
         {
@@ -331,7 +359,15 @@ class PropertyController extends AbstractController
             unset($propertiesOfEntity[$property_name][$key]);
         }
 
-        $property = $this->schemaLoader->loadPropertyEnumeration($property_name);
+        try
+        {
+            $property = $this->schemaLoader->loadPropertyEnumeration($property_name);
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
+
         if(array_key_exists("default", $property) && $property['default'] !== null)
         {
             $default = explode('.', $property['default']);

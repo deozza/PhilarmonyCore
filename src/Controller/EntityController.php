@@ -2,6 +2,7 @@
 namespace Deozza\PhilarmonyBundle\Controller;
 
 use Deozza\PhilarmonyBundle\Entity\Entity;
+use Deozza\PhilarmonyBundle\Exceptions\BadFileTree;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\PhilarmonyBundle\Service\FormManager\ProcessForm;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
@@ -49,18 +50,18 @@ class EntityController extends AbstractController
      */
     public function getEntityListAction($entity_name, Request $request)
     {
-        $exists= $this->schemaLoader->loadEntityEnumeration($entity_name);
+        try
+        {
+            $exists= $this->schemaLoader->loadEntityEnumeration($entity_name);
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
 
         if(empty($exists))
         {
             return $this->response->notFound("This route does not exists%s");
-        }
-
-        $access_errors = $this->ruleManager->decideAccess($exists, $request->getMethod());
-
-        if($access_errors > 0)
-        {
-            return $this->response->forbiddenAccess("You can not access to the $entity_name");
         }
 
         $conflict_errors = $this->ruleManager->decideConflict($exists, $request->getMethod(),__DIR__);
@@ -70,15 +71,46 @@ class EntityController extends AbstractController
             return $this->response->conflict("You can not access to the the $entity_name", $conflict_errors);
         }
 
-
         $propertyFilter = $request->query->get("property", []);
         $entityFilter = $request->query->get("entity", []);
         try
         {
             $entitiesQuery = $this->em->getRepository(Entity::class)->findAllFiltered($propertyFilter, $entityFilter, $entity_name);
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->notFound("No entity was found with these filters");
+        }
 
+        try
+        {
             foreach($entitiesQuery as $key=>$item)
             {
+                if(!isset($exists['states']))
+                {
+                    throw new BadFileTree("$entity_name must have a 'states' node");
+                }
+
+                if(!isset($exists['states'][$item->getValidationState()]))
+                {
+                    throw new BadFileTree("State ".$item->getValidationState()." was not found in $entity_name");
+                }
+
+                if(!isset($exists['states'][$item->getValidationState()]['methods']))
+                {
+                    throw new BadFileTree("State ".$item->getValidationState()." of $entity_name must have a 'methods' node");
+                }
+
+                if(!isset($exists['states'][$item->getValidationState()]['methods'][$request->getMethod()]))
+                {
+                    unset($entitiesQuery[$key]);
+                }
+
+                if(!isset($exists['states'][$item->getValidationState()]['methods'][$request->getMethod()]['by']))
+                {
+                    throw new BadFileTree("Method ".$request->getMethod()." must have a 'by' node in $entity_name");
+                }
+
                 $constraints = $exists['states'][$item->getValidationState()]['methods'][$request->getMethod()]['by'];
                 if($constraints !== "all")
                 {
@@ -97,18 +129,17 @@ class EntityController extends AbstractController
                     }
                 }
             }
-
-            $entities = $this->paginator->paginate(
-                $entitiesQuery,
-                $request->query->getInt("page", 1),
-                $request->query->getInt("number", 10)
-            );
-
         }
-        catch(\Exception $e)
+        catch (\Exception $e)
         {
-            return $this->response->notFound("No entity was found with these filters");
+            return $this->response->badRequest($e->getMessage());
         }
+
+        $entities = $this->paginator->paginate(
+            $entitiesQuery,
+            $request->query->getInt("page", 1),
+            $request->query->getInt("number", 10)
+        );
 
         return $this->response->okPaginated($entities, ['entity_complete']);
     }
@@ -133,14 +164,44 @@ class EntityController extends AbstractController
 
         $state = $exist->getValidationState();
 
-        $entityConfig = $this->schemaLoader->loadEntityEnumeration($exist->getKind());
+        try
+        {
+            $entityConfig = $this->schemaLoader->loadEntityEnumeration($exist->getKind());
+            if(!isset($entityConfig['states']))
+            {
+                throw new BadFileTree($exist->getKind()." must have a 'states' node");
+            }
+
+            if(!isset($entityConfig['states'][$state]['methods']))
+            {
+                throw new BadFileTree("$state of ".$exist->getKind()." must have a 'methods' node");
+            }
+
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
+
 
         if(!isset($entityConfig['states'][$state]['methods'][$request->getMethod()]))
         {
             return $this->response->methodNotAllowed($request->getMethod());
         }
 
-        $constraints = $entityConfig['states'][$state]['methods'][$request->getMethod()]['by'];
+        try
+        {
+            if(!isset($entityConfig['states'][$state]['methods'][$request->getMethod()]['by']))
+            {
+                throw new BadFileTree($request->getMethod(). "of $state of ".$exist->getKind()." must have a 'by' node");
+            }
+
+            $constraints = $entityConfig['states'][$state]['methods'][$request->getMethod()]['by'];
+        }
+        catch (\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
 
         if($constraints === "all")
         {
@@ -152,11 +213,17 @@ class EntityController extends AbstractController
             return $this->response->notAuthorized();
         }
 
-        $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $exist);
-
-        if($isAuthorized === false)
+        try
         {
-            return $this->response->forbiddenAccess("Access to this resource is forbidden");
+            $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $exist);
+            if($isAuthorized === false)
+            {
+                return $this->response->forbiddenAccess("Access to this resource is forbidden");
+            }
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
         }
 
         $conflict_errors = $this->ruleManager->decideConflict($exist, $request->getMethod(),__DIR__);
@@ -179,18 +246,49 @@ class EntityController extends AbstractController
      */
     public function postEntityAction($entity_name, Request $request)
     {
-        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity_name);
+        try
+        {
+            $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity_name);
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
 
         if(empty($entityConfig))
         {
             return $this->response->notFound("This route does not exists");
         }
 
-        $stateConfig = $entityConfig['states']['__default'];
-
-        if(!array_key_exists($request->getMethod(), $stateConfig['methods']))
+        try
         {
-            return $this->response->methodNotAllowed($request->getMethod());
+            if(!isset($entityConfig['states']['__default']))
+            {
+                throw new BadFileTree("$entity_name must have a __default state");
+            }
+
+            $stateConfig = $entityConfig['states']['__default'];
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
+
+        try
+        {
+            if(!isset($stateConfig['methods']))
+            {
+                throw new BadFileTree("__default state of $entity_name must have a 'methods' node");
+            }
+
+            if(!array_key_exists($request->getMethod(), $stateConfig['methods']))
+            {
+                return $this->response->methodNotAllowed($request->getMethod());
+            }
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
         }
 
         if(empty($this->getUser()->getUsername()))
@@ -201,12 +299,27 @@ class EntityController extends AbstractController
         $userRoles = $this->getUser()->getRoles();
         $isAllowed = false;
 
-        foreach ($userRoles as $role)
+        try
         {
-            if(in_array($role, $stateConfig['methods']['POST']['by']['roles']))
+            if(!isset($stateConfig['methods']['POST']['by']))
             {
-                $isAllowed = true;
+                throw new BadFileTree($request->getMethod()." must have a 'by' node");
             }
+
+            if(isset($stateConfig['methods']['POST']['by']['roles']))
+            {
+                foreach ($userRoles as $role)
+                {
+                    if(in_array($role, $stateConfig['methods']['POST']['by']['roles']))
+                    {
+                        $isAllowed = true;
+                    }
+                }
+            }
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
         }
 
         if($isAllowed === false)
@@ -224,16 +337,28 @@ class EntityController extends AbstractController
         $entityToPost->setOwner($this->getUser());
         $entityToPost->setValidationState("__default");
 
-        $formFields = $stateConfig['methods'][$request->getMethod()]['properties'];
-
-        $posted = $this->processForm->generateAndProcess($formKind = 'post', $request->getContent(), $entityToPost, $entityConfig, $formFields);
-
-        if(is_object($posted))
+        try
         {
-            return $posted;
-        }
+            if(!isset($stateConfig['methods'][$request->getMethod()]['properties']))
+            {
+                throw new BadFileTree($request->getMethod()." must have a 'properties' node");
+            }
 
-        $state = $this->validator->processValidation($entityToPost,$entityToPost->getValidationState(), $entityConfig['states'], $this->getUser());
+            $formFields = $stateConfig['methods'][$request->getMethod()]['properties'];
+            $posted = $this->processForm->generateAndProcess($formKind = 'post', $request->getContent(), $entityToPost, $entityConfig, $formFields);
+
+            if(is_object($posted))
+            {
+                return $posted;
+            }
+
+            $state = $this->validator->processValidation($entityToPost,$entityToPost->getValidationState(), $entityConfig['states'], $this->getUser());
+
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
 
         if(!is_array($state) || $state['state'] != $entityToPost->getValidationState())
         {
@@ -273,39 +398,93 @@ class EntityController extends AbstractController
 
         $state = $entity->getValidationState();
 
-        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
-        $stateConfig = $entityConfig['states'][$state];
+        try
+        {
+            $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
+
+        try
+        {
+            if(!isset($entityConfig['states'][$state]))
+            {
+                throw new BadFileTree($entity->getKind()." must have a $state state");
+            }
+            $stateConfig = $entityConfig['states'][$state];
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
 
         if(!isset($stateConfig['methods'][$request->getMethod()]))
         {
             return $this->response->methodNotAllowed($request->getMethod());
         }
 
-        $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
-
-        $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $entity);
-
-        if($isAuthorized === false)
+        try
         {
-            return $this->response->forbiddenAccess("Access to this resource is forbidden");
+            if(!isset($stateConfig['methods'][$request->getMethod()]['by']))
+            {
+                throw new BadFileTree($request->getMethod()." must have a 'by' node");
+            }
+            $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
         }
 
-        $formFields = $stateConfig['methods'][$request->getMethod()]['properties'];
-
-        $patched = $this->processForm->generateAndProcess($formKind = 'patch', $request->getContent(), $entity, $entityConfig, $formFields);
-
-        if(empty($patched))
+        try
         {
-            return $this->response->badRequest("Request content must not be empty");
+            $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $entity);
+            if($isAuthorized === false)
+            {
+                return $this->response->forbiddenAccess("Access to this resource is forbidden");
+            }
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
         }
 
-        if(is_object($patched))
+        try
         {
-            return $patched;
+            if(!isset($stateConfig['methods'][$request->getMethod()]['properties']))
+            {
+                throw new BadFileTree($request->getMethod()." must have a 'properties' node");
+            }
+            $formFields = $stateConfig['methods'][$request->getMethod()]['properties'];
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
         }
 
-        $state = $this->validator->processValidation($entity,$entity->getValidationState(), $entityConfig['states'], $this->getUser());
-        $this->em->flush();
+        try
+        {
+            $patched = $this->processForm->generateAndProcess($formKind = 'patch', $request->getContent(), $entity, $entityConfig, $formFields);
+
+            if(empty($patched))
+            {
+                return $this->response->badRequest("Request content must not be empty");
+            }
+
+            if(is_object($patched))
+            {
+                return $patched;
+            }
+            $state = $this->validator->processValidation($entity,$entity->getValidationState(), $entityConfig['states'], $this->getUser());
+            $this->em->flush();
+
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
 
         if(is_array($state))
         {
@@ -328,7 +507,6 @@ class EntityController extends AbstractController
      */
     public function deleteEntityAction($id, Request $request)
     {
-
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($id);
 
         if(empty($entity))
@@ -343,24 +521,63 @@ class EntityController extends AbstractController
 
         $state = $entity->getValidationState();
 
-        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
-        $stateConfig = $entityConfig['states'][$state];
-
-
-        if(!isset($stateConfig['methods'][$request->getMethod()]))
+        try
         {
-            return $this->response->methodNotAllowed($request->getMethod());
+            $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
         }
 
-        $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
-
-        $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $entity);
-
-        if($isAuthorized === false)
+        try
         {
-            return $this->response->forbiddenAccess("Access to this resource is forbidden");
+            if(!isset($entityConfig['states']))
+            {
+                throw new BadFileTree($entity->getKind()." must have a 'states' node");
+            }
+            $stateConfig = $entityConfig['states'][$state];
+
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
         }
 
+        try
+        {
+            if (!isset($stateConfig["methods"]))
+            {
+                throw new BadFileTree("$state of ".$entity->getKind()." must have a 'methods' node");
+            }
+            if(!isset($stateConfig['methods'][$request->getMethod()]))
+            {
+                return $this->response->methodNotAllowed($request->getMethod());
+            }
+
+            if(!isset($stateConfig['methods'][$request->getMethod()]['by']))
+            {
+                throw new BadFileTree($request->getMethod()." of $state must have a 'by' node");
+            }
+            $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
+
+        try
+        {
+            $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $entity);
+            if($isAuthorized === false)
+            {
+                return $this->response->forbiddenAccess("Access to this resource is forbidden");
+            }
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
 
         $conflict_errors = $this->ruleManager->decideConflict($entity, $request->getMethod(),__DIR__);
 

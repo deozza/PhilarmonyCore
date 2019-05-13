@@ -1,6 +1,7 @@
 <?php
 namespace Deozza\PhilarmonyBundle\Service\FormManager;
 
+use Deozza\PhilarmonyBundle\Exceptions\BadFileTree;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\PhilarmonyBundle\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;
@@ -35,19 +36,31 @@ class ProcessForm
         {
             $formFields = $entityKind['properties'];
         }
-        $this->formFields = $this->selectFormFields($formFields);
+        try
+        {
+            $this->formFields = $this->selectFormFields($formFields);
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
+        }
         if(!is_object(json_decode($requestBody)))
         {
             $data = $this->saveData($requestBody, $entityToProcess, $formKind, $formFields);
             return $data;
         }
 
+
         foreach($this->formFields as $field=>$config)
         {
-            $this->addFieldToForm($field, $config, $form);
+            if(!isset($config['constraints']['automatic']))
+            {
+                $this->addFieldToForm($field, $config, $form);
+            }
         }
 
         $data = $this->processData($requestBody, $form, $formKind);
+
 
         if(is_a($data, JsonResponse::class))
         {
@@ -56,24 +69,50 @@ class ProcessForm
 
         if(!is_object($data))
         {
-            $this->saveData($data, $entityToProcess, $formKind, $formFields);
+            $this->saveData($data, $entityToProcess, $formKind, $this->formFields);
         }
 
         return $data;
     }
 
-    private function selectFormFields(array $properties, $fields = [], $isRequired = null)
+    private function selectFormFields(array $properties, $fields = [], $isRequired = null, $arrayOf = null)
     {
         foreach($properties as $property)
         {
-            $propertyConfig = $this->schemaLoader->loadPropertyEnumeration($property);
+            try
+            {
+                $propertyConfig = $this->schemaLoader->loadPropertyEnumeration($property);
+            }
+            catch(\Exception $e)
+            {
+                return $this->response->badRequest($e->getMessage());
+            }
+
+            if(!isset($propertyConfig['type']))
+            {
+                throw new BadFileTree("Property $property must have a type");
+            }
+
             $type = explode('.',$propertyConfig['type']);
 
             if(in_array("embedded", $type))
             {
-                $embeddedPropertyConfig = $this->schemaLoader->loadEntityEnumeration($type[1])['properties'];
+                try
+                {
+                    $embeddedPropertyConfig = $this->schemaLoader->loadEntityEnumeration($type[1])['properties'];
+                }
+                catch(\Exception $e)
+                {
+                    return $this->response->badRequest($e->getMessage());
+                }
+
+                if(isset($propertyConfig['array']))
+                {
+                    $arrayOf = $property;
+                }
+
                 $isRequired = ($propertyConfig['constraints']['required'] === false) ? false : null;
-                $fields = array_merge($fields, $this->selectFormFields($embeddedPropertyConfig, $fields, $isRequired));
+                $fields = array_merge($fields, $this->selectFormFields($embeddedPropertyConfig, $fields, $isRequired, $arrayOf));
             }
             else
             {
@@ -93,7 +132,7 @@ class ProcessForm
                     $isArray = $propertyConfig['array'];
                 }
 
-                $fields[$property] = ["type"=>$realType, "array"=>$isArray, "constraints"=>$propertyConfig['constraints']];
+                $fields[$property] = ["type"=>$realType, "array"=>$isArray, "constraints"=>$propertyConfig['constraints'], "arrayOf"=>$arrayOf];
             }
         }
         return $fields;
@@ -103,11 +142,32 @@ class ProcessForm
     {
         foreach($formFields as $field)
         {
-            $config = $this->schemaLoader->loadPropertyEnumeration($field);
+            try
+            {
+                $config = $this->schemaLoader->loadPropertyEnumeration($field);
+            }
+            catch(\Exception $e)
+            {
+                return $this->response->badRequest($e->getMessage());
+            }
+
+            if(!isset($config['type']))
+            {
+                throw new BadFileTree("Property $field must have a type");
+            }
+
             $isEmbedded = explode("embedded.", $config['type']);
             if(count($isEmbedded)>1)
             {
-                $embeddedProperties = $this->schemaLoader->loadEntityEnumeration($isEmbedded[1])['properties'];
+                try
+                {
+                    $embeddedProperties = $this->schemaLoader->loadEntityEnumeration($isEmbedded[1])['properties'];
+                }
+                catch(\Exception $e)
+                {
+                    return $this->response->badRequest($e->getMessage());
+                }
+
                 foreach($embeddedProperties as $property)
                 {
                     if(isset($data[$property]))

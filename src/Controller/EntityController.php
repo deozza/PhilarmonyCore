@@ -530,19 +530,34 @@ class EntityController extends AbstractController
             return $this->response->badRequest($e->getMessage());
         }
 
-        $stateConfig = $entityConfig['states'][$state];
-
-
-        if(!isset($stateConfig['methods'][$request->getMethod()]))
+        try
         {
-            return $this->response->methodNotAllowed($request->getMethod());
+            if(!isset($entityConfig['states']))
+            {
+                throw new BadFileTree($entity->getKind()." must have a 'states' node");
+            }
+            $stateConfig = $entityConfig['states'][$state];
+
+        }
+        catch(\Exception $e)
+        {
+            return $this->response->badRequest($e->getMessage());
         }
 
         try
         {
+            if (!isset($stateConfig["methods"]))
+            {
+                throw new BadFileTree("$state of ".$entity->getKind()." must have a 'methods' node");
+            }
+            if(!isset($stateConfig['methods'][$request->getMethod()]))
+            {
+                return $this->response->methodNotAllowed($request->getMethod());
+            }
+
             if(!isset($stateConfig['methods'][$request->getMethod()]['by']))
             {
-                throw new BadFileTree($request->getMethod()." must have a 'by' node");
+                throw new BadFileTree($request->getMethod()." of $state must have a 'by' node");
             }
             $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
         }

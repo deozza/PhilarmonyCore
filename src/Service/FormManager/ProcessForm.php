@@ -61,6 +61,7 @@ class ProcessForm
 
         $data = $this->processData($requestBody, $form, $formKind);
 
+
         if(is_a($data, JsonResponse::class))
         {
             return $data;

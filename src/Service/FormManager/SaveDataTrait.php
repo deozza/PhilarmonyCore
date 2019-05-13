@@ -15,7 +15,7 @@ trait SaveDataTrait{
         }
         else
         {
-            $data = $this->mergeData($data,$propertiesOfEntity, $formFields);
+            $data = $this->mergeData($data,$propertiesOfEntity, $formFields, $formKind);
         }
 
 /*
@@ -84,7 +84,6 @@ trait SaveDataTrait{
             }
         }
         */
-
         $entityToProcess->setProperties($data);
         $this->em->persist($entityToProcess);
     }
@@ -138,7 +137,7 @@ trait SaveDataTrait{
         return $data;
     }
 
-    private function mergeData($data, $propertiesOfEntity, $formFields)
+    private function mergeData($data, $propertiesOfEntity, $formFields, $formKind)
     {
         $data = $this->saveNewData($data, $formFields);
         foreach($data as $key=>$value)
@@ -147,9 +146,20 @@ trait SaveDataTrait{
             {
                 $propertiesOfEntity[$key] = $value;
             }
-            if(is_array($propertiesOfEntity[$key]))
+            else if(is_array($propertiesOfEntity[$key]))
             {
-                $propertiesOfEntity[$key] = array_merge($propertiesOfEntity[$key], $value);
+                if($formKind === "post")
+                {
+                    $propertiesOfEntity[$key] = array_merge($propertiesOfEntity[$key], $value);
+                }
+                else
+                {
+                    $propertiesOfEntity[$key] = $value;
+                }
+            }
+            else
+            {
+                $propertiesOfEntity[$key] = $value;
             }
         }
         return $propertiesOfEntity;

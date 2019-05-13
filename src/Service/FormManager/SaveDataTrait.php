@@ -9,6 +9,24 @@ trait SaveDataTrait{
     {
         $this->default = [];
         $propertiesOfEntity = $entityToProcess->getProperties();
+        if(!is_array($data))
+        {
+            $field = $formFields[0];
+            $data = base64_encode($data);
+            $fieldConfig = $this->schemaLoader->loadPropertyEnumeration($field);
+            $formFields = [ $field => $fieldConfig];
+
+            if(isset($fieldConfig['array']))
+            {
+
+                $data = [$data];
+            }
+
+            $data = [$field => $data];
+
+        }
+
+
         if(empty($propertiesOfEntity))
         {
             $data = $this->saveNewData($data, $formFields);

@@ -35,73 +35,7 @@ trait SaveDataTrait{
         {
             $data = $this->mergeData($data,$propertiesOfEntity, $formFields, $formKind);
         }
-
-/*
-
-        if(!is_array($data))
-        {
-            $file = base64_encode($data);
-
-            try
-            {
-                $isPropertyMultiple = $this->schemaLoader->loadPropertyEnumeration($formFields[0]);
-            }
-            catch(\Exception $e)
-            {
-                return $this->response->badRequest($e->getMessage());
-            }
-
-            $isMultiple = explode('.', $isPropertyMultiple['type']);
-
-            if($isMultiple[0] === "array")
-            {
-                $file = [$file];
-            }
-
-            $data = [$formFields[0]=> $file];
-        }
-
-        $data = array_merge_recursive($data, $this->default);
-
-        foreach($data as $property=>$value)
-        {
-            if(!empty($value))
-            {
-                if ($formKind == "patch")
-                {
-                    $propertiesOfEntity[$property] = $value;
-                }
-                else
-                {
-                    if (!empty($propertiesOfEntity[$property]))
-                    {
-                        if(!is_array($propertiesOfEntity[$property]))
-                        {
-                            continue;
-                        }
-
-                        if(in_array($value, $propertiesOfEntity[$property]))
-                        {
-                            continue;
-                        }
-
-                        if (is_array($value))
-                        {
-                            array_push($propertiesOfEntity[$property], $value);
-                        }
-                    }
-                    else
-                    {
-                        if (is_array($value))
-                        {
-                            $value = [$value];
-                        }
-                        $propertiesOfEntity[$property] = $value;
-                    }
-                }
-            }
-        }
-        */
+        
         $entityToProcess->setProperties($data);
         $this->em->persist($entityToProcess);
     }

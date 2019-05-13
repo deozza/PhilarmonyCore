@@ -73,9 +73,10 @@ class EntityController extends AbstractController
 
         $propertyFilter = $request->query->get("property", []);
         $entityFilter = $request->query->get("entity", []);
+        $sort = $request->query->get("sortBy");
         try
         {
-            $entitiesQuery = $this->em->getRepository(Entity::class)->findAllFiltered($propertyFilter, $entityFilter, $entity_name);
+            $entitiesQuery = $this->em->getRepository(Entity::class)->findAllFiltered($propertyFilter, $entityFilter, $entity_name, $sort);
         }
         catch(\Exception $e)
         {

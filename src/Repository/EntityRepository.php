@@ -20,7 +20,7 @@ class EntityRepository extends ServiceEntityRepository
     }
 
 
-    public function findAllFiltered(Array $propertyFilters,Array $entityFilters, $kind)
+    public function findAllFiltered(Array $propertyFilters,Array $entityFilters, $kind, $sort)
     {
         $queryBuilder = $this->createQueryBuilder('e');
         $queryBuilder->select('e');
@@ -47,6 +47,22 @@ class EntityRepository extends ServiceEntityRepository
                 $parameters[$filter] = "%$value%";
             }
 
+        }
+
+        if(!empty($sort))
+        {
+            foreach($sort as $field=>$order)
+            {
+                $field = explode('.', $field);
+                if($field[0] === "properties" )
+                {
+                    $queryBuilder->addOrderBy("JSON_EXTRACT(e.properties,'$.".$field[1]."') ", "$order");
+                }
+                else
+                {
+                    $queryBuilder->addOrderBy("e.".$field[0], "$order");
+                }
+            }
         }
 
         $queryBuilder->setParameters($parameters);

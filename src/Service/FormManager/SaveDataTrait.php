@@ -18,12 +18,10 @@ trait SaveDataTrait{
 
             if(isset($fieldConfig['array']))
             {
-
                 $data = [$data];
             }
 
             $data = [$field => $data];
-
         }
 
 
@@ -48,14 +46,13 @@ trait SaveDataTrait{
 
             if(isset($config['constraints']['automatic']))
             {
-                $value = $this->addDefaultValue($config['constraints']['automatic']);
+                $value = $this->addDefaultValue($config['constraints']['automatic'], $data);
                 $data = array_merge($data, [$field=>$value]);
             }
 
             if(isset($config['constraints']['default']) && !isset($data[$field]))
             {
-
-                $value = $this->addDefaultValue($config['constraints']['default']);
+                $value = $this->addDefaultValue($config['constraints']['default'], $data);
                 $data = array_merge($data, [$field=>$value]);
             }
 
@@ -117,15 +114,49 @@ trait SaveDataTrait{
         return $propertiesOfEntity;
     }
 
-    private function addDefaultValue($default)
+    private function addDefaultValue($default, $data)
     {
-        $default = explode('.', $default);
-        $value = $default[0];
-        if($value === "date")
+        if(is_array($default))
         {
-            $value = new \DateTime($default[1]);
-            $value = $value->format('Y-m-d H:i:s');
+            $finalValue = [];
+            foreach($default as $item)
+            {
+                $item = explode('.', $item);
+                $value = $item[0];
+                if($value === "date")
+                {
+                    $value = new \DateTime($item[1]);
+                    $value = $value->format('Y-m-d H:i:s');
+                    $finalValue[] = $value;
+                }
+                else if($value === "owner")
+                {
+                    $value = $this->user->getId();
+                    $finalValue[] = $value;
+                }
+                else
+                {
+                    $value = $data;
+                    for($i = 0; $i < count($item); $i++)
+                    {
+                        $value = $value[$item[$i]];
+                    }
+                    $finalValue[] = $value;
+                }
+            }
+            $value = $finalValue;
         }
+        else
+        {
+            $default = explode('.', $default);
+            $value = $default[0];
+            if($value === "date")
+            {
+                $value = new \DateTime($default[1]);
+                $value = $value->format('Y-m-d H:i:s');
+            }
+        }
+
         return $value;
     }
 }

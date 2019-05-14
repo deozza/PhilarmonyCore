@@ -11,6 +11,8 @@ use Deozza\PhilarmonyBundle\Service\Validation\Validate;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -245,7 +247,7 @@ class EntityController extends AbstractController
      *     name="post_entity",
      *      methods={"POST"})
      */
-    public function postEntityAction($entity_name, Request $request)
+    public function postEntityAction($entity_name, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         try
         {
@@ -363,6 +365,16 @@ class EntityController extends AbstractController
 
         if(!is_array($state) || $state['state'] != $entityToPost->getValidationState())
         {
+            if(isset($stateConfig['methods'][$request->getMethod()]['post_scripts']))
+            {
+                $scripts = $stateConfig['methods'][$request->getMethod()]['post_scripts'];
+
+                $event = new GenericEvent($entityToPost);
+                foreach($scripts as $script)
+                {
+                    $eventDispatcher->dispatch($script, $event);
+                };
+            }
             $this->em->flush();
         }
 

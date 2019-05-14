@@ -362,8 +362,13 @@ class EntityController extends AbstractController
         {
             return $this->response->badRequest($e->getMessage());
         }
+        $conflict_errors = $this->ruleManager->decideConflict($entityToPost , $request->getMethod(),__DIR__);
 
-        if(!is_array($state) || $state['state'] != $entityToPost->getValidationState())
+        if($conflict_errors > 0)
+        {
+            return $this->response->conflict("You can not access to this entity", $conflict_errors);
+        }
+        if(!is_array($state) || $entityToPost->getValidationState() != "__default")
         {
             $this->handleEvents($request->getMethod(), $stateConfig, $entityToPost, $eventDispatcher);
             $this->em->flush();
@@ -371,7 +376,7 @@ class EntityController extends AbstractController
 
         if(is_array($state))
         {
-            return $this->response->conflict($state['errors'],$entityToPost, ['entity_property', "entity_basic"]);
+            return $this->response->conflict($state['errors'],$entityToPost, ['entity_id', 'entity_property', "entity_basic"]);
         }
 
         return $this->response->created($entityToPost, ['entity_complete', 'user_basic']);
@@ -601,9 +606,9 @@ class EntityController extends AbstractController
 
     private function handleEvents($request, $stateConfig, $entity, $eventDispatcher)
     {
-        if(isset($stateConfig['methods'][$request->getMethod()]['post_scripts']))
+        if(isset($stateConfig['methods'][$request]['post_scripts']))
         {
-            $scripts = $stateConfig['methods'][$request->getMethod()]['post_scripts'];
+            $scripts = $stateConfig['methods'][$request]['post_scripts'];
 
             $event = new GenericEvent($entity);
             foreach($scripts as $script)

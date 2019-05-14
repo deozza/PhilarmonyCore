@@ -28,26 +28,34 @@ class EntityRepository extends ServiceEntityRepository
         $queryBuilder->andWhere('e.kind = :kind');
         $parameters["kind"] = $kind;
 
-
         if(!empty($filters))
         {
             foreach($filters as $field=>$value)
             {
                 $field = explode('.', $field);
                 $operator = "LIKE";
-
-                if(is_numeric($value) === true)
+                switch ($field[0])
                 {
-                    $operator = "=";
+                    case "equal": $operator = "=";break;
+                    case "lesser": $operator = "<";break;
+                    case "greater": $operator = ">";break;
+                    case "lesserOrEqual": $operator = "<=";break;
+                    case "greaterOrEqual": $operator = ">=";break;
+                    case "like": $operator = "LIKE";break;
                 }
 
-                if($field[0] === "properties")
+                if(is_numeric($value) === false)
                 {
-                    $queryBuilder->andWhere("JSON_EXTRACT(e.properties,'$.".$field[1]."') $operator $value");
+                    $value = "'".$value."'";
+                }
+
+                if($field[1] === "properties")
+                {
+                    $queryBuilder->andWhere("JSON_EXTRACT(e.properties,'$.".$field[2]."') $operator $value");
                 }
                 else
                 {
-                    $queryBuilder->andWhere("e.".$field[0]." $operator $value");
+                    $queryBuilder->andWhere("e.".$field[1]." $operator $value");
                 }
             }
         }
@@ -70,7 +78,6 @@ class EntityRepository extends ServiceEntityRepository
 
         $queryBuilder->setParameters($parameters);
         return $queryBuilder->getQuery()->execute();
-
     }
 
     public function findAllForValidate($kind, $property, $value, $operator)
@@ -93,8 +100,6 @@ class EntityRepository extends ServiceEntityRepository
     {
         $parameters = [];
 
-
-
         $queryBuilder = $this->createQueryBuilder('e');
         $queryBuilder->select('e');
         $queryBuilder->andWhere('e.kind = :kind');
@@ -112,14 +117,11 @@ class EntityRepository extends ServiceEntityRepository
             $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$propertyMin."')>= :value");
             $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$propertyMax."')<= :value");
             $parameters["value"] = $value;
-
         }
-
 
         $parameters["kind"] = $kind;
 
         $queryBuilder->setParameters($parameters);
         return $queryBuilder->getQuery()->execute();
     }
-
 }

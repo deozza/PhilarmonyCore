@@ -1,10 +1,9 @@
 <?php
 namespace Deozza\PhilarmonyBundle\Rules;
 
-use Deozza\PhilarmonyBundle\Entity\Property;
+use Deozza\PhilarmonyBundle\Entity\Entity;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 class UniqueConflictRule
 {
@@ -12,31 +11,61 @@ class UniqueConflictRule
 
     public function supports($context, $method)
     {
-        return false; //in_array($method, ['POST']) && is_a($context, Property::class);
+        return in_array($method, ['POST', 'PATCH']);
     }
 
-    public function decide($object, Request $request, EntityManagerInterface $em, DatabaseSchemaLoader $schemaLoader)
+    public function decide($entity, $request, EntityManagerInterface $em, DatabaseSchemaLoader $schemaLoader)
     {
-        $propertyKind = $schemaLoader->loadPropertyEnumeration($object->getKind());
+        $kind = $entity->getKind();
+        $properties = $this->getProperties($schemaLoader, $kind);
+        $properties = $this->onlyUniqueProperties($properties);
 
-
-        if($propertyKind['unique'] == true)
+        $submited = $entity->getProperties();
+        foreach($properties as $key=>$value)
         {
-            $alreadyExists = $em->getRepository(Property::class)->findOneBy(
-                [
-                    "kind" => $object->getKind(),
-                    "value" => $object->getValue()
-                ]
-            );
-
-            if(!empty($alreadyExists))
+            $exist = $em->getRepository(Entity::class)->findAllFiltered(['equal.properties.'.$key=>$submited[$key]], [], $entity->getKind());
+            if(count($exist)> 0)
             {
-                return ["conflict" => self::ERROR_EXISTS];
+                return ["conflict" => [$key=>self::ERROR_EXISTS]];
+            }
+        }
+        return;
+    }
 
+    private function getProperties($schemaLoader, $kind)
+    {
+        $propertiesConfig = $schemaLoader->loadEntityEnumeration($kind)['properties'];
+
+        $properties = [];
+        foreach($propertiesConfig as $property)
+        {
+            $properties[$property] = $schemaLoader->loadPropertyEnumeration($property);
+            $type = explode('.', $properties[$property]['type']);
+            if($type[0] === "embedded")
+            {
+                unset($properties[$property]);
+                $sub = $schemaLoader->loadEntityEnumeration($type[1])['properties'];
+                foreach($sub as $item)
+                {
+                    $properties[$property.'.'.$item] = $schemaLoader->loadPropertyEnumeration($item);
+                }
             }
         }
 
-        return ;
+        return $properties;
+    }
+
+    private function onlyUniqueProperties(array $properties)
+    {
+        foreach($properties as $key=>$value)
+        {
+            if($value['constraints']['unique'] !== true)
+            {
+                unset($properties[$key]);
+            }
+        }
+
+        return $properties;
 
     }
 }

@@ -5,7 +5,7 @@ Philarmony
 [![mysql](https://img.shields.io/badge/mysql-%5E5.7-blue.svg)]()
 [![symfony](https://img.shields.io/badge/symfony-%5E4.2-blue.svg)](https://symfony.com/doc/current/index.html#gsc.tab=0)
 [![Build Status](https://travis-ci.org/deozza/atypikhouse.svg?branch=master)](https://travis-ci.org/deozza/atypikhouse)
-[![Stable](https://img.shields.io/badge/stable-1.0-brightgreen.svg)](https://github.com/deozza/Philarmony/tree/1.0.0)
+[![Stable](https://img.shields.io/badge/stable-1.2-brightgreen.svg)](https://github.com/deozza/Philarmony/tree/1.2.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]()
 
 ## Table of contents

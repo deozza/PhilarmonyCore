@@ -86,7 +86,7 @@ class Entity
         return $this;
     }
 
-    public function getUuid(): ?UuidInterface
+    public function getUuid()
     {
         return $this->uuid;
     }

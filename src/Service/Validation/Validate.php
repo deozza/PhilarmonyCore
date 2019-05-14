@@ -182,7 +182,15 @@ class Validate
                 }
                 else
                 {
-
+                    $properties = $entity->getProperties();
+                    for($i = 0; $i < count($userPath); $i++)
+                    {
+                        $properties = $properties[$userPath[$i]];
+                    }
+                    if($user->getId() === $properties)
+                    {
+                        $isAuthorized = true;
+                    }
                 }
             }
         }

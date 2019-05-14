@@ -131,14 +131,23 @@ __Response example :__
 ]
 ```
 
-You can filter the results of the request. To do so, add a `filterBy` url query parameter with the name of the property you want to filter by. If the property is within the json properties, prefix it with `properties`.
+You can filter the results of the request. To do so, add a `filterBy` url query parameter with the kind of filter operator and the name of the property you want to filter by. If the property is within the json properties, prefix it with `properties`.
 
+Here is the list of the possible operators :
+
+* equal
+* like
+* lesser
+* lesserOrEqual
+* greater
+* greaterOrEqual
+ 
 __Request example :__
 
 ```
 curl --header "Content-Type: application/json"
      --request GET
-     http://www.mysuper.app/api/entity/offer?filterBy[properties.price]=150
+     http://www.mysuper.app/api/entity/offer?filterBy[equal.properties.price]=150
 ```
 
 __Response example :__
@@ -291,3 +300,28 @@ curl --header "Content-Type: application/json"
 __Response example :__
 
 As the HTTP response code is 204, there is no body inside the response.
+
+### Launch post scripts
+
+You may need to execute scripts at the end of a sucessful request. For example, if you need to modify data of an entity according to a new entity freshly posted. Or if you need to send an email after a successful request. To do so, add a `post_scrips` node below an entity state:
+
+```yaml
+entities:
+  conversation:
+    properties:
+      - message
+      - participants
+    states:
+      __default:
+        methods:
+          POST:
+            properties:
+              - message
+            by:
+              roles:
+                - ROLE_USER
+            post_scripts:
+              - addParticipants
+```
+
+In this example, Philarmony will dispatch an event called `addParticipants`. All you need to do, is to subscribe to this event in your app. To know more about it, read the [Symfony documentation](https://symfony.com/doc/current/event_dispatcher.html#creating-an-event-subscriber).

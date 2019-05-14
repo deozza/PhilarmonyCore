@@ -22,10 +22,16 @@ Philarmony
 
 Philarmony is a bundle made to help you create a modular REST API. From database to controllers and forms, without forgetting authorization and data validation, manage your API easily in minutes.
 
-## V.1.1 - What's new ?
+## V.1.2 - What's new ?
 
- * the organization of properties configuration files has changed. Read more [here](src/Resources/documentation/DatabaseSchema/PROPERTY.md)
- * it is now possible to sort the results of a GET entities request. Read more [here](src/Resources/documentation/DatabaseSchema/ENTTITY.md)
+ * it is now possible to launch event at the end of a successful request. Read more [here](src/Resources/documentation/DatabaseSchema/ENTITY.md)
+ * it is now possible to specify the operator of a filter on a GET entities request. Read more [here](src/Resources/documentation/DatabaseSchema/ENTITY.md)
+ * it is now possible to apply advanced constraints onto entities via Rules. Read more [here](src/Resources/documentation/RuleManager/CONFLICTRULE.md)
+ 
+### V.1.1 - What's new ?
+
+* the organization of properties configuration files has changed. Read more [here](src/Resources/documentation/DatabaseSchema/PROPERTY.md)
+* it is now possible to sort the results of a GET entities request. Read more [here](src/Resources/documentation/DatabaseSchema/ENTTITY.md)
 
 ## Installation
 
@@ -199,6 +205,12 @@ To assure the right user is manipulating a resource, authorization is handled by
 In order to pass from one state to the next, the entity and its data must be valid according to constraints.
 
  * [Read more](src/Resources/documentation/Validation/CONSTRAINS.md)
+ 
+#### Conflict rules
+
+A conflict rules is a custom and advanced constraint that need to be developed and cannot be added to a configuration file.
+
+ * [Read more](src/Resources/documentation/RuleManager/CONFLICTRULE.md) 
  
 ## Tests 
 

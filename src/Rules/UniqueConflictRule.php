@@ -5,11 +5,11 @@ use Deozza\PhilarmonyBundle\Entity\Entity;
 use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Doctrine\ORM\EntityManagerInterface;
 
-class UniqueConflictRule
+class UniqueConflictRule implements RuleInterface
 {
     const ERROR_EXISTS = "PROPERTY_ALREADY_EXISTS";
 
-    public function supports($context, $method)
+    public function supports($entity, $method)
     {
         return in_array($method, ['POST', 'PATCH']);
     }

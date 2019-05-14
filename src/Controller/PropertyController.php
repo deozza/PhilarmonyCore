@@ -9,6 +9,8 @@ use Deozza\PhilarmonyBundle\Service\RulesManager\RulesManager;
 use Deozza\PhilarmonyBundle\Service\Validation\Validate;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -46,7 +48,7 @@ class PropertyController extends AbstractController
      *     name="get_property_from_entity",
      *     methods={"GET"})
      */
-    public function getPropertyFromEntityAction($entity_name,$property_name, $id, Request $request)
+    public function getPropertyFromEntityAction($entity_name,$property_name, $id, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneBy([
             "uuid" => $id,
@@ -112,7 +114,7 @@ class PropertyController extends AbstractController
         {
             $data = $propertiesOfEntity[$property_name][$key];
         }
-
+        $this->handleEvents($request->getMethod(), $entityConfig['states'][$state]['methods'][$request->getMethod()], $entity, $eventDispatcher);
         return $this->response->ok($data);
     }
 
@@ -128,7 +130,7 @@ class PropertyController extends AbstractController
      *     name="post_property",
      *      methods={"POST"})
      */
-    public function postPropertyAction($entity_name, $id, $property_name, Request $request)
+    public function postPropertyAction($entity_name, $id, $property_name, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         if(empty($this->getUser()->getUsername()))
         {
@@ -186,7 +188,7 @@ class PropertyController extends AbstractController
             return $posted;
         }
 
-
+        $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher);
         $this->em->flush();
 
         return $this->response->created($entity, ['entity_complete']);
@@ -203,7 +205,7 @@ class PropertyController extends AbstractController
      *     name="patch_property",
      *      methods={"PATCH"})
      */
-    public function patchPropertyAction($entity_name, $property_name, $id, Request $request)
+    public function patchPropertyAction($entity_name, $property_name, $id, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         if(empty($this->getUser()->getUsername()))
         {
@@ -268,7 +270,7 @@ class PropertyController extends AbstractController
         {
             return $patched;
         }
-
+        $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher);
         $this->em->flush();
 
         return $this->response->ok($patched);
@@ -285,7 +287,7 @@ class PropertyController extends AbstractController
      *     name="delete_property",
      *     methods={"DELETE"})
      */
-    public function deletePropertyAction($entity_name,$property_name, $id, Request $request)
+    public function deletePropertyAction($entity_name,$property_name, $id, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         if(empty($this->getUser()->getUsername()))
         {
@@ -383,9 +385,22 @@ class PropertyController extends AbstractController
 
         $entity->setProperties($propertiesOfEntity);
 
+        $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher);
 
         $this->em->flush();
         return $this->response->empty();
     }
+    private function handleEvents($request, $stateConfig, $entity, $eventDispatcher)
+    {
+        if(isset($stateConfig['methods'][$request->getMethod()]['post_scripts']))
+        {
+            $scripts = $stateConfig['methods'][$request->getMethod()]['post_scripts'];
 
+            $event = new GenericEvent($entity);
+            foreach($scripts as $script)
+            {
+                $eventDispatcher->dispatch($script, $event);
+            };
+        }
+    }
 }

@@ -25,6 +25,7 @@ class ProcessForm
 
     public function generateAndProcess($formKind, $requestBody, $entityToProcess, $entityKind, $formFields)
     {
+        $this->user = $entityToProcess->getOwner();
         if(!is_object($entityToProcess))
         {
             return;

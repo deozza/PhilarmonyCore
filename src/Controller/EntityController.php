@@ -11,6 +11,8 @@ use Deozza\PhilarmonyBundle\Service\Validation\Validate;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -79,7 +81,6 @@ class EntityController extends AbstractController
         }
         catch(\Exception $e)
         {
-            var_dump($e->getMessage());die;
             return $this->response->notFound("No entity was found with these filters");
         }
 
@@ -154,7 +155,7 @@ class EntityController extends AbstractController
      *     name="get_entity",
      *     methods={"GET"})
      */
-    public function getEntityAction($id, Request $request)
+    public function getEntityAction($id, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $exist = $this->em->getRepository(Entity::class)->findOneByUuid($id);
 
@@ -183,7 +184,6 @@ class EntityController extends AbstractController
         {
             return $this->response->badRequest($e->getMessage());
         }
-
 
         if(!isset($entityConfig['states'][$state]['methods'][$request->getMethod()]))
         {
@@ -233,6 +233,8 @@ class EntityController extends AbstractController
         {
             return $this->response->conflict("You can not access to this entity", $conflict_errors);
         }
+
+        $this->handleEvents($request->getMethod(), $entityConfig['states'][$state]['methods'][$request->getMethod()], $exist, $eventDispatcher);
         return $this->response->ok($exist, ['entity_basic', 'user_basic']);
     }
 
@@ -245,7 +247,7 @@ class EntityController extends AbstractController
      *     name="post_entity",
      *      methods={"POST"})
      */
-    public function postEntityAction($entity_name, Request $request)
+    public function postEntityAction($entity_name, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         try
         {
@@ -363,6 +365,7 @@ class EntityController extends AbstractController
 
         if(!is_array($state) || $state['state'] != $entityToPost->getValidationState())
         {
+            $this->handleEvents($request->getMethod(), $stateConfig, $entityToPost, $eventDispatcher);
             $this->em->flush();
         }
 
@@ -383,7 +386,7 @@ class EntityController extends AbstractController
      *     name="patch_entity",
      *      methods={"PATCH"})
      */
-    public function patchEntityAction($id, Request $request)
+    public function patchEntityAction($id, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($id);
 
@@ -479,6 +482,8 @@ class EntityController extends AbstractController
                 return $patched;
             }
             $state = $this->validator->processValidation($entity,$entity->getValidationState(), $entityConfig['states'], $this->getUser());
+
+            $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher);
             $this->em->flush();
 
         }
@@ -506,7 +511,7 @@ class EntityController extends AbstractController
      *     name="delete_entity",
      *     methods={"DELETE"})
      */
-    public function deleteEntityAction($id, Request $request)
+    public function deleteEntityAction($id, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($id);
 
@@ -587,9 +592,25 @@ class EntityController extends AbstractController
             return $this->response->conflict("You can not delete this entity", $conflict_errors);
         }
 
+        $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher);
+
         $this->em->remove($entity);
         $this->em->flush();
         return $this->response->empty();
+    }
+
+    private function handleEvents($request, $stateConfig, $entity, $eventDispatcher)
+    {
+        if(isset($stateConfig['methods'][$request->getMethod()]['post_scripts']))
+        {
+            $scripts = $stateConfig['methods'][$request->getMethod()]['post_scripts'];
+
+            $event = new GenericEvent($entity);
+            foreach($scripts as $script)
+            {
+                $eventDispatcher->dispatch($script, $event);
+            };
+        }
     }
 
 }

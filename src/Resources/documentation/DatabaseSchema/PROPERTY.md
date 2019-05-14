@@ -14,18 +14,21 @@ In order to create a new property kind, simply add it to your entity `yaml` file
 properties:
       title:
             type: string
-            required: true
-            unique: true
+            constraints:
+                required: true
+                unique: true
 
 ```
 
-|    Property   |                                                Description                                               | Example |
-|:-------------:|:--------------------------------------------------------------------------------------------------------:|:-------:|
-| property name | The name of you property kind. It must be unique through all your system                                 | title   |
-|      type     | The type of data handled by the property. To know more about the types handled, [read this](../TYPES.md) | string  |
-|    required   | Defines if the property must be filled (not null)                                                        | true    |
-|     unique    | Defines if the value is unique throughout all the system                                                 | true    |
-|    default    | If the property submited in the form is null, it takes the default value                                 | 1       |
+|        Property       |                                                Description                                               | Required (yes/no) |  Example |
+|:---------------------:|:--------------------------------------------------------------------------------------------------------:|:-----------------:|:--------:|
+|     property name     |                 The name of you property kind. It must be unique through all your system                 |        Yes        |   title  |
+|          type         | The type of data handled by the property. To know more about the types handled, [read this](../TYPES.md) |        Yes        |  string  |
+|  constraints.required |                             Defines if the property must be filled (not null)                            |        Yes        |   true   |
+|   constraints.unique  |                         Defines if the value is unique throughout all the system                         |        Yes        |   true   |
+|   constraints.array   |                                  Determines if the property is an array                                  |         No        |   true   |
+|  constraints.default  |                 If the property submited in the form is null, it takes the default value                 |         No        |     1    |
+| constraints.automatic |             If the property must be initialized to a cettain value without user intervention             |         No        | date.now |
 
 These are the basic constraints required by Philarmony for a property. All the constraints, advanced ones included, handled by Philarmony are [here](../CONSTRAINTS.md). You also can add new constraints assuming they will be handled by your business logic.
 

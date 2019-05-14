@@ -22,6 +22,11 @@ Philarmony
 
 Philarmony is a bundle made to help you create a modular REST API. From database to controllers and forms, without forgetting authorization and data validation, manage your API easily in minutes.
 
+## V.1.1 - What's new ?
+
+ * the organization of properties configuration files has changed. Read more [here](src/Resources/documentation/DatabaseSchema/PROPERTY.md)
+ * it is now possible to sort the results of a GET entities request. Read more [here](src/Resources/documentation/DatabaseSchema/ENTTITY.md)
+
 ## Installation
 
 You can install using composer, assuming it is already installed globally :
@@ -68,8 +73,6 @@ doctrine:
     orm:
         dql:
             string_functions:
-                JSON_CONTAINS: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonContains
-                JSON_CONTAINS_PATH: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonContainsPath
                 JSON_EXTRACT: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonExtract
                 JSON_UNQUOTE: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonUnquote
 ```

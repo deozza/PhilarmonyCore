@@ -71,15 +71,15 @@ class EntityController extends AbstractController
             return $this->response->conflict("You can not access to the the $entity_name", $conflict_errors);
         }
 
-        $propertyFilter = $request->query->get("property", []);
-        $entityFilter = $request->query->get("entity", []);
-        $sort = $request->query->get("sortBy");
+        $filter = $request->query->get("filterBy", []);
+        $sort = $request->query->get("sortBy", []);
         try
         {
-            $entitiesQuery = $this->em->getRepository(Entity::class)->findAllFiltered($propertyFilter, $entityFilter, $entity_name, $sort);
+            $entitiesQuery = $this->em->getRepository(Entity::class)->findAllFiltered($filter, $sort, $entity_name);
         }
         catch(\Exception $e)
         {
+            var_dump($e->getMessage());die;
             return $this->response->notFound("No entity was found with these filters");
         }
 

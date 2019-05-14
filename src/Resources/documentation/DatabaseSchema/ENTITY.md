@@ -90,8 +90,6 @@ __Response example :__
 |:--------------:|:------:|:---------------------------:|
 |   entity_name  | string | The name of the Entity kind |
 
-_You can filter the results of the request by the content of the properties. To do that add`filter[]` url query parameters with the name of the property you want to filter with._
-
 __Request example :__
 
 ```
@@ -128,6 +126,79 @@ __Response example :__
         "description": "Near the beach.",
         "price": 150,
         "place_category": "House"
+      }
+    }
+]
+```
+
+You can filter the results of the request. To do so, add a `filterBy` url query parameter with the name of the property you want to filter by. If the property is within the json properties, prefix it with `properties`.
+
+__Request example :__
+
+```
+curl --header "Content-Type: application/json"
+     --request GET
+     http://www.mysuper.app/api/entity/offer?filterBy[properties.price]=150
+```
+
+__Response example :__
+
+```json
+[
+    {
+      "uuid": "00100000-0000-5000-a000-000000000000",
+      "kind": "offer",
+      "owner": "00100000-0000-4000-a000-000000000000",
+      "date_of_Creation": "2019-01-02T12:00:00+02:00",
+      "validationState": "__default",
+      "properties": {
+        "title": "Villa in Corsica",
+        "description": "Near the beach.",
+        "price": 150,
+        "place_category": "House"
+      }
+    }
+]
+```
+
+You can filter the results of the request. To do so, add a `sortBy` url query parameter with the name of the property you want to sort by. If the property is within the json properties, prefix it with `properties`. The sort value must be either `ASC` or `DESC`.
+
+__Request example :__
+
+```
+curl --header "Content-Type: application/json"
+     --request GET
+     http://www.mysuper.app/api/entity/offer?sortBy[properties.price]=DESC
+```
+
+__Response example :__
+
+```json
+[
+    {
+      "uuid": "00100000-0000-5000-a000-000000000000",
+      "kind": "offer",
+      "owner": "00100000-0000-4000-a000-000000000000",
+      "date_of_Creation": "2019-01-02T12:00:00+02:00",
+      "validationState": "__default",
+      "properties": {
+        "title": "Villa in Corsica",
+        "description": "Near the beach.",
+        "price": 150,
+        "place_category": "House"
+      }
+    },
+    {
+      "uuid": "00100000-0000-4000-a000-000000000000",
+      "kind": "offer",
+      "owner": "00100000-0000-4000-a000-000000000000",
+      "date_of_Creation": "2019-01-01T12:00:00+02:00",
+      "validationState": "__default",
+      "properties": {
+        "title": "Stunning appartment in Tokyo",
+        "description": "Located in central Tokyo. 2 bedrooms, bathroom, wifi.",
+        "price": 82,
+        "place_category": "appartment"
       }
     }
 ]

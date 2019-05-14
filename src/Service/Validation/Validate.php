@@ -42,7 +42,8 @@ class Validate
                 $nextState = $possibleStates[$currentState +1];
                 return $this->processValidation($entity, $nextState, $entityStates, $user, $state, $manual);
             }
-            return $lastState;
+            $entity->setValidationState($state);
+            return $state;
         }
         else
         {
@@ -59,7 +60,6 @@ class Validate
                 return $state;
             }
             $entity->setValidationState($lastState);
-
             return ["state"=>$lastState, "errors"=>$isValid];
         }
     }
@@ -187,7 +187,8 @@ class Validate
                     {
                         $properties = $properties[$userPath[$i]];
                     }
-                    if($user->getId() === $properties)
+
+                    if($user->getId() === $properties || in_array($user->getId(), $properties))
                     {
                         $isAuthorized = true;
                     }

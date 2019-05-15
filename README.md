@@ -218,4 +218,4 @@ A demo app has been developped and is visible [here](https://github.com/deozza/a
 
 ## Road map
 
-* Event handler : in some case, manipulating the data could trigger events
+* EThere is nothing in the road map !

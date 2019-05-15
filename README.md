@@ -218,4 +218,4 @@ A demo app has been developped and is visible [here](https://github.com/deozza/a
 
 ## Road map
 
-* EThere is nothing in the road map !
+* There is nothing in the road map !

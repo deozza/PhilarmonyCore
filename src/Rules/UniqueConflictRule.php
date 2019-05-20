@@ -29,7 +29,7 @@ class UniqueConflictRule implements RuleInterface
                 return ["conflict" => [$key=>self::ERROR_EXISTS]];
             }
         }
-        return;
+        return null;
     }
 
     private function getProperties($schemaLoader, $kind)

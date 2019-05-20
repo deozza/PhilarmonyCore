@@ -396,11 +396,11 @@ class PropertyController extends AbstractController
         $this->em->flush();
         return $this->response->empty();
     }
-    private function handleEvents($request, $stateConfig, $entity, $eventDispatcher)
+    private function handleEvents($method, $stateConfig, $entity, $eventDispatcher)
     {
-        if(isset($stateConfig['methods'][$request->getMethod()]['post_scripts']))
+        if(isset($stateConfig['methods'][$method]['post_scripts']))
         {
-            $scripts = $stateConfig['methods'][$request->getMethod()]['post_scripts'];
+            $scripts = $stateConfig['methods'][$method]['post_scripts'];
 
             $event = new GenericEvent($entity);
             foreach($scripts as $script)

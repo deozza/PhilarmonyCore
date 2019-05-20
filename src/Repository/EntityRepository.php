@@ -46,6 +46,10 @@ class EntityRepository extends ServiceEntityRepository
 
                 if(is_numeric($value) === false)
                 {
+                    if($operator === "LIKE")
+                    {
+                        $value = "%".$value."%";
+                    }
                     $value = "'".$value."'";
                 }
 

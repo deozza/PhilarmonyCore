@@ -188,6 +188,12 @@ class PropertyController extends AbstractController
             return $posted;
         }
 
+        $conflict_errors = $this->ruleManager->decideConflict($entity ,$request->getContent(), $request->getMethod(),__DIR__);
+        if($conflict_errors > 0)
+        {
+            return $this->response->conflict("You can not access to this entity", $conflict_errors);
+        }
+
         $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher);
         $this->em->flush();
 

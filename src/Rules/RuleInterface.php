@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 interface RuleInterface
 {
-    public function supports($entity, $method) : bool;
+    public function supports($entity, $posted, $method) : bool;
 
-    public function decide($entity, $request, EntityManagerInterface $em, DatabaseSchemaLoader $schemaLoader);
+    public function decide($entity, $posted, $method, EntityManagerInterface $em, DatabaseSchemaLoader $schemaLoader);
 }

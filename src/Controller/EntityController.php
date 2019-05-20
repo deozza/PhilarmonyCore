@@ -66,7 +66,7 @@ class EntityController extends AbstractController
             return $this->response->notFound("This route does not exists%s");
         }
 
-        $conflict_errors = $this->ruleManager->decideConflict($exists, $request->getMethod(),__DIR__);
+        $conflict_errors = $this->ruleManager->decideConflict($exists, $request->getContent(), $request->getMethod(),__DIR__);
 
         if($conflict_errors > 0)
         {
@@ -227,7 +227,7 @@ class EntityController extends AbstractController
             return $this->response->badRequest($e->getMessage());
         }
 
-        $conflict_errors = $this->ruleManager->decideConflict($exist, $request->getMethod(),__DIR__);
+        $conflict_errors = $this->ruleManager->decideConflict($exist, $request->getContent(), $request->getMethod(),__DIR__);
 
         if($conflict_errors > 0)
         {
@@ -362,7 +362,7 @@ class EntityController extends AbstractController
         {
             return $this->response->badRequest($e->getMessage());
         }
-        $conflict_errors = $this->ruleManager->decideConflict($entityToPost , $request->getMethod(),__DIR__);
+        $conflict_errors = $this->ruleManager->decideConflict($entityToPost , $request->getContent(), $request->getMethod(),__DIR__);
 
         if($conflict_errors > 0)
         {
@@ -590,7 +590,7 @@ class EntityController extends AbstractController
             return $this->response->badRequest($e->getMessage());
         }
 
-        $conflict_errors = $this->ruleManager->decideConflict($entity, $request->getMethod(),__DIR__);
+        $conflict_errors = $this->ruleManager->decideConflict($entity, $request->getContent(), $request->getMethod(),__DIR__);
 
         if($conflict_errors > 0)
         {

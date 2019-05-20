@@ -15,11 +15,11 @@ class RulesManager
         $this->folders = [];
     }
 
-    public function decideConflict($object,$method, $folder)
+    public function decideConflict($object, $posted, $method, $folder)
     {
         $this->getUsefullFolder($this->srcPath);
         $this->folders[] = [$folder."/../Rules"];
-        $errors = $this->decide($object, $method, $this->folders, $glob = "/*ConflictRule.php");
+        $errors = $this->decide($object, $posted, $method, $this->folders, $glob = "/*ConflictRule.php");
 
         if(count($errors) > 0)
         {
@@ -29,21 +29,7 @@ class RulesManager
         return count($errors);
     }
 
-    public function decideAccess($object,$method)
-    {
-        $this->getUsefullFolder($this->srcPath);
-
-        $errors = $this->decide($object, $method, $this->folders, $glob = "/*AccessRule.php");
-
-        if(count($errors) > 0)
-        {
-            return $errors;
-        }
-
-        return count($errors);
-    }
-
-    protected function decide($object, $method, $folders, $glob)
+    protected function decide($object, $posted, $method, $folders, $glob)
     {
         $errors = [];
         foreach($folders as $folder)
@@ -58,9 +44,9 @@ class RulesManager
 
                     $rule = new $class;
 
-                    if($rule->supports($object, $method))
+                    if($rule->supports($object, json_decode($posted, true), $method))
                     {
-                        $error = $rule->decide($object,$method, $this->em, $this->schemaLoader);
+                        $error = $rule->decide($object, json_decode($posted, true), $method, $this->em, $this->schemaLoader);
                         if(!empty($error))
                         {
                             $errors[] = $error;

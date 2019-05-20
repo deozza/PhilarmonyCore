@@ -9,12 +9,12 @@ class UniqueConflictRule implements RuleInterface
 {
     const ERROR_EXISTS = "PROPERTY_ALREADY_EXISTS";
 
-    public function supports($entity, $method): bool
+    public function supports($entity, $posted, $method): bool
     {
         return in_array($method, ['POST', 'PATCH']);
     }
 
-    public function decide($entity, $request, EntityManagerInterface $em, DatabaseSchemaLoader $schemaLoader)
+    public function decide($entity, $posted, $method, EntityManagerInterface $em, DatabaseSchemaLoader $schemaLoader)
     {
         $kind = $entity->getKind();
         $properties = $this->getProperties($schemaLoader, $kind);

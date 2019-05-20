@@ -14,7 +14,7 @@ class UniqueConflictRule implements RuleInterface
         return in_array($method, ['POST', 'PATCH']);
     }
 
-    public function decide($entity, $posted, $method, EntityManagerInterface $em, DatabaseSchemaLoader $schemaLoader)
+    public function decide($entity, $posted, $method, EntityManagerInterface $em, DatabaseSchemaLoader $schemaLoader): ?array
     {
         $kind = $entity->getKind();
         $properties = $this->getProperties($schemaLoader, $kind);

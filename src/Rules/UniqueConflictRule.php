@@ -9,7 +9,7 @@ class UniqueConflictRule implements RuleInterface
 {
     const ERROR_EXISTS = "PROPERTY_ALREADY_EXISTS";
 
-    public function supports($entity, $method)
+    public function supports($entity, $method): bool
     {
         return in_array($method, ['POST', 'PATCH']);
     }

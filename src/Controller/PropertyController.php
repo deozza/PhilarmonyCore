@@ -194,7 +194,7 @@ class PropertyController extends AbstractController
             return $this->response->conflict("You can not access to this entity", $conflict_errors);
         }
 
-        $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher);
+        $this->handleEvents($request->getMethod(), $stateConfig, $eventDispatcher, $entity , $request->getContent());
         $this->em->flush();
 
         return $this->response->created($entity, ['entity_complete']);
@@ -276,7 +276,7 @@ class PropertyController extends AbstractController
         {
             return $patched;
         }
-        $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher);
+        $this->handleEvents($request->getMethod(), $stateConfig, $eventDispatcher, $entity, $request->getContent());
         $this->em->flush();
 
         return $this->response->ok($patched);
@@ -396,13 +396,20 @@ class PropertyController extends AbstractController
         $this->em->flush();
         return $this->response->empty();
     }
-    private function handleEvents($method, $stateConfig, $entity, $eventDispatcher)
+    private function handleEvents($method, $stateConfig, $eventDispatcher, $entity, $posted = null)
     {
         if(isset($stateConfig['methods'][$method]['post_scripts']))
         {
             $scripts = $stateConfig['methods'][$method]['post_scripts'];
 
-            $event = new GenericEvent($entity);
+            $eventPayload = ["entity"=>$entity];
+
+            if($posted != null)
+            {
+                $eventPayload['posted'] = json_decode($posted, true);
+            }
+
+            $event = new GenericEvent($eventPayload);
             foreach($scripts as $script)
             {
                 $eventDispatcher->dispatch($script, $event);

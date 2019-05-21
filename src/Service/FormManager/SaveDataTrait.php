@@ -33,13 +33,21 @@ trait SaveDataTrait{
         {
             $data = $this->mergeData($data,$propertiesOfEntity, $formFields, $formKind);
         }
-        
+
         $entityToProcess->setProperties($data);
         $this->em->persist($entityToProcess);
     }
 
     private function saveNewData($data, $formFields)
     {
+        foreach($data as $key=>$value)
+        {
+            if(is_a($value, Entity::class))
+            {
+                $data[$key] = $value->getUuidAsString();
+            }
+        }
+
         $subData = [];
         foreach($formFields as $field=>$config)
         {
@@ -70,8 +78,8 @@ trait SaveDataTrait{
                 {
                     $subData[$config['arrayOf']] = [];
                 }
-                    $subData[$config['arrayOf']][$field] = $data[$field];
-                    unset($data[$field]);
+                $subData[$config['arrayOf']][$field] = $data[$field];
+                unset($data[$field]);
             }
         }
 
@@ -82,7 +90,6 @@ trait SaveDataTrait{
                 $data[$key] = [$value];
             }
         }
-
         return $data;
     }
 

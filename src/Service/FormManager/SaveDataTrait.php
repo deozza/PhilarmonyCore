@@ -44,7 +44,8 @@ trait SaveDataTrait{
         {
             if(is_a($value, Entity::class))
             {
-                $data[$key] = $value->getUuidAsString();
+                $objectData = ["owner"=>["id"=>$value->getOwner()->getId(), "username"=>$value->getOwner()->getUsername()], "properties"=>$value->getProperties()];
+                $data[$key] = $objectData;
             }
         }
 

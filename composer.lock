@@ -4,8 +4,37 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dfa0c1b1d1ce2bb22cd64fb4b375fc31",
+    "content-hash": "20a6c72daf2a2c75e5d05a4126bf74c7",
     "packages": [
+        {
+            "name": "deozza/philarmony-utils",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "../philarmonyUtils",
+                "reference": "5419c31aaf5e1d5cc8d96eac542ecb28052220f4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Deozza\\PhilarmonyUtilsBundle\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Deozza\\PhilarmonyUtilsBundle\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Edenn Touitou",
+                    "email": "deozza@gmail.com"
+                }
+            ]
+        },
         {
             "name": "deozza/response-maker-bundle",
             "version": "1.0.1",
@@ -5624,7 +5653,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "deozza/philarmony-utils": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Deozza\PhilarmonyUtils\Forms\FieldTypes;
 
 trait AddFieldTrait{
 

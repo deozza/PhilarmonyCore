@@ -3,7 +3,8 @@ namespace Deozza\PhilarmonyCoreBundle\Service\FormManager;
 
 use Deozza\PhilarmonyCoreBundle\Exceptions\BadFileTree;
 use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
-use Deozza\ResponseMaker\Service\ResponseMaker;
+use Deozza\ResponseMakerBundle\Service\FormErrorSerializer;
+use Deozza\ResponseMakerBundle\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormFactoryInterface;

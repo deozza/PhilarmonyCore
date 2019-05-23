@@ -24,4 +24,9 @@ class DeozzaPhilarmonyCoreExtension extends Extension
         $definition->setArgument(2, $config['directory']['enumeration']);
     }
 
+    public function getAlias()
+    {
+        return "philarmony";
+    }
+
 }

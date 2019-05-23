@@ -37,7 +37,7 @@ Philarmony is a bundle made to help you create a modular REST API. From database
 
 You can install using composer, assuming it is already installed globally :
 
-`composer require deozza/philarmony-bundle`
+`composer require deozza/philarmony-core-bundle`
 
 ## Configuration
 
@@ -57,11 +57,11 @@ Then, to use the embedded services, as the controllers and the repositories, of 
 ```yaml
 services: 
     Deozza\PhilarmonyBundle\Controller\:
-      resource: '@DeozzaPhilarmonyBundle/Controller'
+      resource: DeozzaPhilarmonyCoreBundle
       tags: ['controller.service_arguments']
       
     Deozza\PhilarmonyBundle\Repository\:
-      resource: '@DeozzaPhilarmonyBundle/Repository'
+      resource: DeozzaPhilarmonyCoreBundle
       tags: ['doctrine.service_entity']  
 ```
 

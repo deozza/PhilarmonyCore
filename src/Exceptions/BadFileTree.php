@@ -1,8 +1,6 @@
 <?php
 
-
-namespace Deozza\PhilarmonyBundle\Exceptions;
-
+namespace Deozza\PhilarmonyCoreBundle\Exceptions;
 
 class BadFileTree extends \Exception
 {

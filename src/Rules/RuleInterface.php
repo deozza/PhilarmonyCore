@@ -1,10 +1,8 @@
 <?php
 
+namespace Deozza\PhilarmonyCoreBundle\Rules;
 
-namespace Deozza\PhilarmonyBundle\Rules;
-
-
-use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
+use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Doctrine\ORM\EntityManagerInterface;
 
 interface RuleInterface

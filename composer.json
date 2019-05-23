@@ -1,5 +1,5 @@
 {
-    "name": "deozza/philarmony-bundle",
+    "name": "deozza/philarmony-core-bundle",
     "description": "A bundle to create quickly a modular REST API upon Symfony 4",
     "type": "symfony-bundle",
     "license": "MIT",

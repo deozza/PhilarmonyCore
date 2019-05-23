@@ -1,8 +1,8 @@
 <?php
-namespace Deozza\PhilarmonyBundle\Rules;
+namespace Deozza\PhilarmonyCoreBundle\Rules;
 
-use Deozza\PhilarmonyBundle\Entity\Entity;
-use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
+use Deozza\PhilarmonyCoreBundle\Entity\Entity;
+use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UniqueConflictRule implements RuleInterface

@@ -1,7 +1,7 @@
 <?php
-namespace Deozza\PhilarmonyBundle\Service\DatabaseSchema;
+namespace Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema;
 
-use Deozza\PhilarmonyBundle\Exceptions\FileNotFound;
+use Deozza\PhilarmonyCoreBundle\Exceptions\FileNotFound;
 use Symfony\Component\Yaml\Yaml;
 
 class DatabaseSchemaLoader

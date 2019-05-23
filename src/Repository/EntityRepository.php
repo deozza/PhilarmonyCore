@@ -1,8 +1,8 @@
 <?php
 
-namespace Deozza\PhilarmonyBundle\Repository;
+namespace Deozza\PhilarmonyCoreBundle\Repository;
 
-use Deozza\PhilarmonyBundle\Entity\Entity;
+use Deozza\PhilarmonyCoreBundle\Entity\Entity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 

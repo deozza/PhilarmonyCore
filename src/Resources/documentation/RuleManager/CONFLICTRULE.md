@@ -12,9 +12,9 @@ To add a new conflict rule, create a folder in your app that ends with `Rules`. 
 <?php
 namespace App\path\to\your\ApplicationRules;
 
-use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
+use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Doctrine\ORM\EntityManagerInterface;
-use Deozza\PhilarmonyBundle\Rules\RuleInterface;
+use Deozza\PhilarmonyCoreBundle\Rules\RuleInterface;
 
 class FooConflictRule implements RuleInterface
 {

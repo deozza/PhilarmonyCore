@@ -1,6 +1,6 @@
 <?php
 
-namespace Deozza\PhilarmonyBundle\Entity;
+namespace Deozza\PhilarmonyCoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
@@ -8,7 +8,7 @@ use Ramsey\Uuid\UuidInterface;
 use JMS\Serializer\Annotation as JMS;
 
 /**
- * @ORM\Entity(repositoryClass="Deozza\PhilarmonyBundle\Repository\EntityRepository")
+ * @ORM\Entity(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\EntityRepository")
  * @ORM\HasLifecycleCallbacks()
  */
 class Entity

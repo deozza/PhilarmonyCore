@@ -1,9 +1,9 @@
 <?php
-namespace Deozza\PhilarmonyBundle\Service\FormManager;
+namespace Deozza\PhilarmonyCoreBundle\Service\FormManager;
 
-use Deozza\PhilarmonyBundle\Exceptions\BadFileTree;
-use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
-use Deozza\PhilarmonyBundle\Service\ResponseMaker;
+use Deozza\PhilarmonyCoreBundle\Exceptions\BadFileTree;
+use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
+use Deozza\ResponseMaker\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormFactoryInterface;

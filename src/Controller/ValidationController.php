@@ -1,12 +1,12 @@
 <?php
-namespace Deozza\PhilarmonyBundle\Controller;
+namespace Deozza\PhilarmonyCoreBundle\Controller;
 
-use Deozza\PhilarmonyBundle\Entity\Entity;
-use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
-use Deozza\PhilarmonyBundle\Service\FormManager\ProcessForm;
-use Deozza\PhilarmonyBundle\Service\ResponseMaker;
-use Deozza\PhilarmonyBundle\Service\RulesManager\RulesManager;
-use Deozza\PhilarmonyBundle\Service\Validation\Validate;
+use Deozza\PhilarmonyCoreBundle\Entity\Entity;
+use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
+use Deozza\PhilarmonyCoreBundle\Service\FormManager\ProcessForm;
+use Deozza\ResponseMaker\Service\ResponseMaker;
+use Deozza\PhilarmonyCoreBundle\Service\RulesManager\RulesManager;
+use Deozza\PhilarmonyCoreBundle\Service\Validation\Validate;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

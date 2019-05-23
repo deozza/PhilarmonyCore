@@ -1,7 +1,7 @@
 <?php
-namespace Deozza\PhilarmonyBundle\Service\FormManager;
+namespace Deozza\PhilarmonyCoreBundle\Service\FormManager;
 
-use Deozza\PhilarmonyBundle\Entity\Entity;
+use Deozza\PhilarmonyCoreBundle\Entity\Entity;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

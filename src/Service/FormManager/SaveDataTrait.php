@@ -1,8 +1,7 @@
 <?php
-namespace Deozza\PhilarmonyBundle\Service\FormManager;
+namespace Deozza\PhilarmonyCoreBundle\Service\FormManager;
 
-use Deozza\PhilarmonyBundle\Entity\Entity;
-use Deozza\PhilarmonyBundle\Entity\Property;
+use Deozza\PhilarmonyCoreBundle\Entity\Entity;
 
 trait SaveDataTrait{
     private function saveData($data, $entityToProcess, $formKind, $formFields)

@@ -1,13 +1,11 @@
 <?php
 
-namespace Deozza\PhilarmonyBundle\Service\Validation;
+namespace Deozza\PhilarmonyCoreBundle\Service\Validation;
 
-use Deozza\PhilarmonyBundle\Entity\Entity;
-use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
-use Deozza\PhilarmonyBundle\Service\ResponseMaker;
+use Deozza\PhilarmonyCoreBundle\Entity\Entity;
+use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
+use Deozza\ResponseMaker\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;
-use function Sodium\compare;
-use function Symfony\Component\VarDumper\Tests\Fixtures\bar;
 
 class Validate
 {

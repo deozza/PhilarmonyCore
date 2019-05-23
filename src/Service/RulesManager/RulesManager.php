@@ -1,8 +1,8 @@
 <?php
 
-namespace Deozza\PhilarmonyBundle\Service\RulesManager;
+namespace Deozza\PhilarmonyCoreBundle\Service\RulesManager;
 
-use Deozza\PhilarmonyBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
+use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Doctrine\ORM\EntityManagerInterface;
 
 class RulesManager

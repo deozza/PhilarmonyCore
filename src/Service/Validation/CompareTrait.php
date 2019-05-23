@@ -1,10 +1,8 @@
 <?php
 
+namespace Deozza\PhilarmonyCoreBundle\Service\Validation;
 
-namespace Deozza\PhilarmonyBundle\Service\Validation;
-
-
-use Deozza\PhilarmonyBundle\Entity\Entity;
+use Deozza\PhilarmonyCoreBundle\Entity\Entity;
 
 trait CompareTrait
 {

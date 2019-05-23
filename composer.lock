@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "deozza/response-maker-bundle",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/deozza/ResponseMaker.git",
-                "reference": "ef8c7c97124036a860d420be1d8681cb2095ebf9"
+                "reference": "06571d7fad2bdfb06680194fc95735f9b815b8df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/deozza/ResponseMaker/zipball/ef8c7c97124036a860d420be1d8681cb2095ebf9",
-                "reference": "ef8c7c97124036a860d420be1d8681cb2095ebf9",
+                "url": "https://api.github.com/repos/deozza/ResponseMaker/zipball/06571d7fad2bdfb06680194fc95735f9b815b8df",
+                "reference": "06571d7fad2bdfb06680194fc95735f9b815b8df",
                 "shasum": ""
             },
             "require": {
@@ -42,7 +42,7 @@
                 }
             ],
             "description": "A simple way to send serialized json response",
-            "time": "2019-05-23T09:14:13+00:00"
+            "time": "2019-05-23T10:08:04+00:00"
         },
         {
             "name": "doctrine/annotations",

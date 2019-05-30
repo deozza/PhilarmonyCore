@@ -4,27 +4,29 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "20a6c72daf2a2c75e5d05a4126bf74c7",
+    "content-hash": "acae4b3bfc16cbfdb6310e0ad3b487df",
     "packages": [
         {
             "name": "deozza/philarmony-utils",
-            "version": "dev-master",
+            "version": "0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/deozza/PhilarmonyUtils.git",
+                "reference": "7db67cafa08d6c6cb214c4450e4a9828f07e1de0"
+            },
             "dist": {
-                "type": "path",
-                "url": "../philarmonyUtils",
-                "reference": "5419c31aaf5e1d5cc8d96eac542ecb28052220f4"
+                "type": "zip",
+                "url": "https://api.github.com/repos/deozza/PhilarmonyUtils/zipball/7db67cafa08d6c6cb214c4450e4a9828f07e1de0",
+                "reference": "7db67cafa08d6c6cb214c4450e4a9828f07e1de0",
+                "shasum": ""
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Deozza\\PhilarmonyUtilsBundle\\": "src/"
+                    "Deozza\\PhilarmonyUtils\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Deozza\\PhilarmonyUtilsBundle\\Tests\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -33,7 +35,8 @@
                     "name": "Edenn Touitou",
                     "email": "deozza@gmail.com"
                 }
-            ]
+            ],
+            "time": "2019-05-30T20:52:48+00:00"
         },
         {
             "name": "deozza/response-maker-bundle",
@@ -5653,9 +5656,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "deozza/philarmony-utils": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

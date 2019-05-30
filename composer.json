@@ -26,7 +26,7 @@
         "knplabs/knp-paginator-bundle": "^3.0",
         "scienta/doctrine-json-functions": "^4.0",
         "deozza/response-maker-bundle": "^1.0",
-        "deozza/philarmony-utils": "dev-master"
+        "deozza/philarmony-utils": "^0.1.0"
     },
     "require-dev": {
         "symfony/profiler-pack": "^1.0",
@@ -44,11 +44,5 @@
         "psr-4": {
             "Deozza\\PhilarmonyCoreBundle\\Tests\\": "tests/"
         }
-    },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../philarmonyUtils"
-        }
-    ]
+    }
 }

@@ -4,7 +4,7 @@ namespace Deozza\PhilarmonyCoreBundle\Service\Validation;
 
 use Deozza\PhilarmonyCoreBundle\Entity\Entity;
 use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
-use Deozza\ResponseMaker\Service\ResponseMaker;
+use Deozza\ResponseMakerBundle\Service\ResponseMaker;
 use Doctrine\ORM\EntityManagerInterface;
 
 class Validate

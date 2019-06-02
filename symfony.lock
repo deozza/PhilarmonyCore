@@ -272,6 +272,9 @@
     "symfony/intl": {
         "version": "v4.2.8"
     },
+    "symfony/mime": {
+        "version": "v4.3.0"
+    },
     "symfony/options-resolver": {
         "version": "v4.2.8"
     },
@@ -282,6 +285,9 @@
         "version": "v1.11.0"
     },
     "symfony/polyfill-intl-icu": {
+        "version": "v1.11.0"
+    },
+    "symfony/polyfill-intl-idn": {
         "version": "v1.11.0"
     },
     "symfony/polyfill-mbstring": {

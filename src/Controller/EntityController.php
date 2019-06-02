@@ -2,7 +2,7 @@
 namespace Deozza\PhilarmonyCoreBundle\Controller;
 
 use Deozza\PhilarmonyCoreBundle\Entity\Entity;
-use Deozza\PhilarmonyCoreBundle\Exceptions\BadFileTree;
+use Deozza\PhilarmonyUtils\Exceptions\BadFileTree;
 use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\PhilarmonyCoreBundle\Service\FormManager\ProcessForm;
 use Deozza\PhilarmonyCoreBundle\Service\RulesManager\RulesManager;

@@ -1,7 +1,7 @@
 <?php
 namespace Deozza\PhilarmonyCoreBundle\Service\FormManager;
 
-use Deozza\PhilarmonyCoreBundle\Exceptions\BadFileTree;
+use Deozza\PhilarmonyUtils\Exceptions\BadFileTree;
 use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\ResponseMakerBundle\Service\FormErrorSerializer;
 use Deozza\ResponseMakerBundle\Service\ResponseMaker;

@@ -1,4 +1,7 @@
 {
+    "deozza/philarmony-utils": {
+        "version": "dev-master"
+    },
     "deozza/response-maker-bundle": {
         "version": "1.0.0"
     },

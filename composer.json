@@ -25,7 +25,8 @@
         "symfony/yaml": "4.2.*",
         "knplabs/knp-paginator-bundle": "^3.0",
         "scienta/doctrine-json-functions": "^4.0",
-        "deozza/response-maker-bundle": "^1.0"
+        "deozza/response-maker-bundle": "^1.0",
+        "deozza/philarmony-utils": "^0.1.0"
     },
     "require-dev": {
         "symfony/profiler-pack": "^1.0",
@@ -42,12 +43,6 @@
     "autoload-dev": {
         "psr-4": {
             "Deozza\\PhilarmonyCoreBundle\\Tests\\": "tests/"
-        }
-    },
-    "scripts": {
-        "auto-scripts": {
-            "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
         }
     }
 }

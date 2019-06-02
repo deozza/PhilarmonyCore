@@ -613,7 +613,7 @@ class EntityController extends AbstractController
             $event = new GenericEvent($entity);
             foreach($scripts as $script)
             {
-                $eventDispatcher->dispatch($script, $event);
+                $eventDispatcher->dispatch($event, $script);
             };
         }
     }

@@ -412,7 +412,7 @@ class PropertyController extends AbstractController
             $event = new GenericEvent($eventPayload);
             foreach($scripts as $script)
             {
-                $eventDispatcher->dispatch($script, $event);
+                $eventDispatcher->dispatch($event, $script);
             };
         }
     }

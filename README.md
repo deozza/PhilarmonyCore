@@ -5,7 +5,7 @@ Philarmony
 [![mysql](https://img.shields.io/badge/mysql-%5E5.7-blue.svg)]()
 [![symfony](https://img.shields.io/badge/symfony-%5E4.2-blue.svg)](https://symfony.com/doc/current/index.html#gsc.tab=0)
 [![Build Status](https://travis-ci.org/deozza/atypikhouse.svg?branch=master)](https://travis-ci.org/deozza/atypikhouse)
-[![Stable](https://img.shields.io/badge/stable-1.2-brightgreen.svg)](https://github.com/deozza/Philarmony/tree/1.2.0)
+[![Stable](https://img.shields.io/badge/stable-2.0-brightgreen.svg)](https://github.com/deozza/Philarmony/tree/2.0.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]()
 
 ## Table of contents
@@ -22,16 +22,11 @@ Philarmony
 
 Philarmony is a bundle made to help you create a modular REST API. From database to controllers and forms, without forgetting authorization and data validation, manage your API easily in minutes.
 
-## V.1.2 - What's new ?
+## V.2.0 - What's new ?
 
- * it is now possible to launch event at the end of a successful request. Read more [here](src/Resources/documentation/DatabaseSchema/ENTITY.md)
- * it is now possible to specify the operator of a filter on a GET entities request. Read more [here](src/Resources/documentation/DatabaseSchema/ENTITY.md)
- * it is now possible to apply advanced constraints onto entities via Rules. Read more [here](src/Resources/documentation/RuleManager/CONFLICTRULE.md)
- 
-### V.1.1 - What's new ?
+I am aiming to transform Philarmony into a complete solution, from the core system (here) to the user handling, passing through self-generated documentation.
 
-* the organization of properties configuration files has changed. Read more [here](src/Resources/documentation/DatabaseSchema/PROPERTY.md)
-* it is now possible to sort the results of a GET entities request. Read more [here](src/Resources/documentation/DatabaseSchema/ENTTITY.md)
+For now, PhilarmonyBundle is now PhilarmonyCoreBundle. There is no new feature. The bundle has been made to be ready to work on its own and to work better with the incoming bundles.
 
 ## Installation
 
@@ -56,18 +51,18 @@ This will be used to locate the database schema files. By default they are creat
 Then, to use the embedded services, as the controllers and the repositories, of Philarmony, you need to enable them in your `/config/services.yaml` and in your `config/routes/annotations.yaml` :
 ```yaml
 services: 
-    Deozza\PhilarmonyBundle\Controller\:
-      resource: DeozzaPhilarmonyCoreBundle
+    Deozza\PhilarmonyCoreBundle\Controller\:
+      resource: '@DeozzaPhilarmonyCoreBundle/Controller'
       tags: ['controller.service_arguments']
       
-    Deozza\PhilarmonyBundle\Repository\:
-      resource: DeozzaPhilarmonyCoreBundle
+    Deozza\PhilarmonyCoreBundle\Repository\:
+      resource: '@DeozzaPhilarmonyCoreBundle/Repository'
       tags: ['doctrine.service_entity']  
 ```
 
 ```yaml
 philarmony_controllers:
-    resource: '@DeozzaPhilarmonyBundle/Controller'
+    resource: '@DeozzaPhilarmonyCoreBundle/Controller'
     type: annotation
     prefix: /
 ```
@@ -204,7 +199,7 @@ To assure the right user is manipulating a resource, authorization is handled by
 
 In order to pass from one state to the next, the entity and its data must be valid according to constraints.
 
- * [Read more](src/Resources/documentation/Validation/CONSTRAINS.md)
+ * [Read more](src/Resources/documentation/Validation/CONSTRAINTS.md)
  
 #### Conflict rules
 
@@ -218,4 +213,4 @@ A demo app has been developped and is visible [here](https://github.com/deozza/a
 
 ## Road map
 
-* There is nothing in the road map !
+* Database migration : for now, when you delete or update a property or an entity, you need to handle manually the migration. For a better experience, I am thinking about a kind of automatic solution

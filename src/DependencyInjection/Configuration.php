@@ -10,10 +10,8 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
 
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('philarmony');
-
-        $rootNode
+        $treeBuilder = new TreeBuilder('philarmony');
+        $treeBuilder->getRootNode()
             ->children()
                 ->arrayNode('directory')
                     ->children()

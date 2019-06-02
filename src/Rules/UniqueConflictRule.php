@@ -23,10 +23,13 @@ class UniqueConflictRule implements RuleInterface
         $submited = $entity->getProperties();
         foreach($properties as $key=>$value)
         {
-            $exist = $em->getRepository(Entity::class)->findAllFiltered(['equal.properties.'.$key=>$submited[$key]], [], $entity->getKind());
-            if(count($exist)> 0 && in_array($key, $posted))
+            if(in_array($key, $posted))
             {
-                return ["conflict" => [$key=>self::ERROR_EXISTS]];
+                $exist = $em->getRepository(Entity::class)->findAllFiltered(['equal.properties.'.$key=>$submited[$key]], [], $entity->getKind());
+                if(count($exist)> 0)
+                {
+                    return ["conflict" => [$key=>self::ERROR_EXISTS]];
+                }
             }
         }
         return null;

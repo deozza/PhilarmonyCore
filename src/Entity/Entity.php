@@ -55,6 +55,12 @@ class Entity
     private $dateOfCreation;
 
     /**
+     * @ORM\Column(type="date")
+     * @JMS\Groups({"entity_complete", "entity_basic"})
+     */
+    private $lastUpdate;
+
+    /**
      * @ORM\Column(type="json")
      * @JMS\Groups({"entity_complete", "entity_basic", "entity_property"})
      */
@@ -63,6 +69,7 @@ class Entity
     public function __construct()
     {
         $this->dateOfCreation = new \DateTime('now');
+        $this->lastUpdate = $this->dateOfCreation;
     }
 
     public function getId(): ?int
@@ -125,6 +132,16 @@ class Entity
         return $this->dateOfCreation;
     }
 
+    public function getLastUpdate(): ?\DateTime
+    {
+        return $this->lastUpdate;
+    }
+
+    public function setLastUpdate(\DateTime $lastUpdate): ?self
+    {
+        $this->lastUpdate = $lastUpdate;
+        return $this;
+    }
 
     public function getOwner()
     {

@@ -277,6 +277,7 @@ class PropertyController extends AbstractController
             return $patched;
         }
         $this->handleEvents($request->getMethod(), $stateConfig, $eventDispatcher, $entity, $request->getContent());
+        $entity->setLastUpdate(new \DateTime("now"));
         $this->em->flush();
 
         return $this->response->ok($patched);

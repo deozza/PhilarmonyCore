@@ -489,6 +489,7 @@ class EntityController extends AbstractController
             $state = $this->validator->processValidation($entity,$entity->getValidationState(), $entityConfig['states'], $this->getUser());
 
             $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher);
+            $entity->setLastUpdate(new \DateTime("now"));
             $this->em->flush();
 
         }

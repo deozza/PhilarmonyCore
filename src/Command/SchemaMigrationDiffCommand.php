@@ -19,7 +19,7 @@ class SchemaMigrationDiffCommand extends Command
 
     protected function configure()
     {
-       $this->setDescription("Generate a migration for your data schema");
+        $this->setDescription("Generate a migration for your data schema");
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

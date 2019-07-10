@@ -36,5 +36,14 @@
         </service>
         <service id="Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader" alias="philarmony.schema_loader" />
 
+        <service class="Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaValidator" id="philarmony.schema_validator">
+            <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
+        </service>
+        <service id="Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaValidator" alias="philarmony.schema_validator" />
+
+        <service id="Deozza\PhilarmonyCoreBundle\Command\SchemaMigrationDiffCommand">
+            <tag name="console.command" command="philarmony:migration:diff"/>
+            <bind key="$schemaValidator" type="service" id="philarmony.schema_validator"/>
+        </service>
     </services>
 </container>

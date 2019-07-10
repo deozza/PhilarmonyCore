@@ -28,11 +28,6 @@ class DatabaseSchemaLoader
             throw new FileNotFound();
         }
 
-        if(!isset($values['entities']))
-        {
-            throw new FileNotFound("Root node of ".$this->rootPath.$this->entityPath.".yaml must be 'entities'.");
-        }
-
         if(empty($entity_name))
         {
             return $values;

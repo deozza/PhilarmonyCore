@@ -4,6 +4,7 @@ namespace Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema;
 
 use Deozza\PhilarmonyCoreBundle\Exceptions\DataSchemaMissingKeyException;
 use Deozza\PhilarmonyCoreBundle\Exceptions\DataSchemaUnexpectedKeyException;
+use Deozza\PhilarmonyCoreBundle\Exceptions\DataSchemaUnexpectedValueException;
 
 trait ValidateEntityTrait
 {
@@ -89,9 +90,35 @@ trait ValidateEntityTrait
             {
                 throw new DataSchemaUnexpectedKeyException("The authorized methods for a state are 'POST', 'GET', 'PATCH' and 'DELETE'. '$method' found in the '$stateName' of '$entityName'.");
             }
+            $this->checkKeysOfMethod($method, $methodContent, $entityName);
 
-            $functionName = 'validateMethod'.$method;
-            $this->{$functionName}($methodContent, $entityName);
+
+        }
+    }
+
+    private function checkKeysOfMethod(string $method, array $content, string $entityName)
+    {
+        $authorizedKeys = ['properties', 'by', 'post_scripts'];
+        $keys = array_keys($content);
+        foreach($keys as $key)
+        {
+            if(!in_array($key, $authorizedKeys))
+            {
+                throw new DataSchemaUnexpectedKeyException("Authorized keys for a method are 'properties', 'by' and 'post_script'. '$key' found in '$entityName'");
+            }
+        }
+
+        if(!in_array('by', $keys))
+        {
+            throw new DataSchemaMissingKeyException("A method must contains the 'by' key.");
+        }
+
+        $functionName = 'validateMethod'.$method;
+        $this->{$functionName}($content, $entityName);
+
+        if(in_array('post_scripts', $keys))
+        {
+            $this->validatePostScriptOfMethod($method, $content['post_scripts'], $entityName);
         }
     }
 
@@ -142,11 +169,6 @@ trait ValidateEntityTrait
 
     private function validateByOfMethod($content)
     {
-        if(!array_key_exists('by', $content))
-        {
-            throw new DataSchemaMissingKeyException("A method must contains the 'by' key.");
-        }
-
         if(is_string($content['by']) && $content['by'] !== 'all')
         {
             throw new DataSchemaUnexpectedKeyException("The 'by' key of a method must be an array or equal to 'all'. '".$content['by']."' found.");
@@ -166,6 +188,14 @@ trait ValidateEntityTrait
                     throw new DataSchemaUnexpectedKeyException("The 'by' key of a method must be an array or equal to 'all'. '$byContent' found.");
                 }
             }
+        }
+    }
+
+    private function validatePostScriptOfMethod(string $method, $content, string $entityName)
+    {
+        if(empty($content) || !is_array($content))
+        {
+            throw new DataSchemaUnexpectedValueException("'post_scripts' found in the '$method' method of '$entityName' must not be empty and of type 'array'");
         }
     }
 }

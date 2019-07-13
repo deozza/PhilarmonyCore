@@ -24,7 +24,7 @@ class SchemaMigrationDiffCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $isValid = true;
-        $isValid = $this->schemaValidator->validateEntity();
+        $this->schemaValidator->validateEntities();
+        $this->schemaValidator->validateProperties();
     }
 }

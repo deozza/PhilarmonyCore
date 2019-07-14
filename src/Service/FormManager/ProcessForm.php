@@ -90,11 +90,6 @@ class ProcessForm
                 return $this->response->badRequest($e->getMessage());
             }
 
-            if(!isset($propertyConfig['type']))
-            {
-                throw new BadFileTree("Property $property must have a type");
-            }
-
             $type = explode('.',$propertyConfig['type']);
 
             if(in_array("embedded", $type))
@@ -151,11 +146,6 @@ class ProcessForm
             catch(\Exception $e)
             {
                 return $this->response->badRequest($e->getMessage());
-            }
-
-            if(!isset($config['type']))
-            {
-                throw new BadFileTree("Property $field must have a type");
             }
 
             $isEmbedded = explode("embedded.", $config['type']);

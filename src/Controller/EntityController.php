@@ -166,43 +166,15 @@ class EntityController extends AbstractController
 
         $state = $exist->getValidationState();
 
-        try
-        {
-            $entityConfig = $this->schemaLoader->loadEntityEnumeration($exist->getKind());
-            if(!isset($entityConfig['states']))
-            {
-                throw new BadFileTree($exist->getKind()." must have a 'states' node");
-            }
+        $entityConfig = $this->schemaLoader->loadEntityEnumeration($exist->getKind());
 
-            if(!isset($entityConfig['states'][$state]['methods']))
-            {
-                throw new BadFileTree("$state of ".$exist->getKind()." must have a 'methods' node");
-            }
-
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
-        }
 
         if(!isset($entityConfig['states'][$state]['methods'][$request->getMethod()]))
         {
             return $this->response->methodNotAllowed($request->getMethod());
         }
 
-        try
-        {
-            if(!isset($entityConfig['states'][$state]['methods'][$request->getMethod()]['by']))
-            {
-                throw new BadFileTree($request->getMethod(). "of $state of ".$exist->getKind()." must have a 'by' node");
-            }
-
-            $constraints = $entityConfig['states'][$state]['methods'][$request->getMethod()]['by'];
-        }
-        catch (\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
-        }
+        $constraints = $entityConfig['states'][$state]['methods'][$request->getMethod()]['by'];
 
         if($constraints === "all")
         {
@@ -263,35 +235,11 @@ class EntityController extends AbstractController
             return $this->response->notFound("This route does not exists");
         }
 
-        try
-        {
-            if(!isset($entityConfig['states']['__default']))
-            {
-                throw new BadFileTree("$entity_name must have a __default state");
-            }
+        $stateConfig = $entityConfig['states']['__default'];
 
-            $stateConfig = $entityConfig['states']['__default'];
-        }
-        catch(\Exception $e)
+        if(!array_key_exists($request->getMethod(), $stateConfig['methods']))
         {
-            return $this->response->badRequest($e->getMessage());
-        }
-
-        try
-        {
-            if(!isset($stateConfig['methods']))
-            {
-                throw new BadFileTree("__default state of $entity_name must have a 'methods' node");
-            }
-
-            if(!array_key_exists($request->getMethod(), $stateConfig['methods']))
-            {
-                return $this->response->methodNotAllowed($request->getMethod());
-            }
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
+            return $this->response->methodNotAllowed($request->getMethod());
         }
 
         if(empty($this->getUser()->getUsername()))
@@ -302,27 +250,16 @@ class EntityController extends AbstractController
         $userRoles = $this->getUser()->getRoles();
         $isAllowed = false;
 
-        try
-        {
-            if(!isset($stateConfig['methods']['POST']['by']))
-            {
-                throw new BadFileTree($request->getMethod()." must have a 'by' node");
-            }
 
-            if(isset($stateConfig['methods']['POST']['by']['roles']))
+        if(isset($stateConfig['methods']['POST']['by']['roles']))
+        {
+            foreach ($userRoles as $role)
             {
-                foreach ($userRoles as $role)
+                if(in_array($role, $stateConfig['methods']['POST']['by']['roles']))
                 {
-                    if(in_array($role, $stateConfig['methods']['POST']['by']['roles']))
-                    {
-                        $isAllowed = true;
-                    }
+                    $isAllowed = true;
                 }
             }
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
         }
 
         if($isAllowed === false)
@@ -342,11 +279,6 @@ class EntityController extends AbstractController
 
         try
         {
-            if(!isset($stateConfig['methods'][$request->getMethod()]['properties']))
-            {
-                throw new BadFileTree($request->getMethod()." must have a 'properties' node");
-            }
-
             $formFields = $stateConfig['methods'][$request->getMethod()]['properties'];
             $posted = $this->processForm->generateAndProcess($formKind = 'post', $request->getContent(), $entityToPost, $entityConfig, $formFields);
 
@@ -416,36 +348,14 @@ class EntityController extends AbstractController
             return $this->response->badRequest($e->getMessage());
         }
 
-        try
-        {
-            if(!isset($entityConfig['states'][$state]))
-            {
-                throw new BadFileTree($entity->getKind()." must have a $state state");
-            }
-            $stateConfig = $entityConfig['states'][$state];
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
-        }
+        $stateConfig = $entityConfig['states'][$state];
 
         if(!isset($stateConfig['methods'][$request->getMethod()]))
         {
             return $this->response->methodNotAllowed($request->getMethod());
         }
 
-        try
-        {
-            if(!isset($stateConfig['methods'][$request->getMethod()]['by']))
-            {
-                throw new BadFileTree($request->getMethod()." must have a 'by' node");
-            }
-            $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
-        }
+        $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
 
         try
         {
@@ -460,18 +370,7 @@ class EntityController extends AbstractController
             return $this->response->badRequest($e->getMessage());
         }
 
-        try
-        {
-            if(!isset($stateConfig['methods'][$request->getMethod()]['properties']))
-            {
-                throw new BadFileTree($request->getMethod()." must have a 'properties' node");
-            }
-            $formFields = $stateConfig['methods'][$request->getMethod()]['properties'];
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
-        }
+        $formFields = $stateConfig['methods'][$request->getMethod()]['properties'];
 
         try
         {
@@ -542,41 +441,14 @@ class EntityController extends AbstractController
             return $this->response->badRequest($e->getMessage());
         }
 
-        try
-        {
-            if(!isset($entityConfig['states']))
-            {
-                throw new BadFileTree($entity->getKind()." must have a 'states' node");
-            }
-            $stateConfig = $entityConfig['states'][$state];
+        $stateConfig = $entityConfig['states'][$state];
 
-        }
-        catch(\Exception $e)
+        if(!isset($stateConfig['methods'][$request->getMethod()]))
         {
-            return $this->response->badRequest($e->getMessage());
+            return $this->response->methodNotAllowed($request->getMethod());
         }
 
-        try
-        {
-            if (!isset($stateConfig["methods"]))
-            {
-                throw new BadFileTree("$state of ".$entity->getKind()." must have a 'methods' node");
-            }
-            if(!isset($stateConfig['methods'][$request->getMethod()]))
-            {
-                return $this->response->methodNotAllowed($request->getMethod());
-            }
-
-            if(!isset($stateConfig['methods'][$request->getMethod()]['by']))
-            {
-                throw new BadFileTree($request->getMethod()." of $state must have a 'by' node");
-            }
-            $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
-        }
+        $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
 
         try
         {

@@ -144,6 +144,22 @@ trait ValidatePropertyTrait
                     $min = null;
                 }
             }
+
+            if($constraintKey === $authorizedKeys[10])
+            {
+                if(!is_array($constraintValue))
+                {
+                    throw new DataSchemaInvalidValueTypeException("Mimetype constraints value must be of type array. Invalid value found in '$property'.");
+                }
+
+                foreach($constraintValue as $mimetype)
+                {
+                    if(!in_array($mimetype, AuthorizedKeys::MIME_TYPES))
+                    {
+                        throw new DataSchemaUnexpectedValueException("Unexpected mimetype constraint for '$property'.");
+                    }
+                }
+            }
         }
     }
 

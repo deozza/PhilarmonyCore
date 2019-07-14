@@ -2,6 +2,7 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema;
 
+use Deozza\PhilarmonyCoreBundle\Exceptions\DataSchemaInvalidValueTypeException;
 use Deozza\PhilarmonyCoreBundle\Exceptions\DataSchemaMissingKeyException;
 use Deozza\PhilarmonyCoreBundle\Exceptions\DataSchemaUnexpectedKeyException;
 use Deozza\PhilarmonyCoreBundle\Exceptions\DataSchemaUnexpectedValueException;
@@ -70,20 +71,166 @@ trait ValidateEntityTrait
 
         foreach($keys as $key)
         {
-            if(!in_array($key, $authorizedKeys))
+            switch($key)
             {
-                throw new DataSchemaUnexpectedKeyException("The authorized keys in an entity state are ".json_encode($authorizedKeys).". '$key' found in '$entityName'.");
-            }
-
-            if($key === $authorizedKeys[0])
-            {
-                $this->validateEntityStateMethods($entityName, $stateName, $state[$key]);
+                case $authorizedKeys[0]: $this->validateEntityStateMethods($entityName, $stateName, $state[$key]);;
+                    break;
+                case $authorizedKeys[1]: $this->validateEntityStateConstraints($entityName, $stateName, $state[$key]);
+                    break;
+                default : throw new DataSchemaUnexpectedKeyException("The authorized keys in an entity state are ".json_encode($authorizedKeys).". '$key' found in '$entityName'.");
+                    break;
             }
         }
     }
 
-    private function validateEntityStateMethods(string $entityName, string $stateName, array $methods)
+    private function validateEntityStateConstraints(string $entity, string $state, $constraints)
     {
+        if(!is_array($constraints))
+        {
+            throw new DataSchemaUnexpectedValueException("Constraints of an entity must be of type 'array'. Unexpected value found in state '$state' of '$entity'.");
+        }
+
+        foreach($constraints as $constraintKey=>$constraintValue)
+        {
+            $this->validateEntityStateConstraint($entity, $state, $constraintKey,$constraintValue);
+        }
+    }
+
+    private function validateEntityStateConstraint(string $entity, string $state, string $constraintKey, array $constraints)
+    {
+        $authorizedKeys = AuthorizedKeys::ENTITY_CONSTRAINT_KEYS;
+        $key = explode('.',$constraintKey);
+        switch($key[0])
+        {
+            case $authorizedKeys[0]: $this->checkManualConstraint($entity, $state, $constraints);
+                break;
+            case $authorizedKeys[1] : $this->checkPropertyConstraint($entity, $state, $constraintKey, $constraints);
+                break;
+            default : throw new DataSchemaUnexpectedKeyException("Authorized constraints keys are ".json_encode($authorizedKeys).". Unexpected '$constraintKey' found in state '$state' of '$entity'.");
+                break;
+        }
+    }
+
+    private function checkManualConstraint(string $entity, string $state, array $constraints)
+    {
+        $authorizedKeys = AuthorizedKeys::BY_KEYS;
+        if(!array_key_exists('by', $constraints))
+        {
+            throw new DataSchemaMissingKeyException();
+        }
+
+        if(!is_array($constraints['by']))
+        {
+            throw new DataSchemaInvalidValueTypeException();
+        }
+
+        foreach($constraints['by'] as $key=>$value)
+        {
+            if(!in_array($key, $authorizedKeys))
+            {
+                throw new DataSchemaUnexpectedKeyException();
+            }
+
+            if(!is_array($value))
+            {
+                throw new DataSchemaInvalidValueTypeException();
+            }
+        }
+    }
+
+    private function checkPropertyConstraint(string $entity, string $state, string $property, array $constraints)
+    {
+        $authorizedKeys = AuthorizedKeys::ENTITY_CONSTRAINT;
+        $propertyExploded = explode('.', $property);
+
+        $propertiesAvailable = $this->entities[AuthorizedKeys::ENTITY_HEAD][$entity][AuthorizedKeys::ENTITY_KEYS[0]];
+        if(!in_array($propertyExploded[1], $propertiesAvailable))
+        {
+            throw new DataSchemaUnexpectedValueException();
+        }
+
+        foreach($constraints as $constraint)
+        {
+            $regex = "/(\w+\.)/";
+            preg_match($regex, $constraint, $matches);
+
+            if(!empty($matches))
+            {
+                $operator = substr($matches[1], 0, strlen($matches[1]) - 1);
+                if(!in_array($operator, $authorizedKeys))
+                {
+                    throw new DataSchemaUnexpectedValueException();
+                }
+                $regex = "/(\w+\()/";
+                preg_match($regex, $constraint, $matches);
+                if(!empty($matches))
+                {
+                    $constraintOnEntity = substr($matches[1], 0, strlen($matches[1]) - 1);
+                    switch($constraintOnEntity)
+                    {
+                        case "self" : {
+                            $regex = "/(\(.+\))/";
+                            preg_match($regex, $constraint, $matches);
+                            if(!empty($matches))
+                            {
+                                $property = substr($matches[1], 1, strlen($matches[1])-2);
+
+                                $exists = $this->schemaLoader->propertyFinder($property, $entity);
+
+                                if($exists === false)
+                                {
+                                    throw new DataSchemaUnexpectedValueException($property);
+                                }
+                            }
+                        };
+                            break;
+                        default : {
+                            if(!in_array($constraintOnEntity, array_keys($this->entities[AuthorizedKeys::ENTITY_HEAD])))
+                            {
+                                throw new DataSchemaUnexpectedValueException($constraintOnEntity);
+                            }
+                            $regex = "/(\(.+\))/";
+                            preg_match($regex, $constraint, $matches);
+                            if(!empty($matches))
+                            {
+                                $propertiesAvailable = $this->entities[AuthorizedKeys::ENTITY_HEAD][$entity]['properties'];
+                                $properties = substr($matches[1], 1, strlen($matches[1])-2);
+                                $explodedProperties = explode(",",$properties);
+                                foreach($explodedProperties as $explodedProperty)
+                                {
+                                    if(!in_array($explodedProperty, $propertiesAvailable))
+                                    {
+                                        throw new DataSchemaUnexpectedValueException($explodedProperty);
+                                    }
+                                }
+                            }
+                        }
+                            break;
+                    }
+                }
+
+            }
+            elseif(strpos($constraint, "equal") == false)
+            {
+                $regex = "/(\w+\()/";
+                preg_match($regex, $constraint, $matches);
+                $operator = substr($matches[1], 0, strlen($matches[1]) - 1);
+                if(!in_array($operator, $authorizedKeys))
+                {
+                    throw new DataSchemaUnexpectedValueException();
+                }
+            }
+
+        }
+    }
+
+    private function validateEntityStateMethods(string $entityName, string $stateName, $methods)
+    {
+        if(!is_array($methods))
+        {
+            throw new DataSchemaUnexpectedValueException("Methods of an entity must be of type 'array'. Unexpected value found in state '$stateName' of '$entityName'.");
+        }
+
         $authorizedMethod = AuthorizedKeys::METHODS;
         foreach($methods as $method => $methodContent)
         {

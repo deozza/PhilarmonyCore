@@ -1,16 +1,8 @@
 <?php
 namespace Deozza\PhilarmonyCoreBundle\Controller;
 
+use Deozza\PhilarmonyCoreBundle\Controller\BaseController;
 use Deozza\PhilarmonyCoreBundle\Entity\Entity;
-use Deozza\PhilarmonyUtils\Exceptions\BadFileTree;
-use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
-use Deozza\PhilarmonyCoreBundle\Service\FormManager\ProcessForm;
-use Deozza\PhilarmonyCoreBundle\Service\RulesManager\RulesManager;
-use Deozza\PhilarmonyCoreBundle\Service\Validation\Validate;
-use Deozza\ResponseMakerBundle\Service\ResponseMaker;
-use Doctrine\ORM\EntityManagerInterface;
-use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,25 +13,8 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * @Route("api/")
  */
-class EntityController extends AbstractController
+class EntityController extends BaseController
 {
-
-    public function __construct(ResponseMaker $responseMaker,
-                                EntityManagerInterface $em,
-                                PaginatorInterface $paginator,
-                                ProcessForm $processForm,
-                                DatabaseSchemaLoader $schemaLoader,
-                                RulesManager $ruleManager,
-                                Validate $validate)
-    {
-        $this->response = $responseMaker;
-        $this->em = $em;
-        $this->processForm = $processForm;
-        $this->schemaLoader = $schemaLoader;
-        $this->ruleManager = $ruleManager;
-        $this->paginator = $paginator;
-        $this->validator = $validate;
-    }
 
     /**
      * @Route(
@@ -50,445 +25,164 @@ class EntityController extends AbstractController
      *     name="get_entity_list",
      *      methods={"GET"})
      */
-    public function getEntityListAction($entity_name, Request $request)
+    public function getEntityListAction(string $entity_name, Request $request)
     {
-        try
-        {
-            $exists= $this->schemaLoader->loadEntityEnumeration($entity_name);
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
-        }
 
-        if(empty($exists))
-        {
-            return $this->response->notFound("This route does not exists%s");
-        }
-
-        $conflict_errors = $this->ruleManager->decideConflict($exists, $request->getContent(), $request->getMethod(),__DIR__);
-
-        if($conflict_errors > 0)
-        {
-            return $this->response->conflict("You can not access to the the $entity_name", $conflict_errors);
-        }
-
-        $filter = $request->query->get("filterBy", []);
-        $sort = $request->query->get("sortBy", []);
-        try
-        {
-            $entitiesQuery = $this->em->getRepository(Entity::class)->findAllFiltered($filter, $sort, $entity_name);
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->notFound("No entity was found with these filters");
-        }
-
-        try
-        {
-            foreach($entitiesQuery as $key=>$item)
-            {
-                if(!isset($exists['states']))
-                {
-                    throw new BadFileTree("$entity_name must have a 'states' node");
-                }
-
-                if(!isset($exists['states'][$item->getValidationState()]))
-                {
-                    throw new BadFileTree("State ".$item->getValidationState()." was not found in $entity_name");
-                }
-
-                if(!isset($exists['states'][$item->getValidationState()]['methods']))
-                {
-                    throw new BadFileTree("State ".$item->getValidationState()." of $entity_name must have a 'methods' node");
-                }
-
-                if(!isset($exists['states'][$item->getValidationState()]['methods'][$request->getMethod()]))
-                {
-                    unset($entitiesQuery[$key]);
-                }
-
-                if(!isset($exists['states'][$item->getValidationState()]['methods'][$request->getMethod()]['by']))
-                {
-                    throw new BadFileTree("Method ".$request->getMethod()." must have a 'by' node in $entity_name");
-                }
-
-                $constraints = $exists['states'][$item->getValidationState()]['methods'][$request->getMethod()]['by'];
-                if($constraints !== "all")
-                {
-                    if(empty($this->getUser()->getUsername()))
-                    {
-                        unset($entitiesQuery[$key]);
-                        continue;
-                    }
-
-                    $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $item);
-
-                    if($isAuthorized === false)
-                    {
-                        unset($entitiesQuery[$key]);
-                        continue;
-                    }
-                }
-            }
-        }
-        catch (\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
-        }
-
-        $entities = $this->paginator->paginate(
-            $entitiesQuery,
-            $request->query->getInt("page", 1),
-            $request->query->getInt("number", 10)
-        );
-
-        return $this->response->okPaginated($entities, ['entity_complete']);
     }
 
     /**
      * @Route(
-     *     "entity/{id}",
+     *     "entity/{uuid}",
      *     requirements={
-     *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
      *     },
      *     name="get_entity",
-     *     methods={"GET"})
+     *      methods={"GET"})
      */
-    public function getEntityAction($id, Request $request, EventDispatcherInterface $eventDispatcher)
+    public function getEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $exist = $this->em->getRepository(Entity::class)->findOneByUuid($id);
+        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
 
-        if(empty($exist))
+        if(empty($entity))
         {
-            return $this->response->notFound("The entity with the id $id does not exist");
+            return $this->response->notFound("Resource not found");
+        }
+        $state = $entity->getValidationState();
+        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'][$state]['methods'];
+        if(!array_key_exists($request->getMethod(),$entityConfig))
+        {
+            return $this->response->methodNotAllowed($request->getMethod()." is not allowed on this route");
         }
 
-        $state = $exist->getValidationState();
+        $isAllowed = $this->isAllowed($entityConfig[$request->getMethod()]['by'], false, $entity);
 
-        $entityConfig = $this->schemaLoader->loadEntityEnumeration($exist->getKind());
-
-
-        if(!isset($entityConfig['states'][$state]['methods'][$request->getMethod()]))
+        if(is_object($isAllowed))
         {
-            return $this->response->methodNotAllowed($request->getMethod());
+            return $isAllowed;
         }
 
-        $constraints = $entityConfig['states'][$state]['methods'][$request->getMethod()]['by'];
-
-        if($constraints === "all")
-        {
-            return $this->response->ok($exist, ['entity_basic', 'user_basic']);
-        }
-
-        if(empty($this->getUser()->getUsername()))
-        {
-            return $this->response->notAuthorized();
-        }
-
-        try
-        {
-            $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $exist);
-            if($isAuthorized === false)
-            {
-                return $this->response->forbiddenAccess("Access to this resource is forbidden");
-            }
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
-        }
-
-        $conflict_errors = $this->ruleManager->decideConflict($exist, $request->getContent(), $request->getMethod(),__DIR__);
+        $conflict_errors = $this->rulesManager->decideConflict($entity, $request->getContent(), $request->getMethod(),__DIR__);
 
         if($conflict_errors > 0)
         {
             return $this->response->conflict("You can not access to this entity", $conflict_errors);
         }
 
-        $this->handleEvents($request->getMethod(), $entityConfig['states'][$state]['methods'][$request->getMethod()], $exist, $eventDispatcher);
-        return $this->response->ok($exist, ['entity_basic', 'user_basic']);
+        $this->handleEvents($request->getMethod(), $entityConfig[$request->getMethod()], $entity, $eventDispatcher);
+
+        return $this->response->ok($entity, ['entity_basic', 'user_basic']);
     }
 
     /**
      * @Route(
      *     "entity/{entity_name}",
-     *      requirements={
+     *     requirements={
      *          "entity_name" = "^(\w{1,50})$"
      *     },
      *     name="post_entity",
      *      methods={"POST"})
      */
-    public function postEntityAction($entity_name, Request $request, EventDispatcherInterface $eventDispatcher)
+    public function postEntityAction(string $entity_name, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        try
+        $entity = $this->schemaLoader->loadEntityEnumeration($entity_name);
+
+        if(empty($entity))
         {
-            $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity_name);
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
+            return $this->response->notFound("Route not found");
         }
 
-        if(empty($entityConfig))
+        $formClass = "App\Form\\".$entity_name."\__default\POST";
+        if(!class_exists($formClass))
         {
-            return $this->response->notFound("This route does not exists");
+            return $this->response->notFound("Route not found");
+        }
+        $isAllowed = $this->isAllowed($entity['states']['__default']['methods']['POST']['by']);
+        if(is_object($isAllowed))
+        {
+            return $isAllowed;
         }
 
-        $stateConfig = $entityConfig['states']['__default'];
+        $formObject = new \ReflectionClass($formClass);
+        $form = $this->createForm($formObject->getName(), null);
+        $form->submit(json_decode($request->getContent(), true), false);
 
-        if(!array_key_exists($request->getMethod(), $stateConfig['methods']))
+        if(!$form->isValid())
         {
-            return $this->response->methodNotAllowed($request->getMethod());
-        }
-
-        if(empty($this->getUser()->getUsername()))
-        {
-            return $this->response->notAuthorized();
-        }
-
-        $userRoles = $this->getUser()->getRoles();
-        $isAllowed = false;
-
-
-        if(isset($stateConfig['methods']['POST']['by']['roles']))
-        {
-            foreach ($userRoles as $role)
-            {
-                if(in_array($role, $stateConfig['methods']['POST']['by']['roles']))
-                {
-                    $isAllowed = true;
-                }
-            }
-        }
-
-        if($isAllowed === false)
-        {
-            return $this->response->forbiddenAccess("Access to this resource is forbidden");
-        }
-
-        if(empty($request->getContent()))
-        {
-            return $this->response->badRequest("Post content must not be empty");
+            return $this->response->badRequest('Form invalid');
         }
 
         $entityToPost = new Entity();
         $entityToPost->setKind($entity_name);
         $entityToPost->setOwner($this->getUser());
         $entityToPost->setValidationState("__default");
+        $entityToPost->setProperties($form->getData());
 
-        try
-        {
-            $formFields = $stateConfig['methods'][$request->getMethod()]['properties'];
-            $posted = $this->processForm->generateAndProcess($formKind = 'post', $request->getContent(), $entityToPost, $entityConfig, $formFields);
-
-            if(is_object($posted))
-            {
-                return $posted;
-            }
-
-            $state = $this->validator->processValidation($entityToPost,$entityToPost->getValidationState(), $entityConfig['states'], $this->getUser());
-
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
-        }
-        $conflict_errors = $this->ruleManager->decideConflict($entityToPost , $request->getContent(), $request->getMethod(),__DIR__);
-
+        $conflict_errors = $this->rulesManager->decideConflict($entityToPost , $request->getContent(), $request->getMethod(),__DIR__);
         if($conflict_errors > 0)
         {
             return $this->response->conflict("You can not access to this entity", $conflict_errors);
         }
-        if(!is_array($state) || $entityToPost->getValidationState() != "__default")
+
+        $state = $this->validate->processValidation($entityToPost,$entityToPost->getValidationState(), $entity['states'], $this->getUser());
+        $this->em->persist($entityToPost);
+
+        if(!is_string($state) || $state === "__default")
         {
-            $this->handleEvents($request->getMethod(), $stateConfig, $entityToPost, $eventDispatcher);
             $this->em->flush();
+            return $this->response->conflict($state['errors'], $entityToPost, ['entity_id', 'entity_property', "entity_basic"]);
         }
 
-        if(is_array($state))
-        {
-            return $this->response->conflict($state['errors'],$entityToPost, ['entity_id', 'entity_property', "entity_basic"]);
-        }
+        $entityToPost->setValidationState($state);
+        $this->handleEvents($request->getMethod(), $entity['states']['__default'], $entityToPost, $eventDispatcher);
+
+        $this->em->flush();
 
         return $this->response->created($entityToPost, ['entity_complete', 'user_basic']);
     }
 
     /**
      * @Route(
-     *     "entity/{id}",
+     *     "entity/{uuid}",
      *     requirements={
-     *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-     *      },
-     *     name="patch_entity",
-     *      methods={"PATCH"})
-     */
-    public function patchEntityAction($id, Request $request, EventDispatcherInterface $eventDispatcher)
-    {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($id);
-
-        if(empty($entity))
-        {
-            return $this->response->notFound("This route does not exist%s");
-        }
-
-        if(empty($this->getUser()->getUsername()))
-        {
-            return $this->response->notAuthorized();
-        }
-
-        $state = $entity->getValidationState();
-
-        try
-        {
-            $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
-        }
-
-        $stateConfig = $entityConfig['states'][$state];
-
-        if(!isset($stateConfig['methods'][$request->getMethod()]))
-        {
-            return $this->response->methodNotAllowed($request->getMethod());
-        }
-
-        $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
-
-        try
-        {
-            $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $entity);
-            if($isAuthorized === false)
-            {
-                return $this->response->forbiddenAccess("Access to this resource is forbidden");
-            }
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
-        }
-
-        $formFields = $stateConfig['methods'][$request->getMethod()]['properties'];
-
-        try
-        {
-            $patched = $this->processForm->generateAndProcess($formKind = 'patch', $request->getContent(), $entity, $entityConfig, $formFields);
-
-            if(empty($patched))
-            {
-                return $this->response->badRequest("Request content must not be empty");
-            }
-
-            if(is_object($patched))
-            {
-                return $patched;
-            }
-            $state = $this->validator->processValidation($entity,$entity->getValidationState(), $entityConfig['states'], $this->getUser());
-
-            $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher);
-            $entity->setLastUpdate(new \DateTime("now"));
-            $this->em->flush();
-
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
-        }
-
-        if(is_array($state))
-        {
-            return $this->response->conflict($state['errors'],$entity, ['entity_complete', 'user_basic']);
-        }
-        $entity->setValidationState($state);
-
-
-        return $this->response->ok($entity, ['entity_complete', 'user_basic']);
-    }
-
-    /**
-     * @Route(
-     *     "entity/{id}",
-     *     requirements={
-     *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-     *      },
+     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+     *     },
      *     name="delete_entity",
-     *     methods={"DELETE"})
+     *      methods={"DELETE"})
      */
-    public function deleteEntityAction($id, Request $request, EventDispatcherInterface $eventDispatcher)
+    public function deleteEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($id);
+        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
 
         if(empty($entity))
         {
-            return $this->response->notFound("The entity with the id $id does not exist");
+            return $this->response->notFound("Resource not found");
         }
-
-        if(empty($this->getUser()->getUsername()))
-        {
-            return $this->response->notAuthorized();
-        }
-
         $state = $entity->getValidationState();
-
-        try
+        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'][$state]['methods'];
+        if(!array_key_exists($request->getMethod(),$entityConfig))
         {
-            $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
+            return $this->response->methodNotAllowed($request->getMethod()." is not allowed on this route");
         }
 
-        $stateConfig = $entityConfig['states'][$state];
+        $isAllowed = $this->isAllowed($entityConfig[$request->getMethod()]['by'], false, $entity);
 
-        if(!isset($stateConfig['methods'][$request->getMethod()]))
+        if(is_object($isAllowed))
         {
-            return $this->response->methodNotAllowed($request->getMethod());
+            return $isAllowed;
         }
 
-        $constraints = $stateConfig['methods'][$request->getMethod()]['by'];
-
-        try
-        {
-            $isAuthorized = $this->validator->validateUserPermission($constraints, $this->getUser(), $entity);
-            if($isAuthorized === false)
-            {
-                return $this->response->forbiddenAccess("Access to this resource is forbidden");
-            }
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
-        }
-
-        $conflict_errors = $this->ruleManager->decideConflict($entity, $request->getContent(), $request->getMethod(),__DIR__);
+        $conflict_errors = $this->rulesManager->decideConflict($entity, $request->getContent(), $request->getMethod(),__DIR__);
 
         if($conflict_errors > 0)
         {
-            return $this->response->conflict("You can not delete this entity", $conflict_errors);
+            return $this->response->conflict("You can not access to this entity", $conflict_errors);
         }
 
-        $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher);
+        $this->handleEvents($request->getMethod(), $entityConfig[$request->getMethod()], $entity, $eventDispatcher);
 
         $this->em->remove($entity);
         $this->em->flush();
+
         return $this->response->empty();
     }
-
-    private function handleEvents($method, $stateConfig, $entity, $eventDispatcher)
-    {
-        if(isset($stateConfig['methods'][$method]['post_scripts']))
-        {
-            $scripts = $stateConfig['methods'][$method]['post_scripts'];
-
-            $event = new GenericEvent($entity);
-            foreach($scripts as $script)
-            {
-                $eventDispatcher->dispatch($event, $script);
-            };
-        }
-    }
-
 }

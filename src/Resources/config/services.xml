@@ -46,9 +46,16 @@
         </service>
         <service id="Deozza\PhilarmonyCoreBundle\Service\FormManager\FormGenerator" alias="philarmony.form_generator" />
 
+        <service class="Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\Migration\GenerateMigrationFile" id="philarmony.migration.generate">
+            <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
+            <argument key="$rootPath">%kernel.project_dir%</argument>
+        </service>
+        <service id="Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\Migration\GenerateMigrationFile" alias="philarmony.migration.generate" />
+
         <service id="Deozza\PhilarmonyCoreBundle\Command\SchemaMigrationDiffCommand">
             <tag name="console.command" command="philarmony:migration:diff"/>
             <bind key="$schemaValidator" type="service" id="philarmony.schema_validator"/>
+            <bind key="$generateMigrationFile" type="service" id="philarmony.migration.generate"/>
         </service>
         <service id="Deozza\PhilarmonyCoreBundle\Command\SchemaValidateCommand">
             <tag name="console.command" command="philarmony:schema:validate"/>

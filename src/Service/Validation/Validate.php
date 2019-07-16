@@ -150,52 +150,6 @@ class Validate
         return $errors;
     }
 
-    public function validateUserPermission($constraint, $user, Entity $entity)
-    {
-        $isAuthorized = false;
-
-        if(isset($constraint['roles']))
-        {
-            foreach($constraint['roles'] as $role)
-            {
-                if(in_array($role, $user->getRoles()))
-                {
-                    $isAuthorized = true;
-                }
-            }
-        }
-
-        if(isset($constraint['users']))
-        {
-            foreach($constraint['users'] as $userKind)
-            {
-
-                $userPath = explode('.', $userKind);
-                if($userPath[0] === "owner")
-                {
-                    if($entity->getOwner()->getId() === $user->getId())
-                    {
-                        $isAuthorized = true;
-                    }
-                }
-                else
-                {
-                    $properties = $entity->getProperties();
-                    for($i = 0; $i < count($userPath); $i++)
-                    {
-                        $properties = $properties[$userPath[$i]];
-                    }
-
-                    if($user->getId() === $properties || in_array($user->getId(), $properties))
-                    {
-                        $isAuthorized = true;
-                    }
-                }
-            }
-        }
-        return $isAuthorized;
-    }
-
     private function choseFunction($submited, $functionName, $entity)
     {
         $function = explode(".", $functionName[0]);

@@ -55,7 +55,6 @@
         <service id="Deozza\PhilarmonyCoreBundle\Command\SchemaMigrationDiffCommand">
             <tag name="console.command" command="philarmony:migration:diff"/>
             <bind key="$schemaValidator" type="service" id="philarmony.schema_validator"/>
-            <bind key="$generateMigrationFile" type="service" id="philarmony.migration.generate"/>
         </service>
         <service id="Deozza\PhilarmonyCoreBundle\Command\SchemaValidateCommand">
             <tag name="console.command" command="philarmony:schema:validate"/>

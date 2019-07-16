@@ -27,7 +27,7 @@
         "knplabs/knp-paginator-bundle": "^3.0",
         "scienta/doctrine-json-functions": "^4.0",
         "deozza/response-maker-bundle": "^1.0",
-        "deozza/philarmony-utils": "^0.1.0"
+        "deozza/philarmony-utils": "^0.1"
     },
     "require-dev": {
         "symfony/profiler-pack": "^1.0",

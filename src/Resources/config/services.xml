@@ -41,9 +41,23 @@
         </service>
         <service id="Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaValidator" alias="philarmony.schema_validator" />
 
+        <service class="Deozza\PhilarmonyCoreBundle\Service\FormManager\FormGenerator" id="philarmony.form_generator">
+            <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
+        </service>
+        <service id="Deozza\PhilarmonyCoreBundle\Service\FormManager\FormGenerator" alias="philarmony.form_generator" />
+
         <service id="Deozza\PhilarmonyCoreBundle\Command\SchemaMigrationDiffCommand">
             <tag name="console.command" command="philarmony:migration:diff"/>
             <bind key="$schemaValidator" type="service" id="philarmony.schema_validator"/>
+        </service>
+        <service id="Deozza\PhilarmonyCoreBundle\Command\SchemaValidateCommand">
+            <tag name="console.command" command="philarmony:schema:validate"/>
+            <bind key="$schemaValidator" type="service" id="philarmony.schema_validator"/>
+        </service>
+        <service id="Deozza\PhilarmonyCoreBundle\Command\SchemaMigrationMigrateCommand">
+            <tag name="console.command" command="philarmony:migration:migrate"/>
+            <bind key="$formGenerator" type="service" id="philarmony.form_generator"/>
+            <argument key="$rootPath">%kernel.project_dir%</argument>
         </service>
     </services>
 </container>

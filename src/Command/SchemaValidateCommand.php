@@ -8,7 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SchemaMigrationDiffCommand extends Command
+class SchemaValidateCommand extends Command
 {
     protected static $defaultName = 'philarmony:migration:diff';
 
@@ -37,6 +37,7 @@ class SchemaMigrationDiffCommand extends Command
             return;
         }
 
-        $output->writeln("<success>Data schema is okay. Creating migration file...s</success>");
+        $output->writeln("<success>Data schema is okay.</success>");
+        
     }
 }

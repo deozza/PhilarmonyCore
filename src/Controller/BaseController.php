@@ -24,6 +24,33 @@ class BaseController extends AbstractController
         $this->em = $em;
     }
 
+    protected function validateRequest(?Entity $entity, string $method)
+    {
+        if(empty($entity))
+        {
+            return $this->response->notFound("Resource not found");
+        }
+
+        $stateConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'][$entity->getValidationState()]['methods'];
+
+        if(!array_key_exists($method,$stateConfig))
+        {
+            return $this->response->methodNotAllowed($method);
+        }
+
+        $loggedin = false;
+        if($method !== "GET")
+        {
+            $loggedin = true;
+        }
+
+        $isAllowed = $this->isAllowed($stateConfig[$method]['by'], $loggedin, $entity);
+        if(is_object($isAllowed))
+        {
+            return $isAllowed;
+        }
+    }
+
 
     protected function isAllowed($by, $loggedin = true, Entity $entity = null)
     {
@@ -74,15 +101,15 @@ class BaseController extends AbstractController
 
     protected function handleEvents(string $method, array $stateConfig, Entity $entity, EventDispatcherInterface $eventDispatcher)
     {
-        if(isset($stateConfig['methods'][$method]['post_scripts']))
-        {
-            $scripts = $stateConfig['methods'][$method]['post_scripts'];
-
-            $event = new GenericEvent($entity);
-            foreach($scripts as $script)
-            {
-                $eventDispatcher->dispatch($event, $script);
-            };
+        if(!array_key_exists('post_scripts',$stateConfig)) {
+            return;
         }
+        $scripts = $stateConfig['post_scripts'];
+
+        $event = new GenericEvent($entity);
+        foreach($scripts as $script)
+        {
+            $eventDispatcher->dispatch($event, $script);
+        };
     }
 }

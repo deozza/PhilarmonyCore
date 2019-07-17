@@ -28,7 +28,7 @@ class DatabaseSchemaValidator
 
     public function validateEntities(): void
     {
-        if(empty($this->entities) || !array_key_exists(self::ENTITY_HEAD, $this->entities))
+        if(empty($this->entities) || !array_key_exists(self::ENTITY_HEAD, $this->entities) || empty($this->entities[self::ENTITY_HEAD]))
         {
             throw new DataSchemaMissingKeyException(sprintf(self::EMPTY_OR_BAD_HEAD_MSG, 'entity', self::ENTITY_HEAD));
         }
@@ -64,10 +64,5 @@ class DatabaseSchemaValidator
             }
             $this->validateProperty($property, $propertyContent);
         }
-    }
-
-    public function validateEnumerations()
-    {
-
     }
 }

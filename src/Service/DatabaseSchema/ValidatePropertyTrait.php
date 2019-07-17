@@ -52,9 +52,9 @@ trait ValidatePropertyTrait
 
         $explodedType = explode('.', $type);
 
-        if(!array_key_exists($explodedType[0],\Deozza\PhilarmonyUtils\Forms\FieldTypes::ENUMERATION))
+        if(!in_array($explodedType[0],AuthorizedKeys::TYPES))
         {
-            throw new DataSchemaUnexpectedKeyException($explodedType[0]);
+            throw new DataSchemaUnexpectedKeyException($explodedType[0]." ".$property);
         }
 
         if(count($explodedType) === 2)

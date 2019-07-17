@@ -37,7 +37,6 @@ class SchemaValidateCommand extends Command
             return;
         }
 
-        $output->writeln("<success>Data schema is okay.</success>");
-        
+        $output->writeln("<fg=green>Data schema is okay.</>");
     }
 }

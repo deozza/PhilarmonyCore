@@ -104,7 +104,12 @@ trait ValidateEntityTrait
         {
             case $authorizedKeys[0]: $this->checkManualConstraint($entity, $state, $constraints);
                 break;
-            case $authorizedKeys[1] : $this->checkPropertyConstraint($entity, $state, $constraintKey, $constraints);
+            case $authorizedKeys[1] : {
+                foreach($constraints as $constraintKey=>$constraints)
+                {
+                    $this->checkPropertyConstraint($entity, $state, $constraintKey, $constraints);
+                }
+            }
                 break;
             default : throw new DataSchemaUnexpectedKeyException("Authorized constraints keys are ".json_encode($authorizedKeys).". Unexpected '$constraintKey' found in state '$state' of '$entity'.");
                 break;
@@ -142,9 +147,9 @@ trait ValidateEntityTrait
     {
         $authorizedKeys = AuthorizedKeys::ENTITY_CONSTRAINT;
         $propertyExploded = explode('.', $property);
-
         $propertiesAvailable = $this->entities[AuthorizedKeys::ENTITY_HEAD][$entity][AuthorizedKeys::ENTITY_KEYS[0]];
-        if(!in_array($propertyExploded[1], $propertiesAvailable))
+
+        if(!in_array($propertyExploded[0], $propertiesAvailable))
         {
             throw new DataSchemaUnexpectedValueException();
         }
@@ -183,6 +188,10 @@ trait ValidateEntityTrait
                                 }
                             }
                         };
+                            break;
+                        case "value" : {
+
+                        }
                             break;
                         default : {
                             if(!in_array($constraintOnEntity, array_keys($this->entities[AuthorizedKeys::ENTITY_HEAD])))
@@ -239,8 +248,6 @@ trait ValidateEntityTrait
                 throw new DataSchemaUnexpectedKeyException("The authorized methods for a state are ".json_encode($authorizedMethod).". '$method' found in the '$stateName' of '$entityName'.");
             }
             $this->checkKeysOfMethod($method, $methodContent, $entityName);
-
-
         }
     }
 

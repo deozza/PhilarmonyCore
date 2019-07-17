@@ -27,7 +27,10 @@ class ValidationController extends BaseController
     public function postManualValidationAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
-        $valid = $this->ableToValidateEntity($entity);
+        
+        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        
+        $valid = $this->manualValidation->ableToValidateEntity($entity, $user);
         if(is_object($valid))
         {
             return $valid;
@@ -64,7 +67,9 @@ class ValidationController extends BaseController
     public function postManualRetrogradeAction(string $uuid, Request $request)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
-        $valid = $this->ableToRetrogradeEntity($entity);
+        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+
+        $valid = $this->manualValidation->ableToRetrogradeEntity($entity, $user);
         if(is_object($valid))
         {
             return $valid;

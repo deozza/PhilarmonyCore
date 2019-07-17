@@ -27,11 +27,15 @@ class Validate
         $this->em = $em;
     }
 
-    public function processValidation(Entity $entity,int $stateToValidate, array $entityStates, $user,int $lastState = null, $manual = false)
+    public function processValidation(Entity $entity,int $stateToValidate, array $entityStates, $user,int $lastState = null)
     {
         $states = array_keys($entityStates);
-        $stateToValidateConfig = $entityStates[$states[$stateToValidate]];
 
+        if(!array_key_exists($stateToValidate, $states))
+        {
+            return true;
+        }
+        $stateToValidateConfig = $entityStates[$states[$stateToValidate]];
         if(!array_key_exists('constraints', $stateToValidateConfig))
         {
             if(array_key_exists($stateToValidate + 1,$states))

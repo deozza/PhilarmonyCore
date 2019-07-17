@@ -28,7 +28,8 @@ class FileController extends BaseController
     public function getFileAction(string $uuid,string $file_property, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
-        $valid = $this->validateRequest($entity, $request->getMethod());
+        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
             return $valid;
@@ -67,7 +68,8 @@ class FileController extends BaseController
     public function postFileAction(string $uuid,string $file_property, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
-        $valid = $this->validateRequest($entity, $request->getMethod());
+        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
             return $valid;
@@ -158,7 +160,8 @@ class FileController extends BaseController
     public function deleteFileAction(string $uuid,string $file_property, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
-        $valid = $this->validateRequest($entity, $request->getMethod());
+        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
             return $valid;

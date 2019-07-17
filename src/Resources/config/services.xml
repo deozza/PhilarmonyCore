@@ -5,21 +5,30 @@
         http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service class="Deozza\PhilarmonyCoreBundle\Service\FormManager\ProcessForm" id="philarmony.process_form">
-            <bind key="$responseMaker" type="service" id="philarmony.response_maker"/>
-            <bind key="$serializer" type="service" id="philarmony.form_error"/>
-            <bind key="$formFactory" type="service" id="form.factory"/>
-            <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
-            <bind key="$em" type="service" id="doctrine.orm.entity_manager"/>
-        </service>
-        <service id="Deozza\PhilarmonyCoreBundle\Service\FormManager\ProcessForm" alias="philarmony.process_form" />
-
         <service class="Deozza\PhilarmonyCoreBundle\Service\Validation\Validate" id="philarmony.validate">
             <bind key="$responseMaker" type="service" id="philarmony.response_maker"/>
             <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
             <bind key="$em" type="service" id="doctrine.orm.entity_manager"/>
         </service>
         <service id="Deozza\PhilarmonyCoreBundle\Service\Validation\Validate" alias="philarmony.validate" />
+
+        <service class="Deozza\PhilarmonyCoreBundle\Service\Validation\ManualValidation" id="philarmony.manual_validation">
+            <bind key="$responseMaker" type="service" id="philarmony.response_maker"/>
+            <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
+            <bind key="$authorizeAccessToEntity" type="service" id="philarmony.authorize_access_to_entity"/>
+        </service>
+        <service id="Deozza\PhilarmonyCoreBundle\Service\Validation\ManualValidation" alias="philarmony.manual_validation" />
+
+        <service class="Deozza\PhilarmonyCoreBundle\Service\Authorization\AuthorizeAccessToEntity" id="philarmony.authorize_access_to_entity">
+        </service>
+        <service id="Deozza\PhilarmonyCoreBundle\Service\Authorization\AuthorizeAccessToEntity" alias="philarmony.authorize_access_to_entity" />
+
+        <service class="Deozza\PhilarmonyCoreBundle\Service\Authorization\AuthorizeRequest" id="philarmony.authorize_request">
+            <bind key="$responseMaker" type="service" id="philarmony.response_maker"/>
+            <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
+            <bind key="$authorizeAccessToEntity" type="service" id="philarmony.authorize_access_to_entity"/>
+        </service>
+        <service id="Deozza\PhilarmonyCoreBundle\Service\Authorization\AuthorizeRequest" alias="philarmony.authorize_request" />
 
         <service class="Deozza\PhilarmonyCoreBundle\Service\RulesManager\RulesManager" id="philarmony.rule_manager">
             <bind key="$entityManager" type="service" id="doctrine.orm.entity_manager"/>

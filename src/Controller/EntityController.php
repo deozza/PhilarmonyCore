@@ -18,7 +18,7 @@ class EntityController extends BaseController
 
     /**
      * @Route(
-     *     "entity/{entity_name}",
+     *     "entities/{entity_name}",
      *     requirements={
      *          "entity_name" = "^(\w{1,50})$"
      *     },
@@ -35,51 +35,37 @@ class EntityController extends BaseController
 
         $user = !empty($this->getUser()->getUuid()) ? $this->getUser() : null;
 
-        $possibleStates = [];
-        foreach($entityConfig['states'] as $state => $methhods)
+        $filter = $request->query->get("filterBy", []);
+        $sort = $request->query->get("sortBy", []);
+        
+        $entities = $this->em->getRepository(Entity::class)->findAllFiltered($filter, $sort, $entity_name);
+
+        foreach($entities as $key=>$entity)
         {
-            if(!isset($methhods['methods'][$request->getMethod()]))
+            $state_name = $entity->getValidationState();
+            $state_config = $entityConfig['states'][$state_name]['methods'];
+
+            if(!array_key_exists($request->getMethod(), $state_config))
             {
-                continue;
+                unset($entities[$key]);
             }
 
-            if($methhods['methods'][$request->getMethod()]['by'] === "all")
-            {
-                $possibleStates[$state] = true;
-            }
-            elseif(!empty($user))
-            {
-                if(isset($methhods['methods'][$request->getMethod()]['by']['roles']))
-                {
-                    foreach($methhods['methods'][$request->getMethod()]['by']['roles'] as $role)
-                    {
-                        if(in_array($role, $user->getRoles()))
-                        {
-                            $possibleStates[$state] = true;
-                        }
-                        break;
-                    }
-                }
+            $access = $this->authorizeAccessToEntity->authorize($user, $state_config[$request->getMethod()]['by'], $entity);
 
-                if(isset($methhods['methods'][$request->getMethod()]['by']['users']))
-                {
-                    foreach($methhods['methods'][$request->getMethod()]['by']['users'] as $userKind)
-                    {
-                        $possibleStates[$state] = $userKind;
-                    }
-                }
+            if($access === false)
+            {
+                unset($entities[$key]);
             }
         }
 
-        $entities = $this->em->getRepository(Entity::class)->findAllAuthorized($entity_name, $possibleStates, $user);
-        var_dump($entities);die;
-
         $page = $request->query->getInt("page", 1);
-        $count = $request->query->getInt("count", 1);
-        $filter = $request->query->get("filterBy", []);
-        $sort = $request->query->get("sortBy", []);
+        $count = $request->query->getInt("count", 10);
 
-        //$entities = $this->em->getRepository(Entity::class)->findAllPaginatedAndFiltered();
+        $offset = ($page - 1) * $count;
+        $total = count($entities);
+        $paginatedEntities = array_splice($entities, $offset, $count);
+
+        return $this->response->okPaginated($paginatedEntities, ['entity_basic', 'entity_id','user_basic'], $count, $page, $total);
 
     }
 
@@ -95,7 +81,8 @@ class EntityController extends BaseController
     public function getEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
-        $valid = $this->validateRequest($entity, $request->getMethod());
+        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
             return $valid;
@@ -137,7 +124,7 @@ class EntityController extends BaseController
         {
             return $this->response->notFound("Route not found");
         }
-        $isAllowed = $this->isAllowed($entity['states']['__default']['methods']['POST']['by']);
+        $isAllowed = $this->authorizeRequest->isAllowed($entity['states']['__default']['methods']['POST']['by']);
         if(is_object($isAllowed))
         {
             return $isAllowed;
@@ -195,7 +182,8 @@ class EntityController extends BaseController
     public function patchEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
-        $valid = $this->validateRequest($entity, $request->getMethod());
+        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
             return $valid;
@@ -252,7 +240,8 @@ class EntityController extends BaseController
     public function deleteEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
-        $valid = $this->validateRequest($entity, $request->getMethod());
+        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
             return $valid;

@@ -27,6 +27,59 @@ class EntityController extends BaseController
      */
     public function getEntityListAction(string $entity_name, Request $request)
     {
+        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity_name);
+
+        if (empty($entityConfig)) {
+            return $this->response->notFound("Resource not found");
+        }
+
+        $user = !empty($this->getUser()->getUuid()) ? $this->getUser() : null;
+
+        $possibleStates = [];
+        foreach($entityConfig['states'] as $state => $methhods)
+        {
+            if(!isset($methhods['methods'][$request->getMethod()]))
+            {
+                continue;
+            }
+
+            if($methhods['methods'][$request->getMethod()]['by'] === "all")
+            {
+                $possibleStates[$state] = true;
+            }
+            elseif(!empty($user))
+            {
+                if(isset($methhods['methods'][$request->getMethod()]['by']['roles']))
+                {
+                    foreach($methhods['methods'][$request->getMethod()]['by']['roles'] as $role)
+                    {
+                        if(in_array($role, $user->getRoles()))
+                        {
+                            $possibleStates[$state] = true;
+                        }
+                        break;
+                    }
+                }
+
+                if(isset($methhods['methods'][$request->getMethod()]['by']['users']))
+                {
+                    foreach($methhods['methods'][$request->getMethod()]['by']['users'] as $userKind)
+                    {
+                        $possibleStates[$state] = $userKind;
+                    }
+                }
+            }
+        }
+
+        $entities = $this->em->getRepository(Entity::class)->findAllAuthorized($entity_name, $possibleStates, $user);
+        var_dump($entities);die;
+
+        $page = $request->query->getInt("page", 1);
+        $count = $request->query->getInt("count", 1);
+        $filter = $request->query->get("filterBy", []);
+        $sort = $request->query->get("sortBy", []);
+
+        //$entities = $this->em->getRepository(Entity::class)->findAllPaginatedAndFiltered();
 
     }
 
@@ -104,11 +157,11 @@ class EntityController extends BaseController
 
         $formObject = new \ReflectionClass($formClass);
         $form = $this->createForm($formObject->getName(), null);
-        $form->submit(json_decode($request->getContent(), true), false);
+        $form->submit(json_decode($request->getContent(), true), true);
 
         if(!$form->isValid())
         {
-            return $this->response->badRequest('Form invalid');
+            return $this->response->badForm($form);
         }
 
         $entityToPost = new Entity();
@@ -123,16 +176,18 @@ class EntityController extends BaseController
             return $this->response->conflict("You can not access to this entity", $conflict_errors);
         }
 
-        $state = $this->validate->processValidation($entityToPost,$entityToPost->getValidationState(), $entity['states'], $this->getUser());
-        $this->em->persist($entityToPost);
+        $state = $this->validate->processValidation($entityToPost,0, $entity['states'], $this->getUser());
 
-        if(!is_string($state) || $state === "__default")
+        if($entityToPost->getValidationState() !== "__default")
         {
             $this->em->flush();
-            return $this->response->conflict($state['errors'], $entityToPost, ['entity_id', 'entity_property', "entity_basic"]);
         }
 
-        $entityToPost->setValidationState($state);
+        if(is_array($state))
+        {
+            return $this->response->conflict($state, $entityToPost, ['entity_id', 'entity_property', 'entity_basic']);
+        }
+
         $this->handleEvents($request->getMethod(), $entity['states']['__default'], $entityToPost, $eventDispatcher);
 
         $this->em->flush();

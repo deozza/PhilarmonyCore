@@ -19,13 +19,39 @@ class EntityRepository extends ServiceEntityRepository
         parent::__construct($registry, Entity::class);
     }
 
+    public function findAllAuthorized(string $entityName, array $possibleStates, $user)
+    {
+        $queryBuilder = $this->createQueryBuilder('e');
+        $parameters = [];
+
+        $queryBuilder->select('e');
+        $queryBuilder->where("e.kind = :kind");
+        $parameters['kind'] = $entityName;
+
+
+        foreach($possibleStates as $state => $config)
+        {
+            $queryBuilder->andWhere("e.validationState = '$state'");
+
+            if(!empty($user))
+            {
+                $parameters['uuid'] = $user->getUuidAsString();
+                if($config === 'owner')
+                {
+                }
+            }
+        }
+
+        $queryBuilder->setParameters($parameters);
+        return $queryBuilder->getQuery()->execute();
+    }
 
     public function findAllFiltered(Array $filters, Array $sort, $kind)
     {
         $queryBuilder = $this->createQueryBuilder('e');
         $queryBuilder->select('e');
         $parameters = [];
-        $queryBuilder->andWhere('e.kind = :kind');
+        $queryBuilder->where('e.kind = :kind');
         $parameters["kind"] = $kind;
 
         if(!empty($filters))
@@ -46,6 +72,7 @@ class EntityRepository extends ServiceEntityRepository
 
                 if(is_numeric($value) === false)
                 {
+                    $value = preg_replace("/(['])/", "''", $value);
                     if($operator === "LIKE")
                     {
                         $value = "%".$value."%";

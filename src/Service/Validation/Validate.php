@@ -9,17 +9,15 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class Validate
 {
-    use CompareTrait;
-
-    const OPERATOR_TABLE = [
-        ">" => "<=",
-        "<" => ">=",
-        ">=" => "<",
-        "<=" => ">",
-        "!=" => "==",
-        "!between" => "not between",
-        "between" => "between"
-
+    const METHODS = [
+        "greaterThan" => ">",
+        "lesserThan" => "<",
+        "greaterThanOrEqual" => ">=",
+        "lesserThanOrEqual" => "<=",
+        "between" => "between",
+        "notBetween" => "!between",
+        "equal" => "==",
+        "notEqual" => "!="
     ];
 
     public function __construct(ResponseMaker $responseMaker, DatabaseSchemaLoader $schemaLoader, EntityManagerInterface $em)
@@ -29,193 +27,230 @@ class Validate
         $this->em = $em;
     }
 
-    public function processValidation(Entity $entity,$state, $entityStates, $user, $lastState = null, $manual = false)
+    public function processValidation(Entity $entity,int $stateToValidate, array $entityStates, $user,int $lastState = null, $manual = false)
     {
-        $possibleStates = array_keys($entityStates);
-        $currentState = array_search($state, $possibleStates);
-        if(!array_key_exists("constraints", $entityStates[$state]))
-        {
-            if(isset($possibleStates[$currentState +1]))
-            {
-                $nextState = $possibleStates[$currentState +1];
-                return $this->processValidation($entity, $nextState, $entityStates, $user, $state, $manual);
-            }
-            $entity->setValidationState($state);
-            return $state;
-        }
-        else
-        {
-            $isValid = $this->validateEntity($entity, $user, $entityStates[$state]['constraints'], $manual);
-            if(empty($isValid))
-            {
-                if(isset($possibleStates[$currentState +1]))
-                {
-                    $nextState = $possibleStates[$currentState +1];
-                    return $this->processValidation($entity, $nextState, $entityStates, $user, $state, $manual);
-                }
-                $entity->setValidationState($state);
+        $states = array_keys($entityStates);
+        $stateToValidateConfig = $entityStates[$states[$stateToValidate]];
 
-                return $state;
+        if(!array_key_exists('constraints', $stateToValidateConfig))
+        {
+            if(array_key_exists($stateToValidate + 1,$states))
+            {
+                return $this->processValidation($entity, $stateToValidate + 1, $entityStates, $user, $stateToValidate);
             }
-            $entity->setValidationState($lastState);
-            return ["state"=>$lastState, "errors"=>$isValid];
         }
+
+        $validate = [];
+        foreach($stateToValidateConfig['constraints'] as $x=>$y)
+        {
+            $validate[$x] = $this->validateField($x, $y, $entity);
+        }
+
+        foreach($validate as $key=>$value)
+        {
+            if(in_array(false, $value))
+            {
+                $entity->setValidationState($states[$lastState]);
+                $this->em->persist($entity);
+
+                return $validate;
+            }
+        }
+
+        if(array_key_exists($stateToValidate + 1,$states))
+        {
+            return $this->processValidation($entity, $stateToValidate + 1, $entityStates, $user, $stateToValidate);
+        }
+        $entity->setValidationState($states[$stateToValidate]);
+        $this->em->persist($entity);
+
+        return true;
     }
 
-    private function validateEntity(Entity $entity, $user, array $constraints, $manual)
+    private function validateField(string $x, array $y, Entity $entity)
     {
-        $errors = [];
-        foreach($constraints as $type=>$constraint)
+        $validate = [];
+
+        if($x === "manual")
         {
-            if($type === "manual")
-            {
-                if($manual !== true)
-                {
-                    $errors = [
-                        $type=>"The ".$entity->getKind()." needs to be approved to pass to the next state."
-                    ];
-                }
-                else
-                {
-                    $authorized = $this->validateUserPermission($constraint['by'], $user, $entity);
+            $validate[$x] = false;
+            return $validate;
+        }
+        $a = $this->getPropertyValue($x, $entity);
+        foreach($y as $constraint)
+        {
+            $method = $this->getMethod($constraint);
+            $referenceEntity = $this->getReferenceEntity($constraint, $entity);
+            $referenceProperties = $this->getReferenceProperties($constraint);
+            $validate[$constraint] = $this->validate($a, $method, $referenceProperties, $referenceEntity);
+        }
+        return $validate;
+    }
 
-                    if($authorized === false)
-                    {
-                        $errors= ["FORBIDDEN"=> "Access to this resource is forbidden."];
-                    }
-                }
-            }
-            elseif ($type === "embedded")
+    private function getPropertyValue(string $x, Entity $entity)
+    {
+        $field = explode('.', $x);
+        $property = $entity->getProperties();
+        for($i = 0; $i < count($field); $i++)
+        {
+            if(is_array($property))
             {
-                foreach($constraint as $entityKind)
-                {
-                    try
-                    {
-                        $embeddedEntity = $this->schemaLoader->loadEntityEnumeration($entityKind);
-                    }
-                    catch(\Exception $e)
-                    {
-                        return $this->response->badRequest($e->getMessage());
-                    }
-
-                    if(isset($embeddedEntity['constraints']))
-                    {
-                        return $this->validateEntity($entity, $user, $embeddedEntity['constraints'], $manual);
-                    }
-                }
+                $property = $property[$field[$i]];
             }
             else
             {
-                foreach ($constraint as $cons)
-                {
-                    $constraintFunction = explode('(',$cons);
-                    $property = explode(".",$type);
-
-                    if($property[0]=== "properties")
-                    {
-                        $submited = $entity->getProperties();
-                        for($i = 1; $i < count($property); $i++)
-                        {
-                            if(is_object($submited))
-                            {
-                                $get = "get".ucfirst($property[$i]);
-                                $submited = $submited->$get();
-                            }
-                            else
-                            {
-                                if(isset($submited[$property[$i]]))
-                                {
-                                    $submited = $submited[$property[$i]];
-                                }
-                                else
-                                {
-                                    $submited = null;
-                                }
-                            }
-                        }
-                    }
-                    if($submited === null)
-                    {
-                        continue;
-                    }
-                    $error = $this->choseFunction($submited, $constraintFunction, $entity);
-                    if(!empty($error))
-                    {
-                        $errors[$type] = $error;
-                    }
-                }
+                $function = 'get'.ucfirst($field[$i]);
+                $property = $property->{$function}();
             }
         }
 
-        return $errors;
+        return $property;
     }
 
-    private function choseFunction($submited, $functionName, $entity)
+    private function getMethod(string $constraint)
     {
-        $function = explode(".", $functionName[0]);
-        $method = $function[0];
-        $entityToCompare = null;
-        $valueToCompare = $functionName[1];
-        if(isset($function[1]) && $function[1] === "self")
+        $method = explode('.', $constraint);
+        if(!isset(self::METHODS[$method[0]]))
         {
-            $entityToCompare = $entity;
-        }
-        if(isset($function[1]) && $function[1] !== "self")
-        {
-            $entityToCompare = $function[1];
+            $method = explode('(', $constraint);
         }
 
-        $operator = "";
-        switch($method)
-        {
-            case "greaterThanOrEqual": $operator = "<" ;break;
-            case "lesserThanOrEqual" : $operator = ">" ;break;
-            case "greaterThan"       : $operator = "<=";break;
-            case "lesserThan"        : $operator = ">=";break;
-            case "equal"             : $operator = "!=";break;
-            case "notBetween"        : $operator = "!between";break;
-            case "between"           : $operator = "between";break;
-
-        }
-        return $this->method($submited, $valueToCompare, $operator, $entityToCompare);
+        return self::METHODS[$method[0]];
     }
 
-    private function method($submited, $valueToCompare, $operator, $entityToCompare = null)
+    private function getReferenceEntity(string $constraint, Entity $entity)
     {
-        $valueToCompare = substr($valueToCompare, 0, strlen($valueToCompare)-1);
-
-        $startOfCompare = substr($valueToCompare, 0, 1);
-        if($startOfCompare === "#")
+        $referenceEntity = explode('.',$constraint);
+        $referenceEntity = explode('(',$referenceEntity[1]);
+        $referenceEntity = substr($referenceEntity[0], 0, strlen($referenceEntity[1]) - 1);
+        if($referenceEntity === "self")
         {
-            $valueToCompare = substr($valueToCompare, 1);
+            return $entity;
         }
 
-        if(!empty($entityToCompare))
+        return $referenceEntity;
+    }
+
+    private function getReferenceProperties(string $constraint)
+    {
+        $properties = explode('(', $constraint);
+        $properties = substr($properties[1],0, strlen($properties[1]) -1);
+        return explode(',', $properties);
+    }
+
+    private function validate($sentValue, $method, $expectedValue, $referenceEntity)
+    {
+        $sentValue = $this->getTimestampFromDatetime($sentValue);
+        if(is_object($referenceEntity))
         {
-            if(!is_a($entityToCompare, Entity::class))
+            $properties = $referenceEntity->getProperties();
+
+            $propertyA = $this->extractValueFromSelf($expectedValue[0], $properties);
+            if(count($expectedValue) > 1)
             {
-                return $this->compareEntities($operator, $valueToCompare, $entityToCompare, $submited);
+                $propertyB = $this->extractValueFromSelf($expectedValue[1], $properties);
+                return $this->compare($sentValue, $method, $propertyA, $propertyB);
             }
-            else
+            return $this->compare($sentValue, $method, $propertyA);
+        }
+        elseif($referenceEntity === "value")
+        {
+            $propertyA= $this->extractValue($expectedValue[0]);
+
+            if(count($expectedValue) > 1)
             {
-                if(strpos($operator, "between") !==  false)
-                {
-                    return $this->compareSelfBetween($operator, $valueToCompare, $entityToCompare, $submited);
-                }
-                $compareTo = $this->getCompareTo($valueToCompare, $entityToCompare->getProperties());
-                if(is_a($submited, \DateTime::class) && is_a($compareTo, \DateTime::class))
-                {
-                    return $this->compareDate($submited, $operator, $compareTo);
-                }
-                else
-                {
-                    return $this->compareWithEval($submited, $operator, $compareTo);
-                }
+                $propertyB = $this->extractValue($expectedValue[1]);
+                return $this->compare($sentValue, $method, $propertyA, $propertyB);
             }
+            return $this->compare($sentValue, $method, $propertyA);
         }
         else
         {
-            return $this->compareWithEval($submited, $operator, $valueToCompare);
+            if(strpos($method, "between"))
+            {
+                $result = $this->em->getRepository(Entity::class)->findAllBetweenForValidate($referenceEntity,  $expectedValue[0], $expectedValue[1], $sentValue);
+            }
+            else
+            {
+                $result = $this->em->getRepository(Entity::class)->findAllForValidate($referenceEntity, $expectedValue[0], $sentValue, $method);
+            }
+
+            if(substr($method, 0, 1) === "!" && count($result) > 0)
+            {
+                return false;
+            }
+            elseif (substr($method, 0, 1) !== "!" && count($result) === 0)
+            {
+                return false;
+            }
+
+            return true;
         }
+    }
+
+    private function extractValueFromSelf($expectedValue, $properties)
+    {
+        $explodedField = explode('.', $expectedValue);
+
+        for($i = 0; $i < count($explodedField); $i++)
+        {
+            if(is_object($properties))
+            {
+                $get = "get".ucfirst($explodedField[$i]);
+                $properties = $properties->{$get}();
+            }
+            else
+            {
+                $properties = $properties[$explodedField[$i]];
+            }
+        }
+
+        return $this->getTimestampFromDatetime($properties);
+    }
+
+    private function extractValue($expectedValue)
+    {
+        $explodedExpectedValue = explode('.', $expectedValue);
+        if($explodedExpectedValue[0] === 'date')
+        {
+            $expectedValue = new \DateTime($explodedExpectedValue[1]);
+            $expectedValue = $expectedValue->getTimestamp();
+        }
+        else
+        {
+            $expectedValue = $explodedExpectedValue[0];
+        }
+
+        return $expectedValue;
+    }
+
+    private function getTimestampFromDatetime($property)
+    {
+        if(is_a($property, \DateTime::class))
+        {
+            $property = $property->getTimestamp();
+        }
+
+        return $property;
+    }
+
+    private function compare($sentValue, $method, $propertyA, $propertyB = null)
+    {
+        if(!empty($propertyB))
+        {
+            if(substr($method, 0, 1) === '!')
+            {
+                eval("\$result = '$sentValue < '$propertyA' && '$sentValue' > '$propertyB';");
+            }
+            else
+            {
+                eval("\$result = '$sentValue >= '$propertyA' && '$sentValue' <= '$propertyB';");
+            }
+
+            return $result;
+        }
+        eval("\$result = '$sentValue' $method '$propertyA';");
+
+        return $result;
     }
 }

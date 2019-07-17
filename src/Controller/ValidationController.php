@@ -1,15 +1,10 @@
 <?php
 namespace Deozza\PhilarmonyCoreBundle\Controller;
 
+use Deozza\PhilarmonyCoreBundle\Controller\BaseController;
 use Deozza\PhilarmonyCoreBundle\Entity\Entity;
-use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
-use Deozza\PhilarmonyCoreBundle\Service\FormManager\ProcessForm;
-use Deozza\PhilarmonyCoreBundle\Service\RulesManager\RulesManager;
-use Deozza\PhilarmonyCoreBundle\Service\Validation\Validate;
-use Deozza\ResponseMakerBundle\Service\ResponseMaker;
-use Doctrine\ORM\EntityManagerInterface;
-use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -18,71 +13,80 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * @Route("api/")
  */
-class ValidationController extends AbstractController
+class ValidationController extends BaseController
 {
-
-    public function __construct(ResponseMaker $responseMaker,
-                                EntityManagerInterface $em,
-                                PaginatorInterface $paginator,
-                                ProcessForm $processForm,
-                                DatabaseSchemaLoader $schemaLoader,
-                                RulesManager $ruleManager,
-                                Validate $validate)
-    {
-        $this->response = $responseMaker;
-        $this->em = $em;
-        $this->processForm = $processForm;
-        $this->schemaLoader = $schemaLoader;
-        $this->ruleManager = $ruleManager;
-        $this->paginator = $paginator;
-        $this->validator = $validate;
-    }
-
     /**
      * @Route(
-     *     "validate/{id}",
+     *     "validate/{uuid}",
      *      requirements={
-     *          "id" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *     },
      *     name="validate_entity",
      *      methods={"POST"})
      */
-    public function postManualValidationAction($id, Request $request)
+    public function postManualValidationAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        if(empty($this->getUser()->getUsername()))
+        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        $valid = $this->ableToValidateEntity($entity);
+        if(is_object($valid))
         {
-            return $this->response->notAuthorized();
+            return $valid;
         }
 
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($id);
-
-        if(empty($entity))
+        $entity->setValidationState($valid['state']);
+        $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
+        $state = $this->validate->processValidation($entity,$valid['key']+1, $entityStates, $this->getUser());
+        if($entity->getValidationState() !== "__default")
         {
-            return $this->response->notFound("Entity with the id $id was not found");
+            $this->em->flush();
         }
-
-        try
-        {
-            $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind());
-        }
-        catch(\Exception $e)
-        {
-            return $this->response->badRequest($e->getMessage());
-        }
-
-        $state = $this->validator->processValidation($entity,$entity->getValidationState(), $entityConfig['states'], $this->getUser(), null, true);
 
         if(is_array($state))
         {
-            if(array_key_exists("FORBIDDEN",$state['errors']))
-            {
-                return $this->response->forbiddenAccess($state['errors']['FORBIDDEN']);
-            }
-            return $this->response->conflict($state['errors'],$entity, ['entity_complete', 'user_basic']);
+            return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
         }
 
-        $this->em->flush();
+        $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher);
 
+        $this->em->flush();
+        return $this->response->ok($entity, ['entity_complete', 'user_basic']);
+    }
+
+    /**
+     * @Route(
+     *     "retrograde/{uuid}",
+     *      requirements={
+     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+     *     },
+     *     name="retrograde_entity",
+     *      methods={"POST"})
+     */
+    public function postManualRetrogradeAction(string $uuid, Request $request)
+    {
+        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        $valid = $this->ableToRetrogradeEntity($entity);
+        if(is_object($valid))
+        {
+            return $valid;
+        }
+
+        $entity->setValidationState($valid['state']);
+        $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
+
+        $state = $this->validate->processValidation($entity,$valid['key'], $entityStates, $this->getUser(), $valid['key'] - 1);
+        if($entity->getValidationState() !== "__default")
+        {
+            $this->em->flush();
+        }
+
+        if(is_array($state))
+        {
+            return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
+        }
+
+        $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher);
+
+        $this->em->flush();
         return $this->response->ok($entity, ['entity_complete', 'user_basic']);
 
     }

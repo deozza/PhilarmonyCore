@@ -51,6 +51,166 @@ class BaseController extends AbstractController
         }
     }
 
+    protected function ableToValidateEntity(?Entity $entity)
+    {
+        if(empty($this->getUser()->getUuid()))
+        {
+            return $this->response->notAuthorized();
+        }
+
+        if(empty($entity))
+        {
+            return $this->response->notFound("Resource not found");
+        }
+
+        $states = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
+
+        $availableStates = array_keys($states);
+
+        foreach($availableStates as $key=>$state)
+        {
+            if($state === $entity->getValidationState())
+            {
+                if(!array_key_exists($key + 1, $availableStates))
+                {
+                    return $this->response->notFound("Resource not found");
+                }
+                $nextStep = $availableStates[$key + 1];
+            }
+        }
+
+        if(!array_key_exists('constraints', $states[$nextStep]))
+        {
+            return $this->response->notFound("Resource not found");
+        }
+
+
+        if(!array_key_exists('manual', $states[$nextStep]['constraints']))
+        {
+            return $this->response->notFound("Resource not found");
+        }
+
+        $by = $states[$nextStep]['constraints']['manual']['by'];
+
+        if(array_key_exists('roles', $by))
+        {
+            foreach($by['roles'] as $role)
+            {
+                if(in_array($role, $this->getUser()->getRoles())) return ['state'=>$nextStep, 'key'=>$key];
+            }
+        }
+
+        if(array_key_exists("users", $by))
+        {
+            foreach($by['users'] as $userKind)
+            {
+                $userPath = explode('.', $userKind);
+                if($userPath[0] === "owner")
+                {
+                    if($entity->getOwner()->getId() === $this->getUser()->getId())
+                    {
+                        return ['state'=>$nextStep, 'key'=>$key];
+                    }
+                }
+                else
+                {
+                    $properties = $entity->getProperties();
+                    for($i = 0; $i < count($userPath); $i++)
+                    {
+                        $properties = $properties[$userPath[$i]];
+                    }
+
+                    if($this->getUser()->getId() === $properties || in_array($this->getUser()->getId(), $properties))
+                    {
+                        return ['state'=>$nextStep, 'key'=>$key];
+                    }
+                }
+            }
+        }
+        return $this->response->forbiddenAccess("Access to this resource is forbidden.");
+
+    }
+
+    protected function ableToRetrogradeEntity(?Entity $entity)
+    {
+        if(empty($this->getUser()->getUuid()))
+        {
+            return $this->response->notAuthorized();
+        }
+
+        if(empty($entity))
+        {
+            return $this->response->notFound("Resource not found");
+        }
+
+        $states = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
+
+        $currentState = $states[$entity->getValidationState()];
+        $availableStates = array_keys($states);
+
+        foreach($availableStates as $key=>$state)
+        {
+            if($state === $entity->getValidationState())
+            {
+                if(!array_key_exists($key - 1, $availableStates))
+                {
+                    return $this->response->notFound("Resource not found");
+                }
+                $previousState= $availableStates[$key - 1];
+            }
+        }
+
+        if(!array_key_exists('constraints', $currentState))
+        {
+            return $this->response->notFound("Resource not found");
+        }
+
+        if(!array_key_exists('manual', $currentState['constraints']))
+        {
+            return $this->response->notFound("Resource not found");
+        }
+
+        $by = $currentState['constraints']['manual']['by'];
+
+        if(array_key_exists('roles', $by))
+        {
+            foreach($by['roles'] as $role)
+            {
+                if(in_array($role, $this->getUser()->getRoles())) return ['state'=>$previousState, 'key'=>$key];
+            }
+        }
+
+        if(array_key_exists("users", $by))
+        {
+            foreach($by['users'] as $userKind)
+            {
+                $userPath = explode('.', $userKind);
+                if($userPath[0] === "owner")
+                {
+                    if($entity->getOwner()->getId() === $this->getUser()->getId())
+                    {
+                        return ['state'=>$previousState, 'key'=>$key];
+                    }
+                }
+                else
+                {
+                    $properties = $entity->getProperties();
+                    for($i = 0; $i < count($userPath); $i++)
+                    {
+                        $properties = $properties[$userPath[$i]];
+                    }
+
+                    if($this->getUser()->getId() === $properties || in_array($this->getUser()->getId(), $properties))
+                    {
+                        return ['state'=>$previousState, 'key'=>$key];
+                    }
+                }
+            }
+        }
+
+        return $this->response->forbiddenAccess("Access to this resource is forbidden.");
+    }
+
 
     protected function isAllowed($by, $loggedin = true, Entity $entity = null)
     {

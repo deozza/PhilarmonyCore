@@ -120,7 +120,7 @@ class DocController extends BaseController
      *     requirements={
      *          "enumeration_name" = "^(\w{1,50})$"
      *     },
-     *     name="get_property_doc",
+     *     name="get_enumeration_doc",
      *      methods={"GET"})
      */
     public function getEnumerationDocAction(string $enumeration_name, Request $request)

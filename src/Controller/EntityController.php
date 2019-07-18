@@ -37,7 +37,7 @@ class EntityController extends BaseController
 
         $filter = $request->query->get("filterBy", []);
         $sort = $request->query->get("sortBy", []);
-        
+
         $entities = $this->em->getRepository(Entity::class)->findAllFiltered($filter, $sort, $entity_name);
 
         foreach($entities as $key=>$entity)
@@ -124,7 +124,11 @@ class EntityController extends BaseController
         {
             return $this->response->notFound("Route not found");
         }
-        $isAllowed = $this->authorizeRequest->isAllowed($entity['states']['__default']['methods']['POST']['by']);
+
+        $entityToPost = new Entity();
+        $entityToPost->setKind($entity_name);
+        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $isAllowed = $this->authorizeRequest->isAllowed($entity['states']['__default']['methods']['POST']['by'], true, $entityToPost, $user);
         if(is_object($isAllowed))
         {
             return $isAllowed;
@@ -139,8 +143,6 @@ class EntityController extends BaseController
             return $this->response->badForm($form);
         }
 
-        $entityToPost = new Entity();
-        $entityToPost->setKind($entity_name);
         $entityToPost->setOwner($this->getUser());
         $entityToPost->setValidationState("__default");
         $entityToPost->setProperties($form->getData());
@@ -160,14 +162,14 @@ class EntityController extends BaseController
 
         if(is_array($state))
         {
-            return $this->response->conflict($state, $entityToPost, ['entity_id', 'entity_property', 'entity_basic']);
+            return $this->response->conflict($state, $entityToPost, ['entity_basic', 'entity_id', 'user_basic']);
         }
 
         $this->handleEvents($request->getMethod(), $entity['states']['__default'], $entityToPost, $eventDispatcher);
 
         $this->em->flush();
 
-        return $this->response->created($entityToPost, ['entity_complete', 'user_basic']);
+        return $this->response->created($entityToPost, ['entity_basic', 'user_basic']);
     }
 
     /**
@@ -182,6 +184,7 @@ class EntityController extends BaseController
     public function patchEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+
         $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))

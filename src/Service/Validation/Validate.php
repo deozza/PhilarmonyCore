@@ -36,12 +36,14 @@ class Validate
             return true;
         }
         $stateToValidateConfig = $entityStates[$states[$stateToValidate]];
+
         if(!array_key_exists('constraints', $stateToValidateConfig))
         {
             if(array_key_exists($stateToValidate + 1,$states))
             {
                 return $this->processValidation($entity, $stateToValidate + 1, $entityStates, $user, $stateToValidate);
             }
+            return true;
         }
 
         $validate = [];

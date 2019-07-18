@@ -28,17 +28,24 @@ class FileController extends BaseController
     public function getFileAction(string $uuid,string $file_property, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        if(empty($entity))
+        {
+            return $this->response->notFound("Resource not found");
+        }
+
+        $properties = $entity->getProperties();
+        if(!array_key_exists($file_property, $properties) || empty($properties[$file_property]))
+        {
+            return $this->response->notFound("Resource not found");
+        }
+
         $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
             return $valid;
         }
-        $properties = $entity->getProperties();
-        if(!array_key_exists($file_property, $properties) || empty($properties[$file_property]))
-        {
-            return $this->response->notFound("Resource not found");
-        }
+
 
         $files = $properties[$file_property];
         $filename = $request->headers->get('X-File-Name');
@@ -68,18 +75,24 @@ class FileController extends BaseController
     public function postFileAction(string $uuid,string $file_property, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
-        $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
-        if(is_object($valid))
+        if(empty($entity))
         {
-            return $valid;
+            return $this->response->notFound("Resource not found");
         }
+
         $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
         $entityConfig = $entityStates[$entity->getValidationState()]['methods'][$request->getMethod()];
 
         if(!in_array($file_property, $entityConfig['properties']))
         {
             return $this->response->notFound("Resource not found");
+        }
+
+        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
+        if(is_object($valid))
+        {
+            return $valid;
         }
 
         $property = $this->schemaLoader->loadPropertyEnumeration($file_property);
@@ -160,16 +173,22 @@ class FileController extends BaseController
     public function deleteFileAction(string $uuid,string $file_property, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        if(empty($entity))
+        {
+            return $this->response->notFound("Resource not found !entity");
+        }
+
+        $properties = $entity->getProperties();
+        if(!array_key_exists($file_property, $properties) || empty($properties[$file_property]))
+        {
+            return $this->response->notFound("Resource not found !property");
+        }
+
         $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
             return $valid;
-        }
-        $properties = $entity->getProperties();
-        if(!array_key_exists($file_property, $properties) || empty($properties[$file_property]))
-        {
-            return $this->response->notFound("Resource not found");
         }
 
         $files = $properties[$file_property];

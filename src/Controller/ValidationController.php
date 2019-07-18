@@ -27,9 +27,9 @@ class ValidationController extends BaseController
     public function postManualValidationAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
-        
+
         $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
-        
+
         $valid = $this->manualValidation->ableToValidateEntity($entity, $user);
         if(is_object($valid))
         {
@@ -93,6 +93,5 @@ class ValidationController extends BaseController
 
         $this->em->flush();
         return $this->response->ok($entity, ['entity_complete', 'user_basic']);
-
     }
 }

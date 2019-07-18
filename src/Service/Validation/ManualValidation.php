@@ -25,18 +25,23 @@ class ManualValidation
         {
             return $states;
         }
-        
+
         $availableStates = array_keys($states);
-        
-        $nextStep = $this->moveToStep($availableStates);
-        
-        $by = $this->checkConstraintExists($states[$nextStep]);
+
+        $nextStep = $this->moveToStep($availableStates, $entity);
+
+        if(is_object($nextStep))
+        {
+            return $nextStep;
+        }
+
+        $by = $this->checkConstraintExists($states[$nextStep['step']]);
         if(is_object($by))
         {
             return $by;
         }
-        
-        $access = $this->authorizeAccessToEntity->authorize($this->getUser(), $by, $entity);
+
+        $access = $this->authorizeAccessToEntity->authorize($user, $by, $entity);
         if($access === true)
         {
             return $nextStep;
@@ -51,18 +56,22 @@ class ManualValidation
         {
             return $states;
         }
-        
+
         $currentState = $states[$entity->getValidationState()];
         $availableStates = array_keys($states);
 
-        $previousStep = $this->moveToStep($availableStates, false);
+        $previousStep = $this->moveToStep($availableStates, $entity, false);
 
-        $by = $this->checkConstraintExists($currentStatez);
+        if(is_object($currentState))
+        {
+            return $currentState;
+        }
+        $by = $this->checkConstraintExists($currentState);
         if(is_object($by))
         {
             return $by;
         }
-        $access = $this->validateAccess->validate($this->getUser(), $by, $entity);
+        $access = $this->authorizeAccessToEntity->authorize($user, $by, $entity);
 
         if($access === true)
         {
@@ -71,10 +80,10 @@ class ManualValidation
 
         return $this->response->forbiddenAccess("Access to this resource is forbidden.");
     }
-    
+
     private function setup(?Entity $entity, $user)
     {
-        if(empty($user->getUuid()))
+        if(empty($user))
         {
             return $this->response->notAuthorized();
         }
@@ -84,7 +93,7 @@ class ManualValidation
             return $this->response->notFound("Resource not found");
         }
 
-        $states = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
+        return $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
     }
 
     private function checkConstraintExists($state)
@@ -102,8 +111,8 @@ class ManualValidation
 
         return $state['constraints']['manual']['by'];
     }
-    
-    private function moveToStep(array $availableStates, bool $sup = true)
+
+    private function moveToStep(array $availableStates, Entity $entity, bool $sup = true)
     {
         foreach($availableStates as $key=>$state)
         {
@@ -117,7 +126,7 @@ class ManualValidation
                 $step = $availableStates[$key];
             }
         }
-        
+
         return ['step'=>$step, 'key'=>$key];
     }
 

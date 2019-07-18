@@ -33,7 +33,7 @@ class FormGenerator
             'autoescape' => false,
         ));
     }
-    
+
     public function generate(string $rootPath)
     {
         $entities = $this->schemaLoader->loadEntityEnumeration()[AuthorizedKeys::ENTITY_HEAD];
@@ -66,12 +66,12 @@ class FormGenerator
         {
             mkdir($dirPath, $mode = 0777, $recursive = true);
         }
-        
+
         if($properties === "all")
         {
             $properties = $this->schemaLoader->loadEntityEnumeration($entity)['properties'];
         }
-        
+
         $propertiesConfig = [];
         foreach($properties as $property)
         {
@@ -101,12 +101,22 @@ class FormGenerator
                     {
                         $config['constraints']['choices'] = $this->schemaLoader->loadEnumerationEnumeration($type[1]);
                     }
+
+                    if(array_key_exists('array', $propertiesConfig))
+                    {
+                        $config['array'] = true;
+                    }
                     $propertiesConfig[$embeddedProperty] = $config;
                 }
                 continue;
             }
-            $propertiesConfig[$property] = $config;
 
+            if(array_key_exists('array', $propertyConfig))
+            {
+                $config['array'] = true;
+            }
+
+            $propertiesConfig[$property] = $config;
         }
         $twig = $this->getTwigEnvironment();
         $content = $twig->render('form.php.twig', ['properties'=>$propertiesConfig, 'classname'=>$method, 'namespace'=>$entity.'\\'.$state]);

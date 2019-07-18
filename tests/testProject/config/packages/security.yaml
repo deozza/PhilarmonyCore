@@ -1,0 +1,20 @@
+security:
+    encoders:
+        Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\RealUser: bcrypt
+
+    providers:
+        api_key_user_provider:
+            id: "philarmony.user_provider"
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            pattern: ^/api
+            stateless: true
+            provider: api_key_user_provider
+            anonymous: ~
+            guard:
+                authenticators:
+                    - "philarmony.authenticator"
+    access_control:

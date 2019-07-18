@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src;
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -49,5 +49,15 @@ class Kernel extends BaseKernel
         $routes->import($confDir.'/{routes}/'.$this->environment.'/**/*'.self::CONFIG_EXTS, '/', 'glob');
         $routes->import($confDir.'/{routes}/*'.self::CONFIG_EXTS, '/', 'glob');
         $routes->import($confDir.'/{routes}'.self::CONFIG_EXTS, '/', 'glob');
+    }
+
+    public function getCacheDir()
+    {
+        return sys_get_temp_dir().'/PhilarmonyCoreBundle/Tests/cache';
+    }
+
+    public function getLogDir()
+    {
+        return sys_get_temp_dir().'/PhilarmonyCoreBundle/Tests/log';
     }
 }

@@ -36,7 +36,7 @@ class ValidationController extends BaseController
             return $valid;
         }
 
-        $entity->setValidationState($valid['state']);
+        $entity->setValidationState($valid['step']);
         $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
         $state = $this->validate->processValidation($entity,$valid['key']+1, $entityStates, $this->getUser());
         if($entity->getValidationState() !== "__default")
@@ -64,7 +64,7 @@ class ValidationController extends BaseController
      *     name="retrograde_entity",
      *      methods={"POST"})
      */
-    public function postManualRetrogradeAction(string $uuid, Request $request)
+    public function postManualRetrogradeAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
         $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
@@ -75,7 +75,7 @@ class ValidationController extends BaseController
             return $valid;
         }
 
-        $entity->setValidationState($valid['state']);
+        $entity->setValidationState($valid['step']);
         $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
 
         $state = $this->validate->processValidation($entity,$valid['key'], $entityStates, $this->getUser(), $valid['key'] - 1);

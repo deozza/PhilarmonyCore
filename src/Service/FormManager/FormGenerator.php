@@ -1,17 +1,27 @@
 <?php
-
-
 namespace Deozza\PhilarmonyCoreBundle\Service\FormManager;
-
 
 use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\PhilarmonyUtils\DataSchema\AuthorizedKeys;
 
 class FormGenerator
 {
-    public function __construct(DatabaseSchemaLoader $schemaLoader)
+    public function __construct(DatabaseSchemaLoader $schemaLoader, string $formPath, string $formNamespace, string $rootPath)
     {
         $this->schemaLoader = $schemaLoader;
+        $this->formPath = $formPath;
+        $this->formNamespace = $formNamespace;
+        $this->rootPath = $rootPath;
+    }
+
+    public function getFormPath()
+    {
+        return $this->rootPath."/".$this->formPath;
+    }
+
+    public function getFormNamespace()
+    {
+        return $this->formNamespace;
     }
 
     protected function render($template, $parameters)
@@ -34,10 +44,9 @@ class FormGenerator
         ));
     }
 
-    public function generate(string $rootPath)
+    public function generate()
     {
         $entities = $this->schemaLoader->loadEntityEnumeration()[AuthorizedKeys::ENTITY_HEAD];
-        $this->rootPath = $rootPath;
         foreach($entities as $entityName => $entityContent)
         {
             if(!array_key_exists(AuthorizedKeys::ENTITY_KEYS[1], $entityContent))
@@ -60,7 +69,7 @@ class FormGenerator
 
     private function generateForm(string $entity, string $state, string $method,  $properties)
     {
-        $dirPath = $this->rootPath."/src/Form/$entity/$state";
+        $dirPath = $this->getFormPath()."$entity/$state";
         $filePath = $dirPath."/".$method.'.php';
         if(!is_dir($dirPath))
         {
@@ -119,7 +128,7 @@ class FormGenerator
             $propertiesConfig[$property] = $config;
         }
         $twig = $this->getTwigEnvironment();
-        $content = $twig->render('form.php.twig', ['properties'=>$propertiesConfig, 'classname'=>$method, 'namespace'=>$entity.'\\'.$state]);
+        $content = $twig->render('form.php.twig', ['properties'=>$propertiesConfig, 'classname'=>$method, 'namespace'=>$this->formNamespace.$entity.'\\'.$state]);
         file_put_contents($filePath, $content);
 
         echo $filePath." has been created \n";

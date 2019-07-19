@@ -1,0 +1,130 @@
+properties:
+
+  title:
+    type: string
+    constraints:
+      lengthMin: 1
+      lengthMax: 100
+      required: true
+      unique: true
+
+  description:
+    type: string
+    array: true
+    constraints:
+      lengthMin: 1
+      required: false
+      unique: false
+
+  price:
+    type: float
+    constraints:
+      greaterThanOrEqual: 1
+      required: true
+      unique: false
+
+  annonce_category:
+    type: enumeration.annonce_category
+    array: true
+    constraints:
+      required: true
+      unique: false
+
+  date_begin:
+    type: date
+    constraints:
+      greaterThanOrEqual: today
+      required: true
+      unique: false
+
+  date_end:
+    type: date
+    constraints:
+      required: true
+      unique: false
+
+  nbPerson:
+    type: int
+    constraints:
+      greaterThanOrEqual: 1
+      required: true
+      unique: false
+
+  nbPersonMax:
+    type: int
+    constraints:
+      greaterThanOrEqual: 1
+      required: true
+      unique: false
+
+  annonce:
+    type: entity.annonce
+    constraints:
+      required: true
+      unique: false
+
+  photo:
+    type: file
+    array: true
+    constraints:
+      mime: ['image/jpeg']
+      required: false
+      unique: false
+
+
+  messageTitle:
+    type: string
+    constraints:
+      lengthMin: 1
+      lengthMax: 100
+      required: true
+      unique: false
+
+  messageContent:
+    type: string
+    constraints:
+      lengthMin: 1
+      lengthMax: 255
+      required: true
+      unique: false
+
+  receiver:
+    type: string
+    constraints:
+      required: true
+      unique: false
+
+  message:
+    type: embedded.message
+    array: true
+    constraints:
+      required: true
+      unique: false
+
+  seen:
+    type: enumeration.boolean
+    constraints:
+      required: true
+      unique: false
+      automatic: '[]'
+
+  dateOfPost:
+    type: date
+    constraints:
+      required: true
+      unique: false
+      automatic: date.now
+
+  participants:
+    type: int
+    array: true
+    constraints:
+      required: true
+      unique: false
+
+  paid:
+    type: enumeration.boolean
+    constraints:
+      required: true
+      unique: false
+      automatic: '[]'

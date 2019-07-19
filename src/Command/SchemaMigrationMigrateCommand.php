@@ -12,10 +12,9 @@ class SchemaMigrationMigrateCommand extends Command
 {
     protected static $defaultName = 'philarmony:migration:diff';
 
-    public function __construct(FormGenerator $formGenerator, string $rootPath)
+    public function __construct(FormGenerator $formGenerator)
     {
         $this->formGenerator = $formGenerator;
-        $this->rootPath = $rootPath;
         parent::__construct();
     }
 
@@ -26,6 +25,6 @@ class SchemaMigrationMigrateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->formGenerator->generate($this->rootPath);
+        $this->formGenerator->generate();
     }
 }

@@ -52,6 +52,9 @@
 
         <service class="Deozza\PhilarmonyCoreBundle\Service\FormManager\FormGenerator" id="philarmony.form_generator">
             <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
+            <argument key="$formPath"/>
+            <argument key="$formNamespace"/>
+            <argument key="$rootPath">%kernel.project_dir%</argument>
         </service>
         <service id="Deozza\PhilarmonyCoreBundle\Service\FormManager\FormGenerator" alias="philarmony.form_generator" />
 
@@ -72,7 +75,6 @@
         <service id="Deozza\PhilarmonyCoreBundle\Command\SchemaMigrationMigrateCommand">
             <tag name="console.command" command="philarmony:migration:migrate"/>
             <bind key="$formGenerator" type="service" id="philarmony.form_generator"/>
-            <argument key="$rootPath">%kernel.project_dir%</argument>
         </service>
     </services>
 </container>

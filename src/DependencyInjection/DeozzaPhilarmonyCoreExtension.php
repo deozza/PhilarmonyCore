@@ -18,10 +18,15 @@ class DeozzaPhilarmonyCoreExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
 
-        $definition = $container->getDefinition('philarmony.schema_loader');
-        $definition->setArgument(0, $config['directory']['entity']);
-        $definition->setArgument(1, $config['directory']['property']);
-        $definition->setArgument(2, $config['directory']['enumeration']);
+        $definitionSchema = $container->getDefinition('philarmony.schema_loader');
+        $definitionSchema->setArgument(0, $config['directory']['entity']);
+        $definitionSchema->setArgument(1, $config['directory']['property']);
+        $definitionSchema->setArgument(2, $config['directory']['enumeration']);
+
+        $definitionForm = $container->getDefinition('philarmony.form_generator');
+        $definitionForm->setArgument(1, $config['directory']['formPath']);
+        $definitionForm->setArgument(2, $config['directory']['formNamespace']);
+
     }
 
     public function getAlias()

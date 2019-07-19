@@ -119,7 +119,8 @@ class EntityController extends BaseController
             return $this->response->notFound("Route not found");
         }
 
-        $formClass = "App\Form\\".$entity_name."\__default\POST";
+        $formClass = $this->formGenerator->getFormNamespace()."$entity_name\__default\POST";
+
         if(!class_exists($formClass))
         {
             return $this->response->notFound("Route not found");

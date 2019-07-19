@@ -6,6 +6,7 @@ use Deozza\PhilarmonyCoreBundle\Entity\Entity;
 use Deozza\PhilarmonyCoreBundle\Service\Authorization\AuthorizeAccessToEntity;
 use Deozza\PhilarmonyCoreBundle\Service\Authorization\AuthorizeRequest;
 use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
+use Deozza\PhilarmonyCoreBundle\Service\FormManager\FormGenerator;
 use Deozza\PhilarmonyCoreBundle\Service\RulesManager\RulesManager;
 use Deozza\PhilarmonyCoreBundle\Service\Validation\ManualValidation;
 use Deozza\PhilarmonyCoreBundle\Service\Validation\Validate;
@@ -17,9 +18,10 @@ use Symfony\Component\EventDispatcher\GenericEvent;
 
 class BaseController extends AbstractController
 {
-    public function __construct(DatabaseSchemaLoader $schemaLoader, ResponseMaker $responseMaker, Validate $validate, ManualValidation $manualValidation, AuthorizeAccessToEntity $authorizeAccessToEntity, AuthorizeRequest $authorizeRequest, RulesManager $rulesManager, EntityManagerInterface $em)
+    public function __construct(DatabaseSchemaLoader $schemaLoader, FormGenerator $formGenerator, ResponseMaker $responseMaker, Validate $validate, ManualValidation $manualValidation, AuthorizeAccessToEntity $authorizeAccessToEntity, AuthorizeRequest $authorizeRequest, RulesManager $rulesManager, EntityManagerInterface $em)
     {
         $this->schemaLoader = $schemaLoader;
+        $this->formGenerator = $formGenerator;
         $this->response = $responseMaker;
         $this->validate = $validate;
         $this->manualValidation = $manualValidation;

@@ -28,7 +28,10 @@ install:
   - export COMPOSER_ROOT_VERSION=dev-master
   - COMPOSER_MEMORY_LIMIT=-1 travis_retry composer update
   - ./vendor/bin/simple-phpunit install
-
+  - ./tests/testProject/bin/console d:d:d --force
+  - ./tests/testProject/bin/console d:d:c
+  - ./tests/testProject/bin/console d:s:c
+  - ./tests/testProject/bin/console d:f:l --append
 
 script:
   - ./vendor/bin/simple-phpunit $PHPUNIT_FLAGS

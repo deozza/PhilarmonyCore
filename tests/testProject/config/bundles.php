@@ -13,6 +13,6 @@ return [
     Symfony\Bundle\TwigBundle\TwigBundle::class => ['all' => true],
     Symfony\Bundle\WebProfilerBundle\WebProfilerBundle::class => ['dev' => true, 'test' => true],
     Symfony\Bundle\WebServerBundle\WebServerBundle::class => ['dev' => true],
-    Deozza\ApiTesterBundle\DeozzaApiTesterBundle::class => ['dev' => true, 'test' => true],
+    Deozza\PhilarmonyApiTesterBundle\DeozzaPhilarmonyApiTesterBundle::class => ['dev' => true, 'test' => true],
     Nelmio\CorsBundle\NelmioCorsBundle::class => ['all' => true],
 ];

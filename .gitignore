@@ -8,3 +8,5 @@
 ###< symfony/phpunit-bridge ###
 
 tests/testProject/src/Form/
+
+composer\.lock

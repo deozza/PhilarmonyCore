@@ -25,7 +25,7 @@
         "symfony/yaml": "4.2.*",
         "scienta/doctrine-json-functions": "^4.0",
         "deozza/response-maker-bundle": "^1.0",
-        "deozza/philarmony-utils": "^0.1",
+        "deozza/philarmony-utils": "^3.0",
         "nelmio/cors-bundle": "^1.5"
     },
     "require-dev": {

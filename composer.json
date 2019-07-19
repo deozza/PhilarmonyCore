@@ -32,14 +32,14 @@
         "symfony/security-bundle": "4.2.*",
         "symfony/profiler-pack": "^1.0",
         "symfony/web-server-bundle": "4.2.*",
-        "deozza/api-tester-bundle": "^1.1",
+        "deozza/philarmony-api-tester-bundle": "^3.0",
         "fzaninotto/faker": "^1.8",
         "firebase/php-jwt": "^5.0",
         "symfony/console": "4.2.*"
     },
     "suggest": {
         "deozza/philarmony-user-bundle": "^1.0",
-        "deozza/api-tester-bundle": "^1.0"
+        "deozza/philarmony-api-tester-bundle": "^3.0"
     },
     "autoload": {
         "psr-4": {

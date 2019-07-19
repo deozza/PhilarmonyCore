@@ -6,8 +6,11 @@ use Deozza\ApiTesterBundle\Service\TestAsserter;
 
 class NotAuthorizedControllerTest extends TestAsserter
 {
+    const TEST_DATABASE_PATH = __DIR__."/../../var/db_test/demo.sql";
+
     public function setUp()
     {
+        parent::setTestDatabasePath(self::TEST_DATABASE_PATH);
         parent::setUp();
     }
 

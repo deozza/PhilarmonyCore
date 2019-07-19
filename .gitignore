@@ -6,3 +6,5 @@
 .phpunit
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+
+tests/testProject/src/Form/

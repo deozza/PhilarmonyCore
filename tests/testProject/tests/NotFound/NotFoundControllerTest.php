@@ -2,7 +2,7 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\tests\NotFound;
 
-use Deozza\ApiTesterBundle\Service\TestAsserter;
+use Deozza\PhilarmonyApiTesterBundle\Service\TestAsserter;
 
 class NotFoundControllerTest extends TestAsserter
 {

@@ -2,7 +2,7 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\tests\Forbidden;
 
-use Deozza\ApiTesterBundle\Service\TestAsserter;
+use Deozza\PhilarmonyApiTesterBundle\Service\TestAsserter;
 
 class ForbiddenControllerTest extends TestAsserter
 {

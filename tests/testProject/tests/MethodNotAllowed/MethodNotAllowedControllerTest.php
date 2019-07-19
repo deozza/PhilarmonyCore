@@ -2,7 +2,7 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\tests\MethodNotAllowed;
 
-use Deozza\ApiTesterBundle\Service\TestAsserter;
+use Deozza\PhilarmonyApiTesterBundle\Service\TestAsserter;
 
 class MethodNotAllowedControllerTest extends TestAsserter
 {

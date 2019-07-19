@@ -27,9 +27,11 @@ before_install:
 install:
   - export COMPOSER_ROOT_VERSION=dev-master
   - COMPOSER_MEMORY_LIMIT=-1 travis_retry composer update
+  - ./vendor/bin/simple-phpunit install
+
 
 script:
-  - bin/phpunit $PHPUNIT_FLAGS
+  - ./vendor/bin/simple-phpunit $PHPUNIT_FLAGS
 
 services:
   - mysql

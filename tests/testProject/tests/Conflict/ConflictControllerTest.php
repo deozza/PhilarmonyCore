@@ -2,7 +2,7 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\tests\Conflict;
 
-use Deozza\ApiTesterBundle\Service\TestAsserter;
+use Deozza\PhilarmonyApiTesterBundle\Service\TestAsserter;
 
 class ConflictControllerTest extends TestAsserter
 {

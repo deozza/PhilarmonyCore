@@ -27,7 +27,7 @@ before_install:
 install:
   - export COMPOSER_ROOT_VERSION=dev-master
   - COMPOSER_MEMORY_LIMIT=-1 travis_retry composer update
-  - 'tests/testProject/bin/console p:m:m'
+  - './tests/testProject/bin/console p:m:m'
 
 script:
   - bin/phpunit $PHPUNIT_FLAGS

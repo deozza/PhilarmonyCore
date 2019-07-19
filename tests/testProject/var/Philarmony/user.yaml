@@ -1,7 +1,0 @@
-user:
-  entity: Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\RealUser
-  repository: Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Repository\RealUserRepository
-  roles:
-    - ROLE_ADMIN
-    - ROLE_USER
-    - ROLE_PREMIUM

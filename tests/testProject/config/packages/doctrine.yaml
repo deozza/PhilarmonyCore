@@ -24,5 +24,3 @@ doctrine:
             string_functions:
                 JSON_EXTRACT: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonExtract
                 JSON_UNQUOTE: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonUnquote
-        resolve_target_entities:
-            Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\RealUser: Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\RealUser

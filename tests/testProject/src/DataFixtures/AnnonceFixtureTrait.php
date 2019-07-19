@@ -1,7 +1,7 @@
 <?php
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\DataFixtures;
 
-use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\RealUser;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\User;
 use Deozza\PhilarmonyCoreBundle\Entity\Entity;
 use Faker;
 
@@ -23,7 +23,7 @@ trait AnnonceFixtureTrait
         return $annonces;
     }
 
-    public function createAnnonce(RealUser $user, $validationState, ?string $photo, $faker)
+    public function createAnnonce(User $user, $validationState, ?string $photo, $faker)
     {
         $annonce = new Entity();
         $annonce->setKind("annonce");

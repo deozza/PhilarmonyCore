@@ -1,8 +1,8 @@
 <?php
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\DataFixtures;
 
-use Deozza\PhilarmonyUserBundle\Entity\ApiToken;
-use App\Entity\RealUser;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\ApiToken;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\User;
 
 trait UserFixtureTrait
 {
@@ -22,7 +22,7 @@ trait UserFixtureTrait
     public function createUser($name, $active, $role=[])
     {
 
-        $user = new RealUser();
+        $user = new User();
         $user->setUsername($name);
         $user->setEmail($name.'@mail.com');
         $user->setRegisterDate(new \DateTime('now'));
@@ -40,7 +40,7 @@ trait UserFixtureTrait
         return $user;
     }
 
-    public function createTokenForUser(RealUser $user)
+    public function createTokenForUser(User $user)
     {
         $tokenValue = "token_".$user->getUsername();
         $token = new ApiToken($user, $tokenValue);

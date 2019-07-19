@@ -31,13 +31,5 @@ services:
         resource: '@DeozzaPhilarmonyCoreBundle/Repository'
         tags: ['doctrine.service_entity']
 
-    Deozza\PhilarmonyUserBundle\Controller\:
-        resource: '@DeozzaPhilarmonyUserBundle/Controller'
-        tags: ['controller.service_arguments']
-
-    Deozza\PhilarmonyUserBundle\Repository\:
-        resource: '@DeozzaPhilarmonyUserBundle/Repository'
-        tags: ['doctrine.service_entity']
-
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

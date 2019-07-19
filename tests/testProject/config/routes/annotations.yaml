@@ -6,8 +6,3 @@ philarmony_controllers:
     resource: '@DeozzaPhilarmonyCoreBundle/Controller'
     type: annotation
     prefix: /
-
-philarmony_user_controllers:
-    resource: '@DeozzaPhilarmonyUserBundle/Controller'
-    type: annotation
-    prefix: /

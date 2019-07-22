@@ -152,7 +152,7 @@ class FileController extends BaseController
             return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
         }
 
-        $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher);
+        $this->handleEvents($request->getMethod(), $entityStates['__default'], $entity, $eventDispatcher);
 
         $this->em->flush();
 
@@ -174,13 +174,13 @@ class FileController extends BaseController
         $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
         if(empty($entity))
         {
-            return $this->response->notFound("Resource not found !entity");
+            return $this->response->notFound("Resource not found");
         }
 
         $properties = $entity->getProperties();
         if(!array_key_exists($file_property, $properties) || empty($properties[$file_property]))
         {
-            return $this->response->notFound("Resource not found !property");
+            return $this->response->notFound("Resource not found");
         }
 
         $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
@@ -225,7 +225,7 @@ class FileController extends BaseController
             return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
         }
 
-        $this->handleEvents($request->getMethod(), $entity['states']['__default'], $entity, $eventDispatcher);
+        $this->handleEvents($request->getMethod(), $entityStates['__default'], $entity, $eventDispatcher);
 
         $this->em->flush();
 

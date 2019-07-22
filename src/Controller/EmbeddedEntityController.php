@@ -88,4 +88,64 @@ class EmbeddedEntityController extends BaseController
 
         return $this->response->created($entity, ['entity_complete', 'user_basic']);
     }
+
+    /**
+     * @Route(
+     *     "entity/{uuid}/embedded/{property_name}/{property_id}",
+     *     requirements={
+     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+     *          "property_name" = "^(\w{1,50})$",
+     *          "property_id" = "^(\w{1,50})$"
+     *     },
+     *     name="delete_embedded_entity",
+     *      methods={"DELETE"})
+     */
+    public function deleteEmbeddedEntityAction(string $uuid, string $property_name, string $property_id, Request $request, EventDispatcherInterface $eventDispatcher)
+    {
+        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        if(empty($entity))
+        {
+            return $this->response->notFound("Route not found");
+        }
+
+        $properties = $entity->getProperties();
+        if(!array_key_exists($property_name, $properties) || empty($properties[$property_name]))
+        {
+            return $this->response->notFound("Resource not found");
+        }
+
+        if(!array_key_exists($property_id, $properties[$property_name]) || empty($properties[$property_name][$property_id]))
+        {
+            return $this->response->notFound("Resource not found");
+        }
+
+        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
+        if(is_object($valid))
+        {
+            return $valid;
+        }
+
+        $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
+
+        unset($properties[$property_name][$property_id]);
+
+        $entity->setProperties($properties);
+
+        $state = $this->validate->processValidation($entity,0, $entityStates, $this->getUser());
+        if($entity->getValidationState() !== "__default")
+        {
+            $this->em->flush();
+        }
+        if(is_array($state))
+        {
+            return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
+        }
+
+        $this->handleEvents($request->getMethod(), $entityStates['__default'], $entity, $eventDispatcher);
+
+        $this->em->flush();
+
+        return $this->response->empty();
+    }
 }

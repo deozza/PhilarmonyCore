@@ -131,6 +131,7 @@ entities:
                 - participants
           DELETE:
             properties:
+              - message
             by:
               roles:
                 - ROLE_ADMIN

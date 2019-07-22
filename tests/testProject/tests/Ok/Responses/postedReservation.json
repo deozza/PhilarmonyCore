@@ -14,6 +14,7 @@
     "nbPerson": 1,
     "annonce": {
       "uuid": "00200000-0000-4000-a000-000000000000",
+      "validationState": "published",
       "owner": {
         "uuid": "@string@.isUuid()",
         "username": "userActive",

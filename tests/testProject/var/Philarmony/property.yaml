@@ -116,7 +116,7 @@ properties:
       automatic: date.now
 
   participants:
-    type: int
+    type: string
     array: true
     constraints:
       required: true

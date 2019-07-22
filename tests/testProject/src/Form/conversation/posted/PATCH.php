@@ -22,36 +22,17 @@ class PATCH extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('messageTitle' , TextType::class, [
-            'constraints' => [
-                new Assert\Length(['min'=>'1']),
-                new Assert\Length(['max'=>'100']),
-                new Assert\NotBlank(),
-            ],
+        $builder->add('participants' , CollectionType::class, [
+            'entry_type' => TextType::class,
+            'allow_add' => true,
+            'allow_delete' => true,
+            'entry_options' => [
+                'constraints' => [
+                    new Assert\NotBlank(),
+                ],
+            ]
         ]);
 
-        $builder->add('messageContent' , TextType::class, [
-            'constraints' => [
-                new Assert\Length(['min'=>'1']),
-                new Assert\Length(['max'=>'255']),
-                new Assert\NotBlank(),
-            ],
-        ]);
-
-        $builder->add('receiver' , TextType::class, [
-            'constraints' => [
-                new Assert\NotBlank(),
-            ],
-        ]);
-
-        $builder->add('dateOfPost', HiddenType::class, [
-            'data' => new \DateTime('now'),
-            'disabled'=>true
-        ]);
-        $builder->add('seen', HiddenType::class, [
-            'data' => '[]',
-            'disabled'=>true
-        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)

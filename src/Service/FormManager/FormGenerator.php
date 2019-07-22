@@ -67,10 +67,16 @@ class FormGenerator
         }
     }
 
-    private function generateForm(string $entity, string $state, string $method,  $properties)
+    private function generateForm(string $entity, string $state, string $method,  $properties, $subDir = null)
     {
         $dirPath = $this->getFormPath()."$entity/$state";
+
+        if(!empty($subDir))
+        {
+            $dirPath .= '/'.$subDir;
+        }
         $filePath = $dirPath."/".$method.'.php';
+
         if(!is_dir($dirPath))
         {
             mkdir($dirPath, $mode = 0777, $recursive = true);
@@ -98,25 +104,7 @@ class FormGenerator
             if($type[0] === "embedded")
             {
                 $embeddedProperties = $this->schemaLoader->loadEntityEnumeration($type[1])['properties'];
-                foreach($embeddedProperties as $embeddedProperty)
-                {
-                    $propertyConfig = $this->schemaLoader->loadPropertyEnumeration($embeddedProperty);
-                    $config = [];
-                    $type = explode('.',$propertyConfig['type']);
-                    $config['type'] = $type[0];
-
-                    $config['constraints'] = $propertyConfig['constraints'];
-                    if($type[0] === "enumeration")
-                    {
-                        $config['constraints']['choices'] = $this->schemaLoader->loadEnumerationEnumeration($type[1]);
-                    }
-
-                    if(array_key_exists('array', $propertiesConfig))
-                    {
-                        $config['array'] = true;
-                    }
-                    $propertiesConfig[$embeddedProperty] = $config;
-                }
+                $this->generateForm($entity, $state, $method, $embeddedProperties, $type[1]);
                 continue;
             }
 
@@ -127,8 +115,15 @@ class FormGenerator
 
             $propertiesConfig[$property] = $config;
         }
+
+        $namespace = $this->formNamespace.$entity.'\\'.$state;
+        if(!empty($subDir))
+        {
+            $namespace .= '\\'.$subDir;
+        }
+
         $twig = $this->getTwigEnvironment();
-        $content = $twig->render('form.php.twig', ['properties'=>$propertiesConfig, 'classname'=>$method, 'namespace'=>$this->formNamespace.$entity.'\\'.$state]);
+        $content = $twig->render('form.php.twig', ['properties'=>$propertiesConfig, 'classname'=>$method, 'namespace'=>$namespace]);
         file_put_contents($filePath, $content);
 
         echo $filePath." has been created \n";

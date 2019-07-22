@@ -1,6 +1,6 @@
 <?php
 
-namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Form\conversation\__default;
+namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Form\conversation\posted\message;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -22,17 +22,34 @@ class POST extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('participants' , CollectionType::class, [
-            'entry_type' => TextType::class,
-            'allow_add' => true,
-            'allow_delete' => true,
-            'entry_options' => [
-                'constraints' => [
-                    new Assert\NotBlank(),
-                ],
-            ]
+        $builder->add('messageTitle' , TextType::class, [
+            'constraints' => [
+                new Assert\Length(['min'=>'1']),
+                new Assert\Length(['max'=>'100']),
+                new Assert\NotBlank(),
+            ],
         ]);
 
+        $builder->add('messageContent' , TextType::class, [
+            'constraints' => [
+                new Assert\Length(['min'=>'1']),
+                new Assert\Length(['max'=>'255']),
+                new Assert\NotBlank(),
+            ],
+        ]);
+
+        $builder->add('receiver' , TextType::class, [
+            'constraints' => [
+                new Assert\NotBlank(),
+            ],
+        ]);
+
+        $builder->add('dateOfPost', HiddenType::class, [
+            'data' => new \DateTime('now'),
+        ]);
+        $builder->add('seen', HiddenType::class, [
+            'data' => '[]',
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)

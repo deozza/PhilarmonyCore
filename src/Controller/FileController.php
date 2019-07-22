@@ -46,7 +46,6 @@ class FileController extends BaseController
             return $valid;
         }
 
-
         $files = $properties[$file_property];
         $filename = $request->headers->get('X-File-Name');
         if(!empty($filename))
@@ -153,7 +152,7 @@ class FileController extends BaseController
             return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
         }
 
-        $this->handleEvents($request->getMethod(), $entity['states']['__default'], $entity, $eventDispatcher);
+        $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher);
 
         $this->em->flush();
 

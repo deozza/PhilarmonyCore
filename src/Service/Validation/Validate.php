@@ -33,6 +33,7 @@ class Validate
 
         if(!array_key_exists($stateToValidate, $states))
         {
+            $entity->setValidationState($states[$lastState]);
             return true;
         }
         $stateToValidateConfig = $entityStates[$states[$stateToValidate]];
@@ -43,6 +44,8 @@ class Validate
             {
                 return $this->processValidation($entity, $stateToValidate + 1, $entityStates, $user, $stateToValidate);
             }
+
+            $entity->setValidationState($states[$stateToValidate]);
             return true;
         }
 
@@ -50,7 +53,7 @@ class Validate
 
         if(array_key_exists('manual', $stateToValidateConfig['constraints']))
         {
-            $validate['manual'] = false;
+            $validate['manual'] = ["manual"=>false];
         }
 
         if(array_key_exists('properties', $stateToValidateConfig['constraints']))
@@ -66,7 +69,6 @@ class Validate
             if(in_array(false, $value))
             {
                 $entity->setValidationState($states[$lastState]);
-                $this->em->persist($entity);
 
                 return $validate;
             }
@@ -77,7 +79,6 @@ class Validate
             return $this->processValidation($entity, $stateToValidate + 1, $entityStates, $user, $stateToValidate);
         }
         $entity->setValidationState($states[$stateToValidate]);
-        $this->em->persist($entity);
 
         return true;
     }

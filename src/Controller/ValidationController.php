@@ -36,9 +36,20 @@ class ValidationController extends BaseController
             return $valid;
         }
 
+        $steps = array_keys($this->schemaLoader->loadEntityEnumeration($entity->getKind())['states']);
+        $lastStep = $entity->getValidationState();
+
+        foreach($steps as $stepNumber => $step)
+        {
+            if($step === $lastStep)
+            {
+                $lastStep = $stepNumber;
+            }
+        }
+
         $entity->setValidationState($valid['step']);
         $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
-        $state = $this->validate->processValidation($entity,$valid['key']+1, $entityStates, $this->getUser());
+        $state = $this->validate->processValidation($entity,$valid['key']+1, $entityStates, $this->getUser(), $lastStep);
         if($entity->getValidationState() !== "__default")
         {
             $this->em->flush();

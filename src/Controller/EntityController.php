@@ -153,6 +153,7 @@ class EntityController extends BaseController
             {
                 $data[$property] = [
                     "uuid"=>$content->getUuidAsString(),
+                    "validationState"=>$content->getValidationState(),
                     "owner"=>[
                         "uuid"=>$content->getOwner()->getUuidAsString(),
                         "username"=>$content->getOwner()->getUsername(),
@@ -171,6 +172,7 @@ class EntityController extends BaseController
             return $this->response->conflict("You can not access to this entity", $conflict_errors);
         }
 
+        $this->em->persist($entityToPost);
         $state = $this->validate->processValidation($entityToPost,0, $entity['states'], $this->getUser());
 
         if($entityToPost->getValidationState() !== "__default")

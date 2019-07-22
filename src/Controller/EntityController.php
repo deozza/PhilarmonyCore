@@ -146,7 +146,24 @@ class EntityController extends BaseController
 
         $entityToPost->setOwner($this->getUser());
         $entityToPost->setValidationState("__default");
-        $entityToPost->setProperties($form->getData());
+        $data = $form->getData();
+        foreach($data as $property => $content)
+        {
+            if(is_a($content,Entity::class))
+            {
+                $data[$property] = [
+                    "uuid"=>$content->getUuidAsString(),
+                    "owner"=>[
+                        "uuid"=>$content->getOwner()->getUuidAsString(),
+                        "username"=>$content->getOwner()->getUsername(),
+                        "email" => $content->getOwner()->getEmail()
+                        ],
+                    "properties"=>$content->getProperties()
+                ];
+            }
+        }
+
+        $entityToPost->setProperties($data);
 
         $conflict_errors = $this->rulesManager->decideConflict($entityToPost , $request->getContent(), $request->getMethod(),__DIR__);
         if($conflict_errors > 0)
@@ -170,7 +187,7 @@ class EntityController extends BaseController
 
         $this->em->flush();
 
-        return $this->response->created($entityToPost, ['entity_basic', 'user_basic']);
+        return $this->response->created($entityToPost, ['entity_basic', 'entity_id', 'user_basic']);
     }
 
     /**

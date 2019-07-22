@@ -58,7 +58,8 @@ class POST extends AbstractType
         ]);
 
         $builder->add('paid', HiddenType::class, [
-            'data' => '[]'
+            'data' => '',
+            'disabled'=>true
         ]);
     }
 

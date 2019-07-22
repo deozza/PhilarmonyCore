@@ -32,10 +32,11 @@ class {{ classname }} extends AbstractType
         $builder->add('{{ field }}', HiddenType::class, [
 {% set explodedAutomatic = constraints.constraints.automatic|split('.') %}
 {% if 'date' in explodedAutomatic %}
-            'data' => new \DateTime('{{ explodedAutomatic[1] }}')
+            'data' => new \DateTime('{{ explodedAutomatic[1] }}'),
 {% else %}
-            'data' => '{{ explodedAutomatic[0] }}'
+            'data' => '{{ explodedAutomatic[0] }}',
 {% endif %}
+            'disabled'=>true
         ]);
 {% endif %}
 {% endfor %}

@@ -65,15 +65,15 @@ entities:
       posted:
         constraints:
           properties:
-            date_begin:
-              - notBetween.reservation(date_begin,date_end)
-            date_end:
-              - greaterThan.self(date_begin)
-              - notBetween.reservation(date_begin,date_end)
+           # date_begin:
+           #   - notBetween.reservation(date_begin,date_end)
+           # date_end:
+           #   - greaterThan.self(date_begin)
+           #   - notBetween.reservation(date_begin,date_end)
             nbPerson:
               - lesserThanOrEqual.self(annonce.properties.nbPersonMax)
-            annonce.validationState:
-              - equal.value(published)
+           # annonce.validationState:
+           #   - equal.value(published)
         methods:
           GET:
             by:

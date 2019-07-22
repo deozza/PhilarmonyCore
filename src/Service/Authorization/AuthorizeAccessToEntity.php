@@ -41,12 +41,13 @@ class AuthorizeAccessToEntity
                 else
                 {
                     $properties = $entity->getProperties();
+                    //var_dump($properties['annonce']);die;
                     for($i = 0; $i < count($userPath); $i++)
                     {
                         $properties = $properties[$userPath[$i]];
                     }
 
-                    if($user->getId() === $properties || in_array($user->getId(), $properties))
+                    if($user->getUuid() === $properties || in_array($user->getUuid(), $properties))
                     {
                         return true;
                     }

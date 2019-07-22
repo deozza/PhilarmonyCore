@@ -45,10 +45,12 @@ class PATCH extends AbstractType
         ]);
 
         $builder->add('dateOfPost', HiddenType::class, [
-            'data' => new \DateTime('now')
+            'data' => new \DateTime('now'),
+            'disabled'=>true
         ]);
         $builder->add('seen', HiddenType::class, [
-            'data' => '[]'
+            'data' => '[]',
+            'disabled'=>true
         ]);
     }
 

@@ -127,4 +127,4 @@ properties:
     constraints:
       required: true
       unique: false
-      automatic: '[]'
+      automatic: 'false'

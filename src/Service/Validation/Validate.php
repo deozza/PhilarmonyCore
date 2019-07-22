@@ -47,9 +47,18 @@ class Validate
         }
 
         $validate = [];
-        foreach($stateToValidateConfig['constraints'] as $x=>$y)
+
+        if(array_key_exists('manual', $stateToValidateConfig['constraints']))
         {
-            $validate[$x] = $this->validateField($x, $y, $entity);
+            $validate['manual'] = false;
+        }
+
+        if(array_key_exists('properties', $stateToValidateConfig['constraints']))
+        {
+            foreach($stateToValidateConfig['constraints']['properties'] as $x=>$y)
+            {
+                $validate[$x] = $this->validateField($x, $y, $entity);
+            }
         }
 
         foreach($validate as $key=>$value)

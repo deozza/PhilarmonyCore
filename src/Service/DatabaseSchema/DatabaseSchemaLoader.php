@@ -1,6 +1,7 @@
 <?php
 namespace Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema;
 
+use Deozza\PhilarmonyUtils\DataSchema\AuthorizedKeys;
 use Deozza\PhilarmonyUtils\Exceptions\FileNotFound;
 use Symfony\Component\Yaml\Yaml;
 
@@ -28,17 +29,12 @@ class DatabaseSchemaLoader
             throw new FileNotFound();
         }
 
-        if(!isset($values['entities']))
-        {
-            throw new FileNotFound("Root node of ".$this->rootPath.$this->entityPath.".yaml must be 'entities'.");
-        }
-
         if(empty($entity_name))
         {
             return $values;
         }
 
-        foreach (array_keys($values['entities']) as $key)
+        foreach (array_keys($values[AuthorizedKeys::ENTITY_HEAD]) as $key)
         {
             if($key == $entity_name)
             {
@@ -46,7 +42,7 @@ class DatabaseSchemaLoader
                 {
                     return $key;
                 }
-                return $values['entities'][$key];
+                return $values[AuthorizedKeys::ENTITY_HEAD][$key];
             }
         }
 
@@ -66,17 +62,12 @@ class DatabaseSchemaLoader
             throw new FileNotFound();
         }
 
-        if(!isset($values['properties']))
-        {
-            throw new FileNotFound("Root node of ".$this->rootPath.$this->propertyPath.".yaml must be 'properties'.");
-        }
-
         if(empty($property_name))
         {
             return $values;
         }
 
-        foreach (array_keys($values['properties']) as $key)
+        foreach (array_keys($values[AuthorizedKeys::PROPERTY_HEAD]) as $key)
         {
             if($key == $property_name)
             {
@@ -84,7 +75,7 @@ class DatabaseSchemaLoader
                 {
                     return $key;
                 }
-                return $values['properties'][$key];
+                return $values[AuthorizedKeys::PROPERTY_HEAD][$key];
             }
         }
 
@@ -104,23 +95,36 @@ class DatabaseSchemaLoader
             throw new FileNotFound();
         }
 
-        if(!isset($values['enumerations']))
-        {
-            throw new FileNotFound("Root node of ".$this->rootPath.$this->enumerationPath.".yaml must be 'enumeration'.");
-        }
         if (empty($enumeration_name)) {
             return $values;
         }
 
-        foreach (array_keys($values['enumerations']) as $key) {
+        foreach (array_keys($values[AuthorizedKeys::ENUMERATION_HEAD]) as $key) {
             if ($key == $enumeration_name) {
                 if ($returnKey) {
                     return $key;
                 }
-                return $values['enumerations'][$key];
+                return $values[AuthorizedKeys::ENUMERATION_HEAD][$key];
             }
         }
 
         return null;
+    }
+
+    public function propertyFinder(string $propertyName, string $entityName, int $i=0)
+    {
+        $entities = $this->loadEntityEnumeration($entityName);
+        $explodedPropertyName = explode(".", $propertyName);
+        if(count($explodedPropertyName)>1)
+        {
+            return $this->propertyFinder($explodedPropertyName[$i+2], $explodedPropertyName[$i], 2);
+        }
+
+        $availableProperties = $this->loadEntityEnumeration($entityName)[AuthorizedKeys::ENTITY_KEYS[0]];
+        if(empty($availableProperties))
+        {
+            return false;
+        }
+        return in_array($explodedPropertyName[0], $availableProperties);
     }
 }

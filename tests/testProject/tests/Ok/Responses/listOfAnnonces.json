@@ -1,0 +1,70 @@
+{
+  "current_page_number":1,
+  "num_items_per_page":10,
+  "items":[
+    {
+      "uuid":"00200000-0000-4000-a000-000000000000",
+      "kind":"annonce",
+      "validation_state":"published",
+      "owner":{
+        "username":"userActive",
+        "email": "userActive@mail.com"
+      },
+      "date_of_creation":"@date@",
+      "last_update":"@date@",
+      "properties":{
+        "price":"@int@",
+        "title":"@string@",
+        "description":[
+            "@string@"
+        ],
+        "nbPersonMax":"@int@",
+        "annonce_category":["@string@"]
+      }
+    },
+    {
+      "uuid":"00300000-0000-4000-a000-000000000000",
+      "kind":"annonce",
+      "validation_state":"published",
+      "owner":{
+        "username":"userForbidden",
+        "email": "userForbidden@mail.com"
+      },
+      "date_of_creation":"@date@",
+      "last_update":"@date@",
+      "properties":{
+        "price":"@int@",
+        "title":"@string@",
+        "description":[
+            "@string@"
+        ],
+        "nbPersonMax":"@int@",
+        "annonce_category":["@string@"]
+      }
+    },
+    {
+      "uuid":"00400000-0000-4000-a000-000000000000",
+      "kind":"annonce",
+      "validation_state":"published",
+      "owner":{
+        "username":"userForbidden",
+        "email": "userForbidden@mail.com"
+      },
+      "date_of_creation":"@date@",
+      "last_update":"@date@",
+      "properties":{
+        "photo": {
+          "testfile":"@string@"
+        },
+        "price":"@int@",
+        "title":"@string@",
+        "description":[
+          "@string@"
+        ],
+        "nbPersonMax":"@int@",
+        "annonce_category":["@string@"]
+      }
+    }
+  ],
+  "total_count":3
+}

@@ -5,7 +5,7 @@ Philarmony
 [![mysql](https://img.shields.io/badge/mysql-%5E5.7-blue.svg)]()
 [![symfony](https://img.shields.io/badge/symfony-%5E4.2-blue.svg)](https://symfony.com/doc/current/index.html#gsc.tab=0)
 [![Build Status](https://travis-ci.org/deozza/atypikhouse.svg?branch=master)](https://travis-ci.org/deozza/atypikhouse)
-[![Stable](https://img.shields.io/badge/stable-2.0-brightgreen.svg)](https://github.com/deozza/Philarmony/tree/2.0.0)
+[![Stable](https://img.shields.io/badge/stable-3.0-brightgreen.svg)](https://github.com/deozza/Philarmony/tree/3.0.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]()
 
 ## Table of contents
@@ -22,12 +22,9 @@ Philarmony
 
 Philarmony is a bundle made to help you create a modular REST API. From database to controllers and forms, without forgetting authorization and data validation, manage your API easily in minutes.
 
-## V.2.0 - What's new ?
+## V.3.0 - What's new ?
 
-I am aiming to transform Philarmony into a complete solution, from the core system (here) to the user handling, passing through self-generated documentation.
-
-For now, PhilarmonyBundle is now PhilarmonyCoreBundle. There is no new feature. The bundle has been made to be ready to work on its own and to work better with the incoming bundles.
-
+Better performances, this is what can resume Philarmony V3. The core has been rewritten with 
 ## Installation
 
 You can install using composer, assuming it is already installed globally :

@@ -49,13 +49,13 @@ class Entity
     private $owner;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="datetime")
      * @JMS\Groups({"entity_complete", "entity_basic"})
      */
     private $dateOfCreation;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="datetime")
      * @JMS\Groups({"entity_complete", "entity_basic"})
      */
     private $lastUpdate;

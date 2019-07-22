@@ -1,0 +1,19 @@
+{
+  "kind":"annonce",
+  "validation_state":"posted",
+  "owner":{
+    "username":"userActive",
+    "email":"userActive@mail.com"
+  },
+  "date_of_creation":"@date@",
+  "last_update":"@date@",
+  "properties":{
+    "price":"@int@",
+    "title":"@string@",
+    "description":[
+      "@string@"
+    ],
+    "nbPersonMax":"@int@",
+    "annonce_category":["@string@"]
+  }
+}

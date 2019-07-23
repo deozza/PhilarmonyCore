@@ -27,6 +27,30 @@ class Validate
         $this->em = $em;
     }
 
+    public function processEmbeddedValidation(Entity $entity, array $entityConfig, $user)
+    {
+        if(!array_key_exists("constraints", $entityConfig))
+        {
+            return true;
+        }
+
+        $constraints = $entityConfig['constraints']['properties'];
+        $validate = [];
+        foreach($constraints as $x=>$y)
+        {
+            $validate[$x] = $this->validateField($x, $y, $entity);
+        }
+
+        foreach($validate as $constraint)
+        {
+            if(in_array(false, $constraint))
+            {
+                return $validate;
+            }
+        }
+        return true;
+    }
+
     public function processValidation(Entity $entity,int $stateToValidate, array $entityStates, $user,int $lastState = null)
     {
         $states = array_keys($entityStates);
@@ -87,11 +111,6 @@ class Validate
     {
         $validate = [];
 
-        if($x === "manual")
-        {
-            $validate[$x] = false;
-            return $validate;
-        }
         $a = $this->getPropertyValue($x, $entity);
         foreach($y as $constraint)
         {
@@ -107,6 +126,7 @@ class Validate
     {
         $field = explode('.', $x);
         $property = $entity->getProperties();
+
         for($i = 0; $i < count($field); $i++)
         {
             if(is_array($property))

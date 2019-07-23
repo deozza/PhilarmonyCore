@@ -87,6 +87,11 @@ class EmbeddedEntityController extends BaseController
             return $this->response->conflict("You can not access to this entity", $conflict_errors);
         }
 
+        $embeddedValidation = $this->validate->processEmbeddedValidation($entity, $this->schemaLoader->loadEntityEnumeration($property_name), $this->getUser());
+        if(is_array($embeddedValidation))
+        {
+            return $this->response->conflict($embeddedValidation, $entity, ['entity_id', 'entity_property', 'entity_basic']);
+        }
         $state = $this->validate->processValidation($entity,0, $entityStates, $this->getUser());
         if($entity->getValidationState() !== "__default")
         {

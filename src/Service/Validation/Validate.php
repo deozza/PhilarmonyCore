@@ -276,11 +276,11 @@ class Validate
         {
             if(substr($method, 0, 1) === '!')
             {
-                eval("\$result = '$sentValue < '$propertyA' && '$sentValue' > '$propertyB';");
+                eval("\$result = '$sentValue' < '$propertyA' && '$sentValue' > '$propertyB';");
             }
             else
             {
-                eval("\$result = '$sentValue >= '$propertyA' && '$sentValue' <= '$propertyB';");
+                eval("\$result = '$sentValue' >= '$propertyA' && '$sentValue' <= '$propertyB';");
             }
 
             return $result;

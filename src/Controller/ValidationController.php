@@ -61,6 +61,7 @@ class ValidationController extends BaseController
         }
 
         $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher);
+        $entity->setLastUpdate(new \DateTime('now'));
 
         $this->em->flush();
         return $this->response->ok($entity, ['entity_complete', 'user_basic']);
@@ -101,6 +102,7 @@ class ValidationController extends BaseController
         }
 
         $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher);
+        $entity->setLastUpdate(new \DateTime('now'));
 
         $this->em->flush();
         return $this->response->ok($entity, ['entity_complete', 'user_basic']);

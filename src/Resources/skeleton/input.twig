@@ -97,7 +97,10 @@
             },
             'choice_value' =>  function(Entity $entity = null){
                 return $entity ? $entity->getUuidAsString() : '';
-            }
+            },
+            'constraints'=>[
+                new Assert\NotBlank()
+            ]
         ]);
 {% endif %}
 {% endmacro %}

@@ -154,6 +154,7 @@ class FileController extends BaseController
 
         $this->handleEvents($request->getMethod(), $entityStates['__default'], $entity, $eventDispatcher);
 
+        $entity->setLastUpdate(new \DateTime('now'));
         $this->em->flush();
 
         return $this->response->created($entity, ['entity_complete', 'user_basic']);
@@ -226,7 +227,7 @@ class FileController extends BaseController
         }
 
         $this->handleEvents($request->getMethod(), $entityStates['__default'], $entity, $eventDispatcher);
-
+        $entity->setLastUpdate(new \DateTime('now'));
         $this->em->flush();
 
         return $this->response->empty();

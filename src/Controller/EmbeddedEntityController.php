@@ -104,6 +104,7 @@ class EmbeddedEntityController extends BaseController
         }
 
         $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher);
+        $entity->setLastUpdate(new \DateTime('now'));
 
         $this->em->flush();
 
@@ -164,6 +165,7 @@ class EmbeddedEntityController extends BaseController
         }
 
         $this->handleEvents($request->getMethod(), $entityStates['__default'], $entity, $eventDispatcher);
+        $entity->setLastUpdate(new \DateTime('now'));
 
         $this->em->flush();
 

@@ -26,7 +26,7 @@ class DatabaseSchemaLoader
         }
         catch(\Exception $e)
         {
-            throw new FileNotFound();
+            throw new FileNotFound($e->getMessage());
         }
 
         if(empty($entity_name))
@@ -59,7 +59,7 @@ class DatabaseSchemaLoader
         }
         catch(\Exception $e)
         {
-            throw new FileNotFound();
+            throw new FileNotFound($e->getMessage());
         }
 
         if(empty($property_name))
@@ -92,7 +92,7 @@ class DatabaseSchemaLoader
         }
         catch (\Exception $e)
         {
-            throw new FileNotFound();
+            throw new FileNotFound($e->getMessage());
         }
 
         if (empty($enumeration_name)) {

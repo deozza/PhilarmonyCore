@@ -121,24 +121,24 @@ trait ValidateEntityTrait
         $authorizedKeys = AuthorizedKeys::BY_KEYS;
         if(!array_key_exists('by', $constraints))
         {
-            throw new DataSchemaMissingKeyException();
+            throw new DataSchemaMissingKeyException("Manual constraint of '$state' of entity '$entity' must contain a 'by' key.");
         }
 
         if(!is_array($constraints['by']))
         {
-            throw new DataSchemaInvalidValueTypeException();
+            throw new DataSchemaInvalidValueTypeException("'by' key of '$state' of entity '$entity' must contain an array.");
         }
 
         foreach($constraints['by'] as $key=>$value)
         {
             if(!in_array($key, $authorizedKeys))
             {
-                throw new DataSchemaUnexpectedKeyException();
+                throw new DataSchemaUnexpectedKeyException("Authorized constraint keys for 'by' are ".json_encode($authorizedKeys).". Unexpected '$key' found in state '$state' of '$entity'.");
             }
 
             if(!is_array($value))
             {
-                throw new DataSchemaInvalidValueTypeException();
+                throw new DataSchemaInvalidValueTypeException("'$key', manual constraint of '$state' from the '$entity' entity, must be of type array.");
             }
         }
     }
@@ -151,7 +151,7 @@ trait ValidateEntityTrait
 
         if(!in_array($propertyExploded[0], $propertiesAvailable))
         {
-            throw new DataSchemaUnexpectedValueException();
+            throw new DataSchemaUnexpectedValueException("Authorized properties which could have constraints in the entity '$entity' are ".json_encode($propertiesAvailable).". Unexpected '".$propertyExploded[0]."' found in state '$state' of '$entity'.");
         }
 
         foreach($constraints as $constraint)
@@ -164,7 +164,7 @@ trait ValidateEntityTrait
                 $operator = substr($matches[1], 0, strlen($matches[1]) - 1);
                 if(!in_array($operator, $authorizedKeys))
                 {
-                    throw new DataSchemaUnexpectedValueException();
+                    throw new DataSchemaUnexpectedValueException("Authorized operators for a constraint are ".json_encode($authorizedKeys).". Unexpected '$operator' found in state '$state' of '$entity'.");
                 }
                 $regex = "/(\w+\()/";
                 preg_match($regex, $constraint, $matches);
@@ -184,7 +184,7 @@ trait ValidateEntityTrait
 
                                 if($exists === false)
                                 {
-                                    throw new DataSchemaUnexpectedValueException($property);
+                                    throw new DataSchemaUnexpectedValueException("$property does not exist in entity '$entity'");
                                 }
                             }
                         };
@@ -196,7 +196,7 @@ trait ValidateEntityTrait
                         default : {
                             if(!in_array($constraintOnEntity, array_keys($this->entities[AuthorizedKeys::ENTITY_HEAD])))
                             {
-                                throw new DataSchemaUnexpectedValueException($constraintOnEntity);
+                                throw new DataSchemaUnexpectedValueException("'$constraintOnEntity' does not exist. You can not create a constraint over it in state '$state' of '$entity'. Available entities are ".json_encode(array_keys($this->entities[AuthorizedKeys::ENTITY_HEAD])));
                             }
                             $regex = "/(\(.+\))/";
                             preg_match($regex, $constraint, $matches);
@@ -209,7 +209,7 @@ trait ValidateEntityTrait
                                 {
                                     if(!in_array($explodedProperty, $propertiesAvailable))
                                     {
-                                        throw new DataSchemaUnexpectedValueException($explodedProperty);
+                                        throw new DataSchemaUnexpectedValueException("'$explodedProperty' does not exist in '$constraintOnEntity'. You can not create a constraint over it in state '$state' of '$entity'. Available properties are ".json_encode($propertiesAvailable));
                                     }
                                 }
                             }
@@ -226,7 +226,7 @@ trait ValidateEntityTrait
                 $operator = substr($matches[1], 0, strlen($matches[1]) - 1);
                 if(!in_array($operator, $authorizedKeys))
                 {
-                    throw new DataSchemaUnexpectedValueException();
+                    throw new DataSchemaUnexpectedValueException("Authorized operator for 'equal' constraint are ".json_encode($authorizedKeys)."Unexpected '$operator' found in state '$state' of '$entity'");
                 }
             }
 
@@ -316,7 +316,7 @@ trait ValidateEntityTrait
             {
                 if(!in_array($property, $this->entities[AuthorizedKeys::ENTITY_HEAD][$entityName][AuthorizedKeys::METHOD_KEYS[0]]))
                 {
-                    throw new DataSchemaUnexpectedKeyException();
+                    throw new DataSchemaUnexpectedKeyException("Authorized properties for methods are ".json_encode($this->entities[AuthorizedKeys::ENTITY_HEAD][$entityName][AuthorizedKeys::METHOD_KEYS[0]])." Unexpected '$property' found in '$entityName'.");
                 }
             }
         }

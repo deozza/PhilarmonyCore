@@ -19,14 +19,14 @@ trait ValidatePropertyTrait
 
         if(!in_array($authorizedKeys[0], $keys) || !in_array($authorizedKeys[1], $keys))
         {
-            throw new DataSchemaMissingKeyException();
+            throw new DataSchemaMissingKeyException("A property must contain a '".$authorizedKeys[0]."' and a '".$authorizedKeys[1]."' keys. Check your '$property' property.");
         }
 
         foreach($propertyContent as $key => $keyContent)
         {
             if(empty($keyContent))
             {
-                throw new DataSchemaEmptyOrHeadMissingException();
+                throw new DataSchemaEmptyOrHeadMissingException("Empty content in key '$key' of property '$property'.");
             }
 
             switch($key)
@@ -37,7 +37,7 @@ trait ValidatePropertyTrait
                     break;
                 case $authorizedKeys[2] : $this->validateArray($property, $keyContent);
                     break;
-                default : throw new DataSchemaUnexpectedKeyException();
+                default : throw new DataSchemaUnexpectedKeyException("Authorized keys are ".json_encode($authorizedKeys).". Unexpected '$key' found in '$property' property'");
                     break;
             }
         }
@@ -47,14 +47,14 @@ trait ValidatePropertyTrait
     {
         if(!is_string($type))
         {
-            throw new DataSchemaInvalidValueTypeException();
+            throw new DataSchemaInvalidValueTypeException("'type' key of a property must be of type string. Invalid value found in '$property' property.");
         }
 
         $explodedType = explode('.', $type);
 
         if(!in_array($explodedType[0],AuthorizedKeys::TYPES))
         {
-            throw new DataSchemaUnexpectedKeyException($explodedType[0]." ".$property);
+            throw new DataSchemaUnexpectedKeyException("Authorized types are ".json_encode(AuthorizedKeys::TYPES).". Unexpected '".$explodedType[0]."' found in '$property' property");
         }
 
         if(count($explodedType) === 2)
@@ -116,7 +116,7 @@ trait ValidatePropertyTrait
         {
             if(!in_array($constraintKey, $authorizedKeys))
             {
-                throw new DataSchemaUnexpectedKeyException();
+                throw new DataSchemaUnexpectedKeyException("Authorized constraints are ".json_encode($authorizedKeys).". Unexpected '$constraintKey' found in '$property' constraints");
             }
 
             if(($constraintKey === $authorizedKeys[0] || $constraintKey === $authorizedKeys[1]) && !is_bool($constraintValue))

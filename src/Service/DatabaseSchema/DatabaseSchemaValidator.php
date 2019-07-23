@@ -16,7 +16,7 @@ class DatabaseSchemaValidator
     const ENUM_HEAD = "enumerations";
 
     const EMPTY_OR_BAD_HEAD_MSG = "The %s schema is empty or does not start with '%s' key.";
-
+    const INVALID_AMOUNT_HEAD_KEY = "The %s schema should contain only 1 '%s' key.";
 
     public function __construct(DatabaseSchemaLoader $schemaLoader)
     {
@@ -35,7 +35,7 @@ class DatabaseSchemaValidator
 
         if(count($this->entities) > 1)
         {
-            throw new DataSchemaUnexpectedKeyException();
+            throw new DataSchemaUnexpectedKeyException(sprintf(self::INVALID_AMOUNT_HEAD_KEY, self::ENTITY_HEAD, self::ENTITY_HEAD));
         }
 
         foreach($this->entities[self::ENTITY_HEAD] as $entity=>$entityContent)
@@ -53,14 +53,14 @@ class DatabaseSchemaValidator
 
         if(count($this->properties) > 1)
         {
-            throw new DataSchemaUnexpectedKeyException();
+            throw new DataSchemaUnexpectedKeyException(sprintf(self::INVALID_AMOUNT_HEAD_KEY, self::PROPERTY_HEAD, self::PROPERTY_HEAD));
         }
 
         foreach($this->properties[self::PROPERTY_HEAD] as $property=>$propertyContent)
         {
             if(empty($propertyContent))
             {
-                throw new DataSchemaEmptyOrHeadMissingException();
+                throw new DataSchemaEmptyOrHeadMissingException(sprintf(self::INVALID_AMOUNT_HEAD_KEY, self::PROPERTY_HEAD, self::PROPERTY_HEAD));
             }
             $this->validateProperty($property, $propertyContent);
         }

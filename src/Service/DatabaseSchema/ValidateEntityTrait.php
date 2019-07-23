@@ -26,8 +26,14 @@ trait ValidateEntityTrait
 
         if(count($this->properties) > 1 || empty($this->properties[$authorizedKeys[0]]))
         {
-            throw new DataSchemaMissingKeyException("The properties of '$entity' are empty or are badly formated");
+            throw new DataSchemaMissingKeyException("The property schema file is empty or badly formated");
         }
+
+        if(!is_array($entityContent[$authorizedKeys[0]]))
+        {
+            throw new DataSchemaInvalidValueTypeException($authorizedKeys[0]." of entity '$entity' must be of type array'");
+        }
+
         foreach($entityContent[$authorizedKeys[0]] as $property)
         {
             if(!array_key_exists($property, $this->properties[AuthorizedKeys::PROPERTY_HEAD]))

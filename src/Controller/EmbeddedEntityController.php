@@ -61,7 +61,23 @@ class EmbeddedEntityController extends BaseController
         $properties = $entity->getProperties();
 
         $alreadyDefined = in_array($property_name, $properties);
-        $properties[$property_name] =  [$alreadyDefined === false ? "0" : count($properties[$property_name]) => $form->getData()];
+
+        $propertyConfig = $this->schemaLoader->loadPropertyEnumeration($property_name);
+        $isArray = array_key_exists('array', $propertyConfig) && $propertyConfig['array'] === true;
+
+        if($isArray === true)
+        {
+            $properties[$property_name] =  [$alreadyDefined === false ? "0" : count($properties[$property_name]) => $form->getData()];
+        }
+        else
+        {
+            if($alreadyDefined === true)
+            {
+                return $this->response->badRequest("'$property_name' already exists in '$entity'. Can not be added.");
+            }
+
+            $properties[$property_name] = $form->getData();
+        }
 
         $entity->setProperties($properties);
 

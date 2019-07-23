@@ -82,7 +82,12 @@ class EntityRepository extends ServiceEntityRepository
 
                 if($field[1] === "properties")
                 {
-                    $queryBuilder->andWhere("JSON_EXTRACT(e.properties,'$.".$field[2]."') $operator $value");
+                    $filter = $field[2];
+                    for($i = 3; $i < count($field); $i++)
+                    {
+                        $filter .= ".".$field[$i];
+                    }
+                    $queryBuilder->andWhere("JSON_EXTRACT(e.properties,'$.".$filter."') $operator $value");
                 }
                 else
                 {

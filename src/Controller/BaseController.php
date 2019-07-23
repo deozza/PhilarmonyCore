@@ -30,18 +30,18 @@ class BaseController extends AbstractController
         $this->rulesManager = $rulesManager;
         $this->em = $em;
     }
-    
-    protected function handleEvents(string $method, array $stateConfig, Entity $entity, EventDispatcherInterface $eventDispatcher)
+
+    protected function handleEvents(string $method, array $stateConfig, Entity $entity, EventDispatcherInterface $eventDispatcher, array $payload = null)
     {
-        if(!array_key_exists('post_scripts',$stateConfig)) {
+        if(!array_key_exists('post_scripts',$stateConfig['methods'][$method])) {
             return;
         }
-        $scripts = $stateConfig['post_scripts'];
+        $scripts = $stateConfig['methods'][$method]['post_scripts'];
 
-        $event = new GenericEvent($entity);
+        $event = new GenericEvent(['entity'=>$entity, 'payload'=>$payload]);
         foreach($scripts as $script)
         {
-            $eventDispatcher->dispatch($event, $script);
+            $eventDispatcher->dispatch($script, $event);
         };
     }
 }

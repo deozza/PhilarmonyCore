@@ -158,7 +158,7 @@ class EntityController extends BaseController
                         "uuid"=>$content->getOwner()->getUuidAsString(),
                         "username"=>$content->getOwner()->getUsername(),
                         "email" => $content->getOwner()->getEmail()
-                        ],
+                    ],
                     "properties"=>$content->getProperties()
                 ];
             }
@@ -185,7 +185,7 @@ class EntityController extends BaseController
             return $this->response->conflict($state, $entityToPost, ['entity_basic', 'entity_id', 'user_basic']);
         }
 
-        $this->handleEvents($request->getMethod(), $entity['states']['__default'], $entityToPost, $eventDispatcher);
+        $this->handleEvents($request->getMethod(), $entity['states']['__default'], $entityToPost, $eventDispatcher, json_decode($request->getContent(), true));
 
         $this->em->flush();
 
@@ -243,7 +243,7 @@ class EntityController extends BaseController
             return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
         }
 
-        $this->handleEvents($request->getMethod(), $stateConfig[$entity->getValidationState()]['methods'][$request->getMethod()], $entity, $eventDispatcher);
+        $this->handleEvents($request->getMethod(), $stateConfig[$entity->getValidationState()]['methods'][$request->getMethod()], $entity, $eventDispatcher, json_decode($request->getContent(), true));
 
         $this->em->flush();
 

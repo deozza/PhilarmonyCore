@@ -87,7 +87,8 @@ class EntityController extends BaseController
         {
             return $valid;
         }
-        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'][$entity->getValidationState()]['methods'][$request->getMethod()];
+
+        $stateConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'][$entity->getValidationState()];
 
         $conflict_errors = $this->rulesManager->decideConflict($entity, $request->getContent(), $request->getMethod(),__DIR__);
 
@@ -96,8 +97,7 @@ class EntityController extends BaseController
             return $this->response->conflict("You can not access to this entity", $conflict_errors);
         }
 
-        $this->handleEvents($request->getMethod(), $entityConfig, $entity, $eventDispatcher);
-
+        $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher);
         return $this->response->ok($entity, ['entity_basic', 'user_basic']);
     }
 
@@ -243,7 +243,7 @@ class EntityController extends BaseController
             return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
         }
 
-        $this->handleEvents($request->getMethod(), $stateConfig[$entity->getValidationState()]['methods'][$request->getMethod()], $entity, $eventDispatcher, json_decode($request->getContent(), true));
+        $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher, json_decode($request->getContent(), true));
 
         $this->em->flush();
 
@@ -270,7 +270,7 @@ class EntityController extends BaseController
             return $valid;
         }
 
-        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'][$entity->getValidationState()]['methods'];
+        $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'][$entity->getValidationState()];
 
         $conflict_errors = $this->rulesManager->decideConflict($entity, $request->getContent(), $request->getMethod(),__DIR__);
         if($conflict_errors > 0)
@@ -278,7 +278,7 @@ class EntityController extends BaseController
             return $this->response->conflict("You can not access to this entity", $conflict_errors);
         }
 
-        $this->handleEvents($request->getMethod(), $entityConfig[$request->getMethod()], $entity, $eventDispatcher);
+        $this->handleEvents($request->getMethod(), $entityConfig, $entity, $eventDispatcher);
 
         $this->em->remove($entity);
         $this->em->flush();

@@ -35,8 +35,8 @@ class NotAuthorizedControllerTest extends TestAsserter
             ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/00400000-0000-4000-a000-000000000000/photo', "status"=>401]],
             ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entity/00400000-0000-4000-a000-000000000000/photo', "status"=>401]],
 
-            ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/validate/00400000-0000-4000-a000-000000000000'    , "status"=>401]],
-            ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/retrograde/00400000-0000-4000-a000-000000000000'  , "status"=>401]],
+            ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/validate/00400000-0000-4000-a000-000000000000'    , "status"=>401]],
+            ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/retrograde/00400000-0000-4000-a000-000000000000'  , "status"=>401]],
         ];
     }
 }

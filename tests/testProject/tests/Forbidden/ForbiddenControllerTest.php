@@ -33,8 +33,8 @@ class ForbiddenControllerTest extends TestAsserter
             ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/00500000-0000-4000-a000-000000000000/photo', "status"=>403]],
             ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/00500000-0000-4000-a000-000000000000/photo', "status"=>403, 'token'=>'token_userForbidden']],
 
-            ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/validate/00500000-0000-4000-a000-000000000000'    , "status"=>403, 'token'=>'token_userActive']],
-            ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/retrograde/00400000-0000-4000-a000-000000000000'  , "status"=>403, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/validate/00500000-0000-4000-a000-000000000000'    , "status"=>403, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/retrograde/00400000-0000-4000-a000-000000000000'  , "status"=>403, 'token'=>'token_userActive']],
         ];
     }
 }

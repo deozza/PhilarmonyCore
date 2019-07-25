@@ -38,7 +38,7 @@ class OkControllerTest extends TestAsserter
             ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/00500000-0000-4000-a000-000000000000/photo', "status"=>200, "token"=>"token_userActive"]],
             ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/00500000-0000-4000-a000-000000000000/photo', "status"=>200, "token"=>"token_userAdmin"]],
             
-            ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/validate/00500000-0000-4000-a000-000000000000'    , "status"=>200, "token"=>"token_userAdmin"]],
+            ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/validate/00500000-0000-4000-a000-000000000000'    , "status"=>200, "token"=>"token_userAdmin"]],
             ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/reservation'                               , "status"=>201, "token"=>"token_userActive2", "in"=>"postReservation", "out"=>"postedReservation"]],
             
             ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/doc/entities'                                     , "status"=>200]],
@@ -50,7 +50,7 @@ class OkControllerTest extends TestAsserter
             [
                 "kind"=>"scenario",
                 "test"=>[
-                    ['method'=>'POST'  , 'url'=>'/api/entity/reservation'                               , "status"=>201, "token"=>"token_userActive2", "in"=>"postReservation", "out"=>"postedReservationScenario"],
+                    ['method'=>'POST' , 'url'=>'/api/entity/reservation'                               , "status"=>201, "token"=>"token_userActive2", "in"=>"postReservation", "out"=>"postedReservationScenario"],
                     ['method'=>'GET'  , 'url'=>'/api/entity/#uuid#'                                     , "status"=>200, "token"=>"token_userActive2"],
                     ['method'=>'GET'  , 'url'=>'/api/entity/#uuid#'                                     , "status"=>200, "token"=>"token_userActive"],
 

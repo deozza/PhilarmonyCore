@@ -22,7 +22,7 @@ class ValidationController extends BaseController
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *     },
      *     name="validate_entity",
-     *      methods={"POST"})
+     *      methods={"PATCH"})
      */
     public function postManualValidationAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
@@ -59,7 +59,6 @@ class ValidationController extends BaseController
         {
             return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
         }
-
         $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher);
         $entity->setLastUpdate(new \DateTime('now'));
 
@@ -74,7 +73,7 @@ class ValidationController extends BaseController
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *     },
      *     name="retrograde_entity",
-     *      methods={"POST"})
+     *      methods={"PATCH"})
      */
     public function postManualRetrogradeAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {

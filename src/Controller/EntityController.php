@@ -240,7 +240,7 @@ class EntityController extends BaseController
 
         if(is_array($state))
         {
-            return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
+            return $this->response->conflict($state, $entity, ['entity_complete', 'user_basic']);
         }
 
         $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher, json_decode($request->getContent(), true));

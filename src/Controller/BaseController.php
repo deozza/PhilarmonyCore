@@ -33,6 +33,9 @@ class BaseController extends AbstractController
 
     protected function handleEvents(string $method, array $stateConfig, Entity $entity, EventDispatcherInterface $eventDispatcher, array $payload = null)
     {
+        if(!array_key_exists($method,$stateConfig['methods'])) {
+            return;
+        }
         if(!array_key_exists('post_scripts',$stateConfig['methods'][$method])) {
             return;
         }

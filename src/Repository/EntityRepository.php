@@ -116,7 +116,7 @@ class EntityRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->execute();
     }
 
-    public function findAllForValidate($kind, $property, $value, $operator)
+    public function findAllForValidate($kind, $property, $value, $operator, ?array $referenceParams)
     {
         $parameters = [];
 
@@ -132,7 +132,7 @@ class EntityRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->execute();
     }
 
-    public function findAllBetweenForValidate($kind, $propertyMin, $propertyMax, $value)
+    public function findAllBetweenForValidate($kind, $propertyMin, $propertyMax, $value, ?array $referenceParams)
     {
         $parameters = [];
 
@@ -140,19 +140,26 @@ class EntityRepository extends ServiceEntityRepository
         $queryBuilder->select('e');
         $queryBuilder->andWhere('e.kind = :kind');
 
-        if(is_a($value, \DateTime::class))
+        try
         {
-            $value = $value->format("Y-m-d")." 00:00:00.000000";
+            $is_a_date = new \DateTime($value);
             $queryBuilder->andWhere("JSON_UNQUOTE(JSON_EXTRACT(e.properties, '$.".$propertyMin.".date'))  <= :value");
             $queryBuilder->andWhere("JSON_UNQUOTE(JSON_EXTRACT(e.properties, '$.".$propertyMax.".date'))  >= :value");
             $parameters["value"] = $value;
-
         }
-        else
+        catch(\Exception $e)
         {
             $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$propertyMin."')>= :value");
             $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$propertyMax."')<= :value");
             $parameters["value"] = $value;
+        }
+
+        if(!empty($referenceParams))
+        {
+            foreach($referenceParams as $key=>$value)
+            {
+                $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$key."') = '".$value."'");
+            }
         }
 
         $parameters["kind"] = $kind;

@@ -117,7 +117,8 @@ class Validate
             $method = $this->getMethod($constraint);
             $referenceEntity = $this->getReferenceEntity($constraint, $entity);
             $referenceProperties = $this->getReferenceProperties($constraint);
-            $validate[$constraint] = $this->validate($a, $method, $referenceProperties, $referenceEntity);
+            $referenceParams = $this->getReferenceParams($constraint, $entity);
+            $validate[$constraint] = $this->validate($a, $method, $referenceProperties, $referenceEntity, $referenceParams);
         }
         return $validate;
     }
@@ -169,14 +170,35 @@ class Validate
 
     private function getReferenceProperties(string $constraint)
     {
-        $properties = explode('(', $constraint);
-        $properties = substr($properties[1],0, strlen($properties[1]) -1);
+        $regex = "/(\([a-z_,.]+\))/";
+        preg_match($regex, $constraint, $matches);
+        $properties = substr($matches[1], 1, strlen($matches[1])-2);
         return explode(',', $properties);
     }
 
-    private function validate($sentValue, $method, $expectedValue, $referenceEntity)
+    private function getReferenceParams(string $constraint, Entity $entity)
     {
-        $sentValue = $this->getTimestampFromDatetime($sentValue);
+        $regex = "/(\.\w+\(([a-z_,.]+){1,2}\))/";
+        preg_match_all($regex, $constraint, $matches);
+        $prefix = [];
+        $i=0;
+        if(!array_key_exists(1,$matches[1]))
+        {
+            return null;
+        }
+
+        $explodedMatch = explode(',',$matches[2][1]);
+        $params = [];
+        foreach($explodedMatch as $match)
+        {
+            $params[$match] = $this->getPropertyValue($match, $entity);
+        }
+        return $params;
+    }
+
+    private function validate($sentValue, $method, $expectedValue, $referenceEntity, $referenceParams)
+    {
+        $sentValue = $this->getFormatedDateTime($sentValue);
         if(is_object($referenceEntity))
         {
             $properties = $referenceEntity->getProperties();
@@ -204,11 +226,11 @@ class Validate
         {
             if(strpos($method, "between"))
             {
-                $result = $this->em->getRepository(Entity::class)->findAllBetweenForValidate($referenceEntity,  $expectedValue[0], $expectedValue[1], $sentValue);
+                $result = $this->em->getRepository(Entity::class)->findAllBetweenForValidate($referenceEntity,  $expectedValue[0], $expectedValue[1], $sentValue, $referenceParams);
             }
             else
             {
-                $result = $this->em->getRepository(Entity::class)->findAllForValidate($referenceEntity, $expectedValue[0], $sentValue, $method);
+                $result = $this->em->getRepository(Entity::class)->findAllForValidate($referenceEntity, $expectedValue[0], $sentValue, $method, $referenceParams);
             }
 
             if(substr($method, 0, 1) === "!" && count($result) > 0)
@@ -227,7 +249,6 @@ class Validate
     private function extractValueFromSelf($expectedValue, $properties)
     {
         $explodedField = explode('.', $expectedValue);
-
         for($i = 0; $i < count($explodedField); $i++)
         {
             if(is_object($properties))
@@ -241,7 +262,7 @@ class Validate
             }
         }
 
-        return $this->getTimestampFromDatetime($properties);
+        return $this->getFormatedDateTime($properties);
     }
 
     private function extractValue($expectedValue)
@@ -260,11 +281,11 @@ class Validate
         return $expectedValue;
     }
 
-    private function getTimestampFromDatetime($property)
+    private function getFormatedDateTime($property)
     {
         if(is_a($property, \DateTime::class))
         {
-            $property = $property->getTimestamp();
+            $property = $property->format("Y-m-d H:i:s");
         }
 
         return $property;

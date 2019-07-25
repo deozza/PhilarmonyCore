@@ -155,7 +155,7 @@ class EntityController extends BaseController
                     "uuid"=>$content->getUuidAsString(),
                     "validationState"=>$content->getValidationState(),
                     "owner"=>[
-                        "uuid"=>$content->getOwner()->getUuidAsString(),
+                        "uuid"=>$content->getOwner()->getUuid(),
                         "username"=>$content->getOwner()->getUsername(),
                         "email" => $content->getOwner()->getEmail()
                     ],

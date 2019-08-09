@@ -1,6 +1,6 @@
 <?php
 
-namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\DataFixtures;
+namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\DataFixtures\MongoDB;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;

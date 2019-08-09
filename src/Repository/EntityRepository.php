@@ -2,8 +2,8 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Repository;
 
-use Deozza\PhilarmonyCoreBundle\Entity\Entity;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Deozza\PhilarmonyCoreBundle\Document\Entity;
+use Doctrine\ODM\MongoDB\DocumentRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -12,8 +12,10 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  * @method Entity[]    findAll()
  * @method Entity[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class EntityRepository extends ServiceEntityRepository
+class EntityRepository extends DocumentRepository
 {
+
+/*
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Entity::class);
@@ -167,4 +169,5 @@ class EntityRepository extends ServiceEntityRepository
         $queryBuilder->setParameters($parameters);
         return $queryBuilder->getQuery()->execute();
     }
+*/
 }

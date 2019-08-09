@@ -2,7 +2,7 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Repository;
 
-use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\ApiToken;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\ApiToken;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 

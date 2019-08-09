@@ -2,8 +2,8 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Security;
 
-use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\ApiToken;
-use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\User;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\ApiToken;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

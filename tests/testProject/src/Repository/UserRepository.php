@@ -2,7 +2,7 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Repository;
 
-use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\User;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 

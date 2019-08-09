@@ -1,8 +1,8 @@
 <?php
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Security;
 
-use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\User;
-use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Repository\ApiTokenRepository;;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\User;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Repository\ApiTokenRepository;
 use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Repository\UserRepository;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\UserInterface;

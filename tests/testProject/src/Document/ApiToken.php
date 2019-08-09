@@ -1,30 +1,28 @@
 <?php
-namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity;
+namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document;
 
-use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\User;
-use Doctrine\ORM\Mapping as ORM;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\User;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use JMS\Serializer\Annotation as JMS;
 
 /**
- * @ORM\Entity(repositoryClass="Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Repository\ApiTokenRepository")
+ * @ODM\Document(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\EntityRepository")
  */
 class ApiToken
 {
     /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @ODM\Id()
      * @JMS\Exclude
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ODM\Field(type="string")
      */
     private $token;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\User")
+     * @ODM\ReferenceOne(targetDocument="User")
      * @JMS\Exclude
      */
     private $user;

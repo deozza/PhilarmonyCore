@@ -1,68 +1,47 @@
 <?php
 
-namespace Deozza\PhilarmonyCoreBundle\Entity;
+namespace Deozza\PhilarmonyCoreBundle\Document;
 
-use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use JMS\Serializer\Annotation as JMS;
 
 /**
- * @ORM\Entity(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\EntityRepository")
- * @ORM\HasLifecycleCallbacks()
+ * @ODM\Document(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\EntityRepository")
  */
 class Entity
 {
     /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     * @JMS\Exclude()
+     * @ODM\Id(strategy="UUID", type="string")
      */
-    private $id;
+    private $uuid;
 
     /**
-     * @ORM\Column(type="uuid", unique=true)
-     * @JMS\Accessor(getter="getUuidAsString")
-     * @JMS\Groups({"entity_id", "entity_complete"})
-     */
-    protected $uuid;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @JMS\Groups({"entity_complete", "entity_basic"})
+     * @ODM\Field(type="string")
      */
     private $kind;
 
-
     /**
-     * @ORM\Column(type="string", length=255)
-     * @JMS\Groups({"entity_complete", "entity_basic"})
+     * @ODM\Field(type="string")
      */
     private $validationState;
 
-
     /**
-     * @ORM\Column(type="object")
-     * @JMS\Groups({"entity_complete", "entity_basic"})
+     * @ODM\Field(type="hash")
      */
     private $owner;
 
     /**
-     * @ORM\Column(type="datetime")
-     * @JMS\Groups({"entity_complete", "entity_basic"})
+     * @ODM\Field(type="date")
      */
     private $dateOfCreation;
 
     /**
-     * @ORM\Column(type="datetime")
-     * @JMS\Groups({"entity_complete", "entity_basic"})
+     * @ODM\Field(type="date")
      */
     private $lastUpdate;
 
     /**
-     * @ORM\Column(type="json")
-     * @JMS\Groups({"entity_complete", "entity_basic", "entity_property"})
+     * @ODM\Field(type="hash")
      */
     private $properties;
 
@@ -77,31 +56,12 @@ class Entity
         return $this->id;
     }
 
-    /**
-     * @ORM\PrePersist
-     */
-    public function setupUuid()
-    {
-        $this->setUuid(Uuid::uuid4());
-        return $this;
-    }
-
-    public function setUuid($uuid)
-    {
-        $this->uuid = $uuid;
-
-        return $this;
-    }
 
     public function getUuid()
     {
         return $this->uuid;
     }
 
-    public function getUuidAsString()
-    {
-        return $this->uuid->toString();
-    }
 
     public function getKind(): ?string
     {

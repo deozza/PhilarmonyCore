@@ -4,9 +4,10 @@ namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Controller;
 use Deozza\ResponseMakerBundle\Service\FormErrorSerializer;
 use Deozza\ResponseMakerBundle\Service\ResponseMaker;
 use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Form\user\CredentialsType;
-use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\ApiToken;
-use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\Credentials;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\ApiToken;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\Credentials;
 use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Repository\ApiTokenRepository;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Firebase\JWT\JWT;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Dotenv\Dotenv;
@@ -22,9 +23,9 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
  */
 class AuthController extends AbstractController
 {
-    public function __construct(EntityManagerInterface $em, ResponseMaker $responseMaker, FormErrorSerializer $serializer)
+    public function __construct(DocumentManager $dm, ResponseMaker $responseMaker, FormErrorSerializer $serializer)
     {
-        $this->em = $em;
+        $this->dm = $dm;
         $this->response = $responseMaker;
         $this->serializer = $serializer;
     }
@@ -42,7 +43,7 @@ class AuthController extends AbstractController
         {
             return $this->response->badRequest($this->serializer->convertFormToArray($form));
         }
-        $repository = $this->em->getRepository($this->userEntity);
+        $repository = $this->dm->getRepository($this->userEntity);
 
         $user = $repository->findByUsernameOrEmail($credentials->getLogin(), $credentials->getLogin());
 
@@ -57,8 +58,8 @@ class AuthController extends AbstractController
         if(!$isPasswordValid)
         {
             $user->setLastFailedLogin(new \DateTime('now'));
-            $this->em->persist($user);
-            $this->em->flush();
+            $this->dm->persist($user);
+            $this->dm->flush();
             return $this->response->badRequest("Invalid credentials");
         }
 
@@ -68,9 +69,9 @@ class AuthController extends AbstractController
         $token = ["username" => $user->getUsername(), "exp"=> date_create("+1 day")->format('U')];
 
         $user->setLastLogin(new \DateTime('now'));
-        $this->em->persist($user);
+        $this->dm->persist($user);
 
-        $this->em->flush();
+        $this->dm->flush();
         return $this->response->created(JWT::encode($token, $secret));
     }
 }

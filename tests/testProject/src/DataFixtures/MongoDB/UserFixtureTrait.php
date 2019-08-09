@@ -1,8 +1,8 @@
 <?php
-namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\DataFixtures;
+namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\DataFixtures\MongoDB;
 
-use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\ApiToken;
-use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\User;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\ApiToken;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\User;
 
 trait UserFixtureTrait
 {

@@ -1,8 +1,8 @@
 <?php
-namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\DataFixtures;
+namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\DataFixtures\MongoDB;
 
-use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity\User;
-use Deozza\PhilarmonyCoreBundle\Entity\Entity;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\User;
+use Deozza\PhilarmonyCoreBundle\Document\Entity;
 use Faker;
 
 trait AnnonceFixtureTrait
@@ -41,7 +41,7 @@ trait AnnonceFixtureTrait
 
         if(!empty($photo))
         {
-            $file = file_get_contents(__DIR__."/".$photo);
+            $file = file_get_contents(__DIR__ . "AnnonceFixtureTrait.php/" .$photo);
             $filename = "testfile";
             $properties['photo'] = [$filename=>base64_encode($file)];
         }

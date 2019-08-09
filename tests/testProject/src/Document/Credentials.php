@@ -1,23 +1,15 @@
 <?php
-namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity;
-
-use Symfony\Component\Validator\Constraints as Assert;
+namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document;
 
 class Credentials
 {
     /**
      * @var string
-     *
-     * @Assert\NotBlank()
-     * @Assert\Type("string")
      */
     private $login;
 
     /**
      * @var string
-     *
-     * @Assert\NotBlank()
-     * @Assert\Type("string")
      */
     private $password;
 

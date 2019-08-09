@@ -1,99 +1,47 @@
 <?php
-namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Entity;
+namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document;
 
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Validator\Constraints as Assert;
-use JMS\Serializer\Annotation as JMS;
-use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
 
 /**
- * @ORM\Entity(repositoryClass="Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Repository\UserRepository")
- * @ORM\HasLifecycleCallbacks()
+ * @ODM\Document
  */
 
 class User implements UserInterface
 {
     /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     * @JMS\Groups({"user_id", "entity_complete"})
+     * @ODM\Id(strategy="UUID", type="string")
      */
-    private $id;
-    /**
-     * @ORM\Column(type="uuid", unique=true)
-     * @JMS\Accessor(getter="getUuidAsString")
-     * @JMS\Groups({"user_id", "entity_complete"})
-     */
-    protected $uuid;
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank()
-     * @JMS\Groups({"user_basic", "username", "entity_complete"})
-     */
-    protected $username;
+    private $uuid;
 
-    /**
-     * @Assert\Type("string")
-     * @JMS\Exclude
-     */
-    protected $plainPassword;
+    /** @ODM\Field(type="string") */
+    private $username;
 
-    /**
-     * @Assert\Type("string")
-     * @JMS\Exclude
-     */
-    protected $newPassword;
+    /** @ODM\Field(type="string") */
+    private $email;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @JMS\Exclude
-     */
-    protected $password;
+    private $plainPassword;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank()
-     * @Assert\Email(
-     *     message = "The email '{{ value }}' is not a valid email."
-     * )
-     * @JMS\Groups({"user_basic"})
-     */
-    protected $email;
+    private $newPassword;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     * @JMS\Groups({"user_advanced"})
-     */
-    protected $lastLogin;
+    /** @ODM\Field(type="string") */
+    private $password;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     * @JMS\Groups({"user_advanced"})
-     */
-    protected $lastFailedLogin;
+    /** @ODM\Field(type="date") */
+    private $lastLogin;
 
-    /**
-     * @ORM\Column(type="datetime")
-     * @JMS\Groups({"user_advanced"})
-     */
-    protected $registerDate;
+    /** @ODM\Field(type="date") */
+    private $lastFailedLogin;
 
-    /**
-     * @ORM\Column(type="boolean")
-     * @JMS\Groups({"user_advanced"})
-     */
-    protected $active;
+    /** @ODM\Field(type="date") */
+    private $registerDate;
 
+    /** @ODM\Field(type="boolean") */
+    private $active;
 
-    /**
-     * @ORM\Column(type="json")
-     * @JMS\Groups({"user_advanced"})
-     */
-    protected $roles = [];
-
+    /** @ODM\Field(type="collection") */
+    private $roles = [];
 
     /**
      * User constructor.
@@ -104,36 +52,12 @@ class User implements UserInterface
         $this->registerDate = new \DateTime('now');
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    /**
-     * @ORM\PrePersist
-     */
-    public function setupUuid()
-    {
-        $this->setUuid(Uuid::uuid4());
-        return $this;
-    }
-
-    public function setUuid($uuid)
-    {
-        $this->uuid = $uuid;
-
-        return $this;
-    }
 
     public function getUuid()
     {
         return $this->uuid;
     }
 
-    public function getUuidAsString()
-    {
-        return $this->uuid->toString();
-    }
 
     public function getUsername(): ?string
     {
@@ -260,4 +184,5 @@ class User implements UserInterface
     public function eraseCredentials()
     {
     }
+
 }

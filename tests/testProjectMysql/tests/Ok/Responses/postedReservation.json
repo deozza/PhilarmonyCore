@@ -4,7 +4,7 @@
   "validation_state": "posted",
   "owner": {
     "username": "userActive2",
-    "email": "userActive2@mail.com"
+    "uuid": "@string@.isUuid()"
   },
   "date_of_creation": "@date@",
   "last_update": "@date@",
@@ -17,19 +17,14 @@
       "validationState": "published",
       "owner": {
         "uuid": "@string@.isUuid()",
-        "username": "userActive",
-        "email": "userActive@mail.com"
+        "username": "userActive"
       },
       "properties": {
-        "price": 215,
+        "price": "@int@",
         "title": "@string@",
-        "description": [
-          "@string@"
-        ],
-        "nbPersonMax": 5,
-        "annonce_category": [
-          "maison"
-        ]
+        "description": ["@string@"],
+        "nbPersonMax": "@int@",
+        "annonce_category": ["@string@"]
       }
     }
   }

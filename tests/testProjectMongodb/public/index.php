@@ -1,6 +1,6 @@
 <?php
 
-use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Kernel;
+use Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Kernel;
 use Symfony\Component\Debug\Debug;
 use Symfony\Component\HttpFoundation\Request;
 

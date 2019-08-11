@@ -2,8 +2,8 @@
   "kind":"annonce",
   "validation_state":"published",
   "owner":{
-    "username":"userForbidden",
-    "email":"userForbidden@mail.com"
+    "uuid": "@string@.isUuid()",
+    "username":"@string@"
   },
   "date_of_creation":"@date@",
   "last_update":"@date@",

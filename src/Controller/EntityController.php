@@ -144,7 +144,12 @@ class EntityController extends BaseController
             return $this->response->badForm($form);
         }
 
-        $entityToPost->setOwner(['uuid'=>$user->getUuid(), "username"=>$user->getUsername()]);
+        $owner = [
+            'username'=>$user->getUsername(),
+            'uuid' => $user->getUuidAsString()
+        ];
+
+        $entityToPost->setOwner($owner);
         $entityToPost->setValidationState("__default");
         $data = $form->getData();
         foreach($data as $property => $content)
@@ -155,8 +160,8 @@ class EntityController extends BaseController
                     "uuid"=>$content->getUuidAsString(),
                     "validationState"=>$content->getValidationState(),
                     "owner"=>[
-                        "uuid"=>$content->getOwner()->getUuid(),
-                        "username"=>$content->getOwner()->getUsername()
+                        "uuid"=>$content->getOwner()['uuid'],
+                        "username"=>$content->getOwner()['username']
                     ],
                     "properties"=>$content->getProperties()
                 ];
@@ -173,7 +178,6 @@ class EntityController extends BaseController
 
         $this->em->persist($entityToPost);
         $state = $this->validate->processValidation($entityToPost,0, $entity['states'], $this->getUser());
-
         if($entityToPost->getValidationState() !== "__default")
         {
             $this->em->flush();

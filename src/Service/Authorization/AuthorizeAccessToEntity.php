@@ -31,7 +31,7 @@ class AuthorizeAccessToEntity
                 $userPath = explode('.', $userKind);
                 if($userPath[0] === "owner")
                 {
-                    if($entity->getOwner()->getId() === $user->getId())
+                    if($entity->getOwner()['uuid'] === $user->getUuidAsString())
                     {
                         return true;
                     }

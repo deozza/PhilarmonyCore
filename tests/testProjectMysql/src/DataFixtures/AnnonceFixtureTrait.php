@@ -27,7 +27,7 @@ trait AnnonceFixtureTrait
     {
         $annonce = new Entity();
         $annonce->setKind("annonce");
-        $annonce->setOwner($user);
+        $annonce->setOwner(['uuid'=>$user->getUuidAsString(), 'username'=>$user->getUsername()]);
         $annonce->setValidationState($validationState);
 
         $properties =

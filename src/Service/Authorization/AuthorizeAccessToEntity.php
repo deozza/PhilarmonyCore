@@ -2,11 +2,9 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Service\Authorization;
 
-use Deozza\PhilarmonyCoreBundle\Entity\Entity;
-
 class AuthorizeAccessToEntity
 {
-    public function authorize($user, $by, Entity $entity)
+    public function authorize($user, $by, $entity)
     {
         if(is_string($by))
         {
@@ -41,7 +39,6 @@ class AuthorizeAccessToEntity
                 else
                 {
                     $properties = $entity->getProperties();
-                    //var_dump($properties['annonce']);die;
                     for($i = 0; $i < count($userPath); $i++)
                     {
                         $properties = $properties[$userPath[$i]];

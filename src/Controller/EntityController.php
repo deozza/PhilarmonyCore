@@ -2,7 +2,6 @@
 namespace Deozza\PhilarmonyCoreBundle\Controller;
 
 use Deozza\PhilarmonyCoreBundle\Controller\BaseController;
-use Deozza\PhilarmonyCoreBundle\Entity\Entity;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,7 +37,7 @@ class EntityController extends BaseController
         $filter = $request->query->get("filterBy", []);
         $sort = $request->query->get("sortBy", []);
 
-        $entities = $this->em->getRepository(Entity::class)->findAllFiltered($filter, $sort, $entity_name);
+        $entities = $this->em->getRepository($this->entityClassName)->findAllFiltered($filter, $sort, $entity_name);
 
         foreach($entities as $key=>$entity)
         {
@@ -65,6 +64,7 @@ class EntityController extends BaseController
         $total = count($entities);
         $paginatedEntities = array_splice($entities, $offset, $count);
 
+
         return $this->response->okPaginated($paginatedEntities, ['entity_basic', 'entity_id','user_basic'], $count, $page, $total);
 
     }
@@ -80,7 +80,7 @@ class EntityController extends BaseController
      */
     public function getEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
         $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
@@ -126,7 +126,7 @@ class EntityController extends BaseController
             return $this->response->notFound("Route not found");
         }
 
-        $entityToPost = new Entity();
+        $entityToPost = new $this->entityClassName();
         $entityToPost->setKind($entity_name);
         $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
         $isAllowed = $this->authorizeRequest->isAllowed($entity['states']['__default']['methods']['POST']['by'], true, $entityToPost, $user);
@@ -144,20 +144,19 @@ class EntityController extends BaseController
             return $this->response->badForm($form);
         }
 
-        $entityToPost->setOwner($this->getUser());
+        $entityToPost->setOwner(['uuid'=>$user->getUuid(), "username"=>$user->getUsername()]);
         $entityToPost->setValidationState("__default");
         $data = $form->getData();
         foreach($data as $property => $content)
         {
-            if(is_a($content,Entity::class))
+            if(is_a($content,$this->entityClassName))
             {
                 $data[$property] = [
                     "uuid"=>$content->getUuidAsString(),
                     "validationState"=>$content->getValidationState(),
                     "owner"=>[
                         "uuid"=>$content->getOwner()->getUuid(),
-                        "username"=>$content->getOwner()->getUsername(),
-                        "email" => $content->getOwner()->getEmail()
+                        "username"=>$content->getOwner()->getUsername()
                     ],
                     "properties"=>$content->getProperties()
                 ];
@@ -203,7 +202,7 @@ class EntityController extends BaseController
      */
     public function patchEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
 
         $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
@@ -262,7 +261,7 @@ class EntityController extends BaseController
      */
     public function deleteEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
         $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))

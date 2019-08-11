@@ -3,14 +3,16 @@
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Repository;
 
 use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\User;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\DocumentRepository;
 
-class UserRepository extends ServiceEntityRepository
+class UserRepository extends DocumentRepository
 {
-    public function __construct(RegistryInterface $registry)
+    public function __construct(DocumentManager $dm)
     {
-        parent::__construct($registry, User::class);
+        $uow = $dm->getUnitOfWork();
+        $classMetaData = $dm->getClassMetadata(User::class);
+        parent::__construct($dm, $uow, $classMetaData);
     }
 
     public function findByUsernameOrEmail($username, $email)

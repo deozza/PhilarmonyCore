@@ -1,10 +1,10 @@
 <?php
 
-namespace Deozza\PhilarmonyCoreBundle\Repository;
+namespace Deozza\PhilarmonyCoreBundle\Repository\MongoDB;
 
 use Deozza\PhilarmonyCoreBundle\Document\Entity;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\DocumentRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * @method Entity|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,26 +14,21 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class EntityRepository extends DocumentRepository
 {
-
-/*
-    public function __construct(RegistryInterface $registry)
+    public function __construct(DocumentManager $dm)
     {
-        parent::__construct($registry, Entity::class);
+        $uow = $dm->getUnitOfWork();
+        $classMetaData = $dm->getClassMetadata(Entity::class);
+        parent::__construct($dm, $uow, $classMetaData);
     }
 
     public function findAllAuthorized(string $entityName, array $possibleStates, $user)
     {
-        $queryBuilder = $this->createQueryBuilder('e');
-        $parameters = [];
-
-        $queryBuilder->select('e');
-        $queryBuilder->where("e.kind = :kind");
-        $parameters['kind'] = $entityName;
-
+        $queryBuilder = $this->createQueryBuilder()->find('Entity');
+        $queryBuilder->field("kind")->equals($entityName);
 
         foreach($possibleStates as $state => $config)
         {
-            $queryBuilder->andWhere("e.validationState = '$state'");
+            $queryBuilder->field("validationState")->equals($state);
 
             if(!empty($user))
             {
@@ -44,56 +39,37 @@ class EntityRepository extends DocumentRepository
             }
         }
 
-        $queryBuilder->setParameters($parameters);
         return $queryBuilder->getQuery()->execute();
     }
 
     public function findAllFiltered(Array $filters, Array $sort, $kind)
     {
-        $queryBuilder = $this->createQueryBuilder('e');
-        $queryBuilder->select('e');
-        $parameters = [];
-        $queryBuilder->where('e.kind = :kind');
-        $parameters["kind"] = $kind;
+        $queryBuilder = $this->createQueryBuilder()
+            ->find(Entity::class)
+            ->eagerCursor(true)
+            ->field('kind')->equals($kind);
 
         if(!empty($filters))
         {
             foreach($filters as $field=>$value)
             {
                 $field = explode('.', $field);
-                $operator = "LIKE";
+                $filter = $field[1];
+                for($i = 2; $i < count($field); $i++)
+                {
+                    $filter .= ".".$field[$i];
+                }
+
+                if(is_numeric($value)) $value = (int) $value;
+
                 switch ($field[0])
                 {
-                    case "equal": $operator = "=";break;
-                    case "lesser": $operator = "<";break;
-                    case "greater": $operator = ">";break;
-                    case "lesserOrEqual": $operator = "<=";break;
-                    case "greaterOrEqual": $operator = ">=";break;
-                    case "like": $operator = "LIKE";break;
-                }
-
-                if(is_numeric($value) === false)
-                {
-                    $value = preg_replace("/(['])/", "''", $value);
-                    if($operator === "LIKE")
-                    {
-                        $value = "%".$value."%";
-                    }
-                    $value = "'".$value."'";
-                }
-
-                if($field[1] === "properties")
-                {
-                    $filter = $field[2];
-                    for($i = 3; $i < count($field); $i++)
-                    {
-                        $filter .= ".".$field[$i];
-                    }
-                    $queryBuilder->andWhere("JSON_EXTRACT(e.properties,'$.".$filter."') $operator $value");
-                }
-                else
-                {
-                    $queryBuilder->andWhere("e.".$field[1]." $operator $value");
+                    case "equal"          : $queryBuilder->field($filter)->equals($value);break;
+                    case "less"           : $queryBuilder->field($filter)->lt($value);break;
+                    case "greater"        : $queryBuilder->field($filter)->gt($value);break;
+                    case "lessOrEqual"    : $queryBuilder->field($filter)->lte($value);break;
+                    case "greaterOrEqual" : $queryBuilder->field($filter)->gte($value);break;
+                    case "like"           : $queryBuilder->field($filter)->equals(new \MongoRegex('/.*'.$value.'.*/i'));break;
                 }
             }
         }
@@ -105,17 +81,15 @@ class EntityRepository extends DocumentRepository
                 $field = explode('.', $field);
                 if($field[0] === "properties" )
                 {
-                    $queryBuilder->addOrderBy("JSON_EXTRACT(e.properties,'$.".$field[1]."') ", "$order");
+                    $queryBuilder->sort("properties.".$field[1], $order);
                 }
                 else
                 {
-                    $queryBuilder->addOrderBy("e.".$field[0], "$order");
+                    $queryBuilder->sort($field[0], $order);
                 }
             }
         }
-
-        $queryBuilder->setParameters($parameters);
-        return $queryBuilder->getQuery()->execute();
+        return $queryBuilder->getQuery()->execute()->toArray();
     }
 
     public function findAllForValidate($kind, $property, $value, $operator, ?array $referenceParams)
@@ -169,5 +143,4 @@ class EntityRepository extends DocumentRepository
         $queryBuilder->setParameters($parameters);
         return $queryBuilder->getQuery()->execute();
     }
-*/
 }

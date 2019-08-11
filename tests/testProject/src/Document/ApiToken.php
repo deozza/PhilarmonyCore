@@ -2,11 +2,12 @@
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document;
 
 use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\User;
+use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Repository\ApiTokenRepository;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use JMS\Serializer\Annotation as JMS;
 
 /**
- * @ODM\Document(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\EntityRepository")
+ * @ODM\Document(repositoryClass=ApiTokenRepository::class)
  */
 class ApiToken
 {

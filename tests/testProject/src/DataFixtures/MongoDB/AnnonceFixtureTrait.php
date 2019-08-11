@@ -15,7 +15,6 @@ trait AnnonceFixtureTrait
         foreach($items as $item)
         {
             $annonce = $this->createAnnonce($item['owner'], $item['validationState'], $item['photo'], $faker);
-            $annonce->setUuid("00".$i."00000-0000-4000-a000-000000000000");
             $annonces[] = $annonce;
             $i++;
         }
@@ -27,7 +26,7 @@ trait AnnonceFixtureTrait
     {
         $annonce = new Entity();
         $annonce->setKind("annonce");
-        $annonce->setOwner($user);
+        $annonce->setOwner(['uuid'=>$user->getUuid(), 'username'=>$user->getUsername()]);
         $annonce->setValidationState($validationState);
 
         $properties =
@@ -41,7 +40,7 @@ trait AnnonceFixtureTrait
 
         if(!empty($photo))
         {
-            $file = file_get_contents(__DIR__ . "AnnonceFixtureTrait.php/" .$photo);
+            $file = file_get_contents(__DIR__ . "/" .$photo);
             $filename = "testfile";
             $properties['photo'] = [$filename=>base64_encode($file)];
         }

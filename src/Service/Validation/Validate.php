@@ -5,6 +5,7 @@ namespace Deozza\PhilarmonyCoreBundle\Service\Validation;
 use Deozza\PhilarmonyCoreBundle\Entity\Entity;
 use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\ResponseMakerBundle\Service\ResponseMaker;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 
 class Validate
@@ -20,14 +21,15 @@ class Validate
         "notEqual" => "!="
     ];
 
-    public function __construct(ResponseMaker $responseMaker, DatabaseSchemaLoader $schemaLoader, EntityManagerInterface $em)
+    public function __construct(string $orm, ResponseMaker $responseMaker, DatabaseSchemaLoader $schemaLoader, EntityManagerInterface $em, DocumentManager $dm)
     {
         $this->response = $responseMaker;
         $this->schemaLoader = $schemaLoader;
-        $this->em = $em;
+        $this->orm = $orm;
+        $this->em = $this->orm === 'mysql' ? $em : $dm;
     }
 
-    public function processEmbeddedValidation(Entity $entity, array $entityConfig, $user)
+    public function processEmbeddedValidation($entity, array $entityConfig, $user)
     {
         if(!array_key_exists("constraints", $entityConfig))
         {
@@ -51,7 +53,7 @@ class Validate
         return true;
     }
 
-    public function processValidation(Entity $entity,int $stateToValidate, array $entityStates, $user,int $lastState = null)
+    public function processValidation($entity,int $stateToValidate, array $entityStates, $user,int $lastState = null)
     {
         $states = array_keys($entityStates);
 
@@ -107,7 +109,7 @@ class Validate
         return true;
     }
 
-    private function validateField(string $x, array $y, Entity $entity)
+    private function validateField(string $x, array $y, $entity)
     {
         $validate = [];
 
@@ -123,7 +125,7 @@ class Validate
         return $validate;
     }
 
-    private function getPropertyValue(string $x, Entity $entity)
+    private function getPropertyValue(string $x, $entity)
     {
         $field = explode('.', $x);
         $property = $entity->getProperties();
@@ -155,7 +157,7 @@ class Validate
         return self::METHODS[$method[0]];
     }
 
-    private function getReferenceEntity(string $constraint, Entity $entity)
+    private function getReferenceEntity(string $constraint, $entity)
     {
         $referenceEntity = explode('.',$constraint);
         $referenceEntity = explode('(',$referenceEntity[1]);
@@ -176,7 +178,7 @@ class Validate
         return explode(',', $properties);
     }
 
-    private function getReferenceParams(string $constraint, Entity $entity)
+    private function getReferenceParams(string $constraint, $entity)
     {
         $regex = "/(\.\w+\(([a-z_,.]+){1,2}\))/";
         preg_match_all($regex, $constraint, $matches);

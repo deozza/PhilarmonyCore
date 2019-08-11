@@ -3,19 +3,15 @@
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Repository;
 
 use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\ApiToken;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\DocumentRepository;
 
-/**
- * @method ApiToken|null find($id, $lockMode = null, $lockVersion = null)
- * @method ApiToken|null findOneBy(array $criteria, array $orderBy = null)
- * @method ApiToken[]    findAll()
- * @method ApiToken[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
-class ApiTokenRepository extends ServiceEntityRepository
+class ApiTokenRepository extends DocumentRepository
 {
-    public function __construct(RegistryInterface $registry)
+    public function __construct(DocumentManager $dm)
     {
-        parent::__construct($registry, ApiToken::class);
+        $uow = $dm->getUnitOfWork();
+        $classMetaData = $dm->getClassMetadata(ApiToken::class);
+        parent::__construct($dm, $uow, $classMetaData);
     }
 }

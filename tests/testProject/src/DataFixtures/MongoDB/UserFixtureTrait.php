@@ -28,9 +28,7 @@ trait UserFixtureTrait
         $user->setRegisterDate(new \DateTime('now'));
         $user->setActive($active);
 
-        $encoded = $this->encoder->encodePassword($user, $name);
-
-        $user->setPassword($encoded);
+        $user->setPassword('');
         $user->setRoles($role);
 
         $this->manager->persist($user);

@@ -3,44 +3,70 @@ namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use JMS\Serializer\Annotation as JMS;
 
 /**
- * @ODM\Document
+ * @ODM\Document(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\UserRepository")
  */
 
 class User implements UserInterface
 {
     /**
      * @ODM\Id(strategy="UUID", type="string")
+     * @JMS\Groups({"user_id", "entity_complete"})
      */
     private $uuid;
 
-    /** @ODM\Field(type="string") */
+    /**
+     * @ODM\Field(type="string")
+     * @JMS\Groups({"user_basic", "username", "entity_complete"})
+     */
     private $username;
 
-    /** @ODM\Field(type="string") */
+    /**
+     * @ODM\Field(type="string")
+     *@JMS\Groups({"user_basic"})
+     */
     private $email;
 
     private $plainPassword;
 
     private $newPassword;
 
-    /** @ODM\Field(type="string") */
+    /**
+     * @ODM\Field(type="string")
+     *@JMS\Exclude()
+     */
     private $password;
 
-    /** @ODM\Field(type="date") */
+    /**
+     * @ODM\Field(type="date")
+     * @JMS\Groups({"user_advanced"})
+     */
     private $lastLogin;
 
-    /** @ODM\Field(type="date") */
+    /**
+     * @ODM\Field(type="date")
+     * @JMS\Groups({"user_advanced"})
+     */
     private $lastFailedLogin;
 
-    /** @ODM\Field(type="date") */
+    /**
+     * @ODM\Field(type="date")
+     * @JMS\Groups({"user_advanced"})
+     */
     private $registerDate;
 
-    /** @ODM\Field(type="boolean") */
+    /**
+     * @ODM\Field(type="boolean")
+     * @JMS\Groups({"user_advanced"})
+     */
     private $active;
 
-    /** @ODM\Field(type="collection") */
+    /**
+     * @ODM\Field(type="collection")
+     * @JMS\Groups({"user_advanced"})
+     */
     private $roles = [];
 
     /**

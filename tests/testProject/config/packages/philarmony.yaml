@@ -5,3 +5,4 @@ philarmony:
     enumeration: ~
     formPath: /src/Form/
     formNamespace : Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Form\
+  orm: "%orm%"

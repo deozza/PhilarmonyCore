@@ -4,7 +4,7 @@ namespace Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Security;
 
 use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\ApiToken;
 use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Document\User;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +19,7 @@ use Symfony\Component\Dotenv\Dotenv;
 
 class ApiKeyAuthenticator extends AbstractGuardAuthenticator
 {
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(DocumentManager $em)
     {
         $this->em = $em;
     }

@@ -59,6 +59,7 @@
             <argument key="$formPath"/>
             <argument key="$formNamespace"/>
             <argument key="$rootPath">%kernel.project_dir%</argument>
+            <argument key="$dbManager">%env(DB_MANAGER)%</argument>
         </service>
         <service id="Deozza\PhilarmonyCoreBundle\Service\FormManager\FormGenerator" alias="philarmony.form_generator" />
 

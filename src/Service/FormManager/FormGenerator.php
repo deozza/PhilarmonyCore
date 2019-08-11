@@ -6,12 +6,13 @@ use Deozza\PhilarmonyUtils\DataSchema\AuthorizedKeys;
 
 class FormGenerator
 {
-    public function __construct(DatabaseSchemaLoader $schemaLoader, string $formPath, string $formNamespace, string $rootPath)
+    public function __construct(DatabaseSchemaLoader $schemaLoader, string $formPath, string $formNamespace, string $rootPath, string $dbManager)
     {
         $this->schemaLoader = $schemaLoader;
         $this->formPath = $formPath;
         $this->formNamespace = $formNamespace;
         $this->rootPath = $rootPath;
+        $this->dbManager = $dbManager;
     }
 
     public function getFormPath()
@@ -123,7 +124,7 @@ class FormGenerator
         }
 
         $twig = $this->getTwigEnvironment();
-        $content = $twig->render('form.php.twig', ['properties'=>$propertiesConfig, 'classname'=>$method, 'namespace'=>$namespace]);
+        $content = $twig->render('form.php.twig', ['properties'=>$propertiesConfig, 'classname'=>$method, 'namespace'=>$namespace, 'dbManager'=>$this->dbManager]);
         file_put_contents($filePath, $content);
 
         echo $filePath." has been created \n";

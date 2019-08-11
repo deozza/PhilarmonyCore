@@ -131,8 +131,9 @@ class User implements UserInterface
         return $this->uuid;
     }
 
-    public function getUuidAsString()
+    public function getUuidAsString(): ?string
     {
+        if(empty($this->uuid)) return null;
         return $this->uuid->toString();
     }
 

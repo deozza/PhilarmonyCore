@@ -9,7 +9,7 @@
             "email": "deozza@gmail.com"
         }
     ],
-    "version": "3.0.8",
+    "version": "3.0.0-MDB",
     "require": {
         "php": "^7.1.3",
         "ext-ctype": "*",
@@ -23,22 +23,22 @@
         "nelmio/cors-bundle": "^1.5",
         "ramsey/uuid-doctrine": "^1.5",
         "scienta/doctrine-json-functions": "^4.0",
-        "symfony/dotenv": "4.2.*",
+        "symfony/dotenv": "4.2.* || 4.3.*",
         "symfony/flex": "^1.1",
-        "symfony/form": "4.2.*",
+        "symfony/form": "4.2.* || 4.3.*",
         "symfony/orm-pack": "^1.0",
-        "symfony/translation": "4.2.*",
-        "symfony/validator": "4.2.*",
-        "symfony/yaml": "4.2.*"
+        "symfony/translation": "4.2.* || 4.3.*",
+        "symfony/validator": "4.2.* || 4.3.*",
+        "symfony/yaml": "4.2.* || 4.3.*"
     },
     "require-dev": {
-        "symfony/security-bundle": "4.2.*",
+        "symfony/security-bundle": "4.2.* || 4.3.*",
         "symfony/profiler-pack": "^1.0",
-        "symfony/web-server-bundle": "4.2.*",
+        "symfony/web-server-bundle": "4.2.* || 4.3.*",
         "deozza/philarmony-api-tester-bundle": "@dev",
         "fzaninotto/faker": "^1.8",
         "firebase/php-jwt": "^5.0",
-        "symfony/console": "4.2.*"
+        "symfony/console": "4.2.* || 4.3.*"
     },
     "suggest": {
         "deozza/philarmony-user-bundle": "^1.0",

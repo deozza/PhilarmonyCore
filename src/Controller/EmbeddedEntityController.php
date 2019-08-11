@@ -2,7 +2,6 @@
 namespace Deozza\PhilarmonyCoreBundle\Controller;
 
 use Deozza\PhilarmonyCoreBundle\Controller\BaseController;
-use Deozza\PhilarmonyCoreBundle\Entity\Entity;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,13 +26,13 @@ class EmbeddedEntityController extends BaseController
      */
     public function postEmbeddedEntityAction(string $uuid, string $property_name, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
         if(empty($entity))
         {
             return $this->response->notFound("Route not found");
         }
 
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
 
         $formClass = $this->formGenerator->getFormNamespace().$entity->getKind()."\\".$entity->getValidationState()."\\".$property_name."\\".$request->getMethod();
@@ -62,7 +61,7 @@ class EmbeddedEntityController extends BaseController
         $data = $form->getData();
         foreach($data as $key=>$value)
         {
-            if(is_a($value, Entity::class))
+            if(is_a($value, $this->entityClassName))
             {
                 $data[$key] = [
                     "uuid"=>$value->getUuidAsString(),
@@ -70,7 +69,6 @@ class EmbeddedEntityController extends BaseController
                     "owner"=>[
                         "uuid"=>$value->getOwner()->getUuidAsString(),
                         "username"=>$value->getOwner()->getUsername(),
-                        "email" => $value->getOwner()->getEmail()
                     ],
                     "properties"=>$value->getProperties()
                 ];
@@ -87,8 +85,8 @@ class EmbeddedEntityController extends BaseController
             if(empty($properties[$property_name]))
             {
                 $properties[$property_name] = [0 => $data];
-
-            }else
+            }
+            else
             {
                 array_push($properties[$property_name], $data);
             }
@@ -145,7 +143,7 @@ class EmbeddedEntityController extends BaseController
      */
     public function patchEmbeddedEntityAction(string $uuid, string $property_name, string $property_id, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
         if(empty($entity))
         {
             return $this->response->notFound("Route not found");
@@ -162,7 +160,7 @@ class EmbeddedEntityController extends BaseController
             return $this->response->notFound("Resource not found");
         }
 
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
 
         $formClass = $this->formGenerator->getFormNamespace().$entity->getKind()."\\".$entity->getValidationState()."\\".$property_name."\\".$request->getMethod();
 
@@ -189,7 +187,7 @@ class EmbeddedEntityController extends BaseController
         $data = $form->getData();
         foreach($data as $key=>$value)
         {
-            if(is_a($value, Entity::class))
+            if(is_a($value, $this->entityClassName))
             {
                 $data[$key] = [
                     "uuid"=>$value->getUuidAsString(),
@@ -249,7 +247,7 @@ class EmbeddedEntityController extends BaseController
      */
     public function deleteEmbeddedEntityAction(string $uuid, string $property_name, string $property_id, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
         if(empty($entity))
         {
             return $this->response->notFound("Route not found");
@@ -266,7 +264,7 @@ class EmbeddedEntityController extends BaseController
             return $this->response->notFound("Resource not found");
         }
 
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {

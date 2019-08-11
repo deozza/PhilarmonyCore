@@ -2,11 +2,9 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Service\Authorization;
 
-use Deozza\PhilarmonyCoreBundle\Entity\Entity;
-
 class AuthorizeAccessToEntity
 {
-    public function authorize($user, $by, Entity $entity)
+    public function authorize($user, $by, $entity)
     {
         if(is_string($by))
         {
@@ -33,7 +31,7 @@ class AuthorizeAccessToEntity
                 $userPath = explode('.', $userKind);
                 if($userPath[0] === "owner")
                 {
-                    if($entity->getOwner()->getId() === $user->getId())
+                    if($entity->getOwner()['uuid'] === $user->getUuidAsString())
                     {
                         return true;
                     }
@@ -41,13 +39,12 @@ class AuthorizeAccessToEntity
                 else
                 {
                     $properties = $entity->getProperties();
-                    //var_dump($properties['annonce']);die;
                     for($i = 0; $i < count($userPath); $i++)
                     {
                         $properties = $properties[$userPath[$i]];
                     }
 
-                    if($user->getUuid() === $properties || in_array($user->getUuid(), $properties))
+                    if($user->getUuidAsString() === $properties || in_array($user->getUuidAsString(), $properties))
                     {
                         return true;
                     }

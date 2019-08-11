@@ -2,7 +2,6 @@
 namespace Deozza\PhilarmonyCoreBundle\Controller;
 
 use Deozza\PhilarmonyCoreBundle\Controller\BaseController;
-use Deozza\PhilarmonyCoreBundle\Entity\Entity;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,12 +32,12 @@ class EntityController extends BaseController
             return $this->response->notFound("Resource not found");
         }
 
-        $user = !empty($this->getUser()->getUuid()) ? $this->getUser() : null;
+        $user = !empty($this->getUser()->getUuidAsString()) ? $this->getUser() : null;
 
         $filter = $request->query->get("filterBy", []);
         $sort = $request->query->get("sortBy", []);
 
-        $entities = $this->em->getRepository(Entity::class)->findAllFiltered($filter, $sort, $entity_name);
+        $entities = $this->em->getRepository($this->entityClassName)->findAllFiltered($filter, $sort, $entity_name);
 
         foreach($entities as $key=>$entity)
         {
@@ -65,6 +64,7 @@ class EntityController extends BaseController
         $total = count($entities);
         $paginatedEntities = array_splice($entities, $offset, $count);
 
+
         return $this->response->okPaginated($paginatedEntities, ['entity_basic', 'entity_id','user_basic'], $count, $page, $total);
 
     }
@@ -80,8 +80,8 @@ class EntityController extends BaseController
      */
     public function getEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
@@ -126,9 +126,9 @@ class EntityController extends BaseController
             return $this->response->notFound("Route not found");
         }
 
-        $entityToPost = new Entity();
+        $entityToPost = new $this->entityClassName();
         $entityToPost->setKind($entity_name);
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $isAllowed = $this->authorizeRequest->isAllowed($entity['states']['__default']['methods']['POST']['by'], true, $entityToPost, $user);
         if(is_object($isAllowed))
         {
@@ -144,20 +144,24 @@ class EntityController extends BaseController
             return $this->response->badForm($form);
         }
 
-        $entityToPost->setOwner($this->getUser());
+        $owner = [
+            'username'=>$user->getUsername(),
+            'uuid' => $user->getUuidAsString()
+        ];
+
+        $entityToPost->setOwner($owner);
         $entityToPost->setValidationState("__default");
         $data = $form->getData();
         foreach($data as $property => $content)
         {
-            if(is_a($content,Entity::class))
+            if(is_a($content,$this->entityClassName))
             {
                 $data[$property] = [
                     "uuid"=>$content->getUuidAsString(),
                     "validationState"=>$content->getValidationState(),
                     "owner"=>[
-                        "uuid"=>$content->getOwner()->getUuid(),
-                        "username"=>$content->getOwner()->getUsername(),
-                        "email" => $content->getOwner()->getEmail()
+                        "uuid"=>$content->getOwner()['uuid'],
+                        "username"=>$content->getOwner()['username']
                     ],
                     "properties"=>$content->getProperties()
                 ];
@@ -174,7 +178,6 @@ class EntityController extends BaseController
 
         $this->em->persist($entityToPost);
         $state = $this->validate->processValidation($entityToPost,0, $entity['states'], $this->getUser());
-
         if($entityToPost->getValidationState() !== "__default")
         {
             $this->em->flush();
@@ -188,6 +191,8 @@ class EntityController extends BaseController
         $this->handleEvents($request->getMethod(), $entity['states']['__default'], $entityToPost, $eventDispatcher, json_decode($request->getContent(), true));
 
         $this->em->flush();
+
+        var_dump('coucou');die;
 
         return $this->response->created($entityToPost, ['entity_basic', 'entity_id', 'user_basic']);
     }
@@ -203,9 +208,9 @@ class EntityController extends BaseController
      */
     public function patchEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
 
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
@@ -262,8 +267,8 @@ class EntityController extends BaseController
      */
     public function deleteEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {

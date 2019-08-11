@@ -2,7 +2,6 @@
 namespace Deozza\PhilarmonyCoreBundle\Controller;
 
 use Deozza\PhilarmonyCoreBundle\Controller\BaseController;
-use Deozza\PhilarmonyCoreBundle\Entity\Entity;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,9 +25,9 @@ class ValidationController extends BaseController
      */
     public function postManualValidationAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
 
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
 
         $valid = $this->manualValidation->ableToValidateEntity($entity, $user);
         if(is_object($valid))
@@ -77,8 +76,8 @@ class ValidationController extends BaseController
      */
     public function postManualRetrogradeAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
 
         $valid = $this->manualValidation->ableToRetrogradeEntity($entity, $user);
         if(is_object($valid))

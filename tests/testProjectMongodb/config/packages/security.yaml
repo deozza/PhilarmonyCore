@@ -1,0 +1,20 @@
+security:
+    encoders:
+        Deozza\PhilarmonyCoreBundle\Tests\testProjecMongodbt\src\Entity\User: bcrypt
+
+    providers:
+        api_key_user_provider:
+            id: Deozza\PhilarmonyCoreBundle\Tests\testProjecMongodb\src\Security\ApiKeyUserProvider
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            pattern: ^/api
+            stateless: true
+            provider: api_key_user_provider
+            anonymous: ~
+            guard:
+                authenticators:
+                    - Deozza\PhilarmonyCoreBundle\Tests\testProjecMongodb\src\Security\ApiKeyAuthenticator
+    access_control:

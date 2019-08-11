@@ -1,0 +1,70 @@
+{
+  "current_page_number":1,
+  "num_items_per_page":10,
+  "items":[
+    {
+      "uuid":"@string@.isUuid()",
+      "kind":"annonce",
+      "validation_state":"published",
+      "owner":{
+        "uuid": "@string@.isUuid()",
+        "username":"@string@"
+      },
+      "date_of_creation":"@date@",
+      "last_update":"@date@",
+      "properties":{
+        "price":"@int@",
+        "title":"@string@",
+        "description":[
+            "@string@"
+        ],
+        "nbPersonMax":"@int@",
+        "annonce_category":["@string@"]
+      }
+    },
+    {
+      "uuid":"@string@.isUuid()",
+      "kind":"annonce",
+      "validation_state":"published",
+      "owner":{
+        "uuid": "@string@.isUuid()",
+        "username":"@string@"
+      },
+      "date_of_creation":"@date@",
+      "last_update":"@date@",
+      "properties":{
+        "price":"@int@",
+        "title":"@string@",
+        "description":[
+            "@string@"
+        ],
+        "nbPersonMax":"@int@",
+        "annonce_category":["@string@"]
+      }
+    },
+    {
+      "uuid":"@string@.isUuid()",
+      "kind":"annonce",
+      "validation_state":"published",
+      "owner":{
+        "uuid": "@string@.isUuid()",
+        "username":"@string@"
+      },
+      "date_of_creation":"@date@",
+      "last_update":"@date@",
+      "properties":{
+        "photo": {
+          "testfile":"@string@"
+        },
+        "price":"@int@",
+        "title":"@string@",
+        "description":[
+          "@string@"
+        ],
+        "nbPersonMax":"@int@",
+        "annonce_category":["@string@"]
+      }
+    }
+  ],
+  "total_count":3
+}

@@ -2,7 +2,6 @@
 namespace Deozza\PhilarmonyCoreBundle\Controller;
 
 use Deozza\PhilarmonyCoreBundle\Controller\BaseController;
-use Deozza\PhilarmonyCoreBundle\Entity\Entity;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,7 +26,7 @@ class FileController extends BaseController
      */
     public function getFileAction(string $uuid,string $file_property, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
         if(empty($entity))
         {
             return $this->response->notFound("Resource not found");
@@ -39,7 +38,7 @@ class FileController extends BaseController
             return $this->response->notFound("Resource not found");
         }
 
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
@@ -73,7 +72,7 @@ class FileController extends BaseController
      */
     public function postFileAction(string $uuid,string $file_property, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
         if(empty($entity))
         {
             return $this->response->notFound("Resource not found");
@@ -87,7 +86,7 @@ class FileController extends BaseController
             return $this->response->notFound("Resource not found");
         }
 
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
@@ -172,7 +171,7 @@ class FileController extends BaseController
      */
     public function deleteFileAction(string $uuid,string $file_property, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
         if(empty($entity))
         {
             return $this->response->notFound("Resource not found");
@@ -184,7 +183,7 @@ class FileController extends BaseController
             return $this->response->notFound("Resource not found");
         }
 
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {

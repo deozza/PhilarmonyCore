@@ -15,7 +15,7 @@ class AuthorizeRequest
         $this->authorizeAccessToEntity = $authorizeAccessToEntity;
     }
     
-    public function validateRequest(?Entity $entity, string $method, $user)
+    public function validateRequest($entity, string $method, $user)
     {
         if(empty($entity))
         {
@@ -42,7 +42,7 @@ class AuthorizeRequest
         }
     }
 
-    public function isAllowed($by, $loggedin = true, Entity $entity = null, $user)
+    public function isAllowed($by, $loggedin = true, $entity = null, $user)
     {
         if($loggedin === true && empty($user))
         {

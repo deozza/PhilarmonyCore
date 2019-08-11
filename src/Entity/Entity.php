@@ -8,7 +8,7 @@ use Ramsey\Uuid\UuidInterface;
 use JMS\Serializer\Annotation as JMS;
 
 /**
- * @ORM\Entity(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\EntityRepository")
+ * @ORM\Entity(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\MySQL\EntityRepository")
  * @ORM\HasLifecycleCallbacks()
  */
 class Entity
@@ -43,7 +43,7 @@ class Entity
 
 
     /**
-     * @ORM\Column(type="object")
+     * @ORM\Column(type="array")
      * @JMS\Groups({"entity_complete", "entity_basic"})
      */
     private $owner;

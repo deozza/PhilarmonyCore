@@ -3,16 +3,18 @@
 namespace Deozza\PhilarmonyCoreBundle\Service\RulesManager;
 
 use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 
 class RulesManager
 {
-    public function __construct(EntityManagerInterface $entityManager, DatabaseSchemaLoader $schemaLoader, $srcPath)
+    public function __construct(EntityManagerInterface $em,DocumentManager $dm, DatabaseSchemaLoader $schemaLoader, string $srcPath, string $orm)
     {
-        $this->em = $entityManager;
         $this->schemaLoader = $schemaLoader;
         $this->srcPath = $srcPath;
         $this->folders = [];
+        $this->orm = $orm;
+        $this->em = $orm === 'mysql' ? $em : $dm;
     }
 
     public function decideConflict($object, $posted, $method, $folder)

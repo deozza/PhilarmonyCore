@@ -42,7 +42,6 @@ class BaseController extends AbstractController
         $this->authorizeAccessToEntity = $authorizeAccessToEntity;
         $this->authorizeRequest = $authorizeRequest;
         $this->rulesManager = $rulesManager;
-
         $this->orm = $orm;
         $this->em = $em;
         $this->entityClassName = MySQLEntity::class;

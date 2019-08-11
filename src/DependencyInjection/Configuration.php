@@ -37,11 +37,6 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->enumNode('orm')
-                    ->values(['mysql', 'mongodb'])
-                    ->isRequired()
-                    ->treatNullLike("mysql")
-                ->end()
             ->end()
         ;
 

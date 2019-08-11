@@ -38,7 +38,7 @@ class FileController extends BaseController
             return $this->response->notFound("Resource not found");
         }
 
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
@@ -86,7 +86,7 @@ class FileController extends BaseController
             return $this->response->notFound("Resource not found");
         }
 
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
@@ -183,7 +183,7 @@ class FileController extends BaseController
             return $this->response->notFound("Resource not found");
         }
 
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {

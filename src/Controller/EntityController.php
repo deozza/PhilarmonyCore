@@ -32,7 +32,7 @@ class EntityController extends BaseController
             return $this->response->notFound("Resource not found");
         }
 
-        $user = !empty($this->getUser()->getUuid()) ? $this->getUser() : null;
+        $user = !empty($this->getUser()->getUuidAsString()) ? $this->getUser() : null;
 
         $filter = $request->query->get("filterBy", []);
         $sort = $request->query->get("sortBy", []);
@@ -81,7 +81,7 @@ class EntityController extends BaseController
     public function getEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
@@ -128,7 +128,7 @@ class EntityController extends BaseController
 
         $entityToPost = new $this->entityClassName();
         $entityToPost->setKind($entity_name);
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $isAllowed = $this->authorizeRequest->isAllowed($entity['states']['__default']['methods']['POST']['by'], true, $entityToPost, $user);
         if(is_object($isAllowed))
         {
@@ -192,6 +192,8 @@ class EntityController extends BaseController
 
         $this->em->flush();
 
+        var_dump('coucou');die;
+
         return $this->response->created($entityToPost, ['entity_basic', 'entity_id', 'user_basic']);
     }
 
@@ -208,7 +210,7 @@ class EntityController extends BaseController
     {
         $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
 
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
@@ -266,7 +268,7 @@ class EntityController extends BaseController
     public function deleteEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {

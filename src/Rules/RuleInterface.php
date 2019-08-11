@@ -9,5 +9,5 @@ interface RuleInterface
 {
     public function supports($entity, $posted, $method) : bool;
 
-    public function decide($entity, $posted, $method, EntityManagerInterface $em, DatabaseSchemaLoader $schemaLoader): ?array;
+    public function decide($entity, $posted, $method, $em, DatabaseSchemaLoader $schemaLoader): ?array;
 }

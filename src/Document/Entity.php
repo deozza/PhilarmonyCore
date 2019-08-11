@@ -4,6 +4,7 @@ namespace Deozza\PhilarmonyCoreBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use JMS\Serializer\Annotation as JMS;
+use Ramsey\Uuid\Uuid;
 
 /**
  * @ODM\Document(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\MongoDB\EntityRepository")
@@ -11,7 +12,7 @@ use JMS\Serializer\Annotation as JMS;
 class Entity
 {
     /**
-     * @ODM\Id(strategy="UUID", type="string")
+     * @ODM\Id(strategy="NONE", type="string")
      * @JMS\Groups({"entity_id", "entity_complete"})
      */
     private $uuid;
@@ -54,21 +55,21 @@ class Entity
 
     public function __construct()
     {
+        $this->setUuid();
         $this->dateOfCreation = new \DateTime('now');
         $this->lastUpdate = $this->dateOfCreation;
     }
 
-    public function getId(): ?int
+    public function setUuid(): self
     {
-        return $this->id;
+        $this->uuid = Uuid::uuid4()->toString();
+        return $this;
     }
 
-
-    public function getUuid()
+    public function getUuidAsString(): ?string
     {
         return $this->uuid;
     }
-
 
     public function getKind(): ?string
     {

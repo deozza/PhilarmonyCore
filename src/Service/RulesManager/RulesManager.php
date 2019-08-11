@@ -15,7 +15,6 @@ class RulesManager
         $this->folders = [];
         $this->orm = $orm;
         $this->em = $orm === 'mysql' ? $em : $dm;
-
     }
 
     public function decideConflict($object, $posted, $method, $folder)

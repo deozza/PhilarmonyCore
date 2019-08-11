@@ -32,7 +32,7 @@ class EmbeddedEntityController extends BaseController
             return $this->response->notFound("Route not found");
         }
 
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
 
         $formClass = $this->formGenerator->getFormNamespace().$entity->getKind()."\\".$entity->getValidationState()."\\".$property_name."\\".$request->getMethod();
@@ -160,7 +160,7 @@ class EmbeddedEntityController extends BaseController
             return $this->response->notFound("Resource not found");
         }
 
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
 
         $formClass = $this->formGenerator->getFormNamespace().$entity->getKind()."\\".$entity->getValidationState()."\\".$property_name."\\".$request->getMethod();
 
@@ -264,7 +264,7 @@ class EmbeddedEntityController extends BaseController
             return $this->response->notFound("Resource not found");
         }
 
-        $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {

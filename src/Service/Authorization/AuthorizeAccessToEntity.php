@@ -44,7 +44,7 @@ class AuthorizeAccessToEntity
                         $properties = $properties[$userPath[$i]];
                     }
 
-                    if($user->getUuid() === $properties || in_array($user->getUuid(), $properties))
+                    if($user->getUuidAsString() === $properties || in_array($user->getUuidAsString(), $properties))
                     {
                         return true;
                     }

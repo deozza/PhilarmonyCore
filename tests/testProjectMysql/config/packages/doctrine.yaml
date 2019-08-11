@@ -24,3 +24,11 @@ doctrine:
             string_functions:
                 JSON_EXTRACT: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonExtract
                 JSON_UNQUOTE: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonUnquote
+doctrine_mongodb:
+    connections:
+        default:
+            server: ~
+            options: {}
+    document_managers:
+        default:
+            auto_mapping: true

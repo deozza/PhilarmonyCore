@@ -4,4 +4,4 @@ philarmony:
     property: ~
     enumeration: ~
     formPath: /src/Form/
-    formNamespace : Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Form\
+    formNamespace : Deozza\PhilarmonyCoreBundle\Tests\testProjectMysql\src\Form\

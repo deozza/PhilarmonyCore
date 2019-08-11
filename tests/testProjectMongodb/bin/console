@@ -12,7 +12,7 @@ require dirname(__DIR__).'/config/bootstrap.php';
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Debug\Debug;
-use Deozza\PhilarmonyCoreBundle\Tests\testProject\src\Kernel;
+use Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Kernel;
 
 $input = new ArgvInput();
 $env = $input->getParameterOption(array('--env', '-e'), getenv('SYMFONY_ENV') ?: 'test');

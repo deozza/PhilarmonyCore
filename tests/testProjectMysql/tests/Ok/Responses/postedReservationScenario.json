@@ -1,0 +1,36 @@
+{
+  "uuid": "@string@.isUuid().catchAs(uuid)",
+  "kind": "reservation",
+  "validation_state": "posted",
+  "owner": {
+    "username": "userActive2",
+    "email": "userActive2@mail.com"
+  },
+  "date_of_creation": "@date@",
+  "last_update": "@date@",
+  "properties": {
+    "date_begin": "2020-07-01T12:00:00+02:00",
+    "date_end": "2020-08-01T12:00:00+02:00",
+    "nbPerson": 1,
+    "annonce": {
+      "uuid": "00200000-0000-4000-a000-000000000000",
+      "validationState": "published",
+      "owner": {
+        "uuid": "@string@.isUuid()",
+        "username": "userActive",
+        "email": "userActive@mail.com"
+      },
+      "properties": {
+        "price": 215,
+        "title": "@string@",
+        "description": [
+          "@string@"
+        ],
+        "nbPersonMax": 5,
+        "annonce_category": [
+          "maison"
+        ]
+      }
+    }
+  }
+}

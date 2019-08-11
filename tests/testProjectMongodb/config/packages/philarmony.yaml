@@ -1,0 +1,7 @@
+philarmony:
+  directory:
+    entity: ~
+    property: ~
+    enumeration: ~
+    formPath: /src/Form/
+    formNamespace : Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Form\

@@ -11,6 +11,7 @@ class MongodbConflictControllerTest extends TestAsserter
     public function setUp()
     {
         parent::setTestDatabasePath(self::TEST_DATABASE_PATH);
+        $this->setEnv(json_decode(file_get_contents(__DIR__.'/../../src/DataFixtures/MongoDB/env.json'), true));
         parent::setUp();
     }
     /**
@@ -26,7 +27,7 @@ class MongodbConflictControllerTest extends TestAsserter
         return
         [
             ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/annonce'                                   , "status"=>409, "token"=>"token_userActive", "in"=>"postAnnonce", "out"=>"postedAnnonce"]],
-            ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/retrograde/00400000-0000-4000-a000-000000000000'  , "status"=>409, "token"=>"token_userAdmin"]],
+            ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/retrograde/#annonce_7#'  , "status"=>409, "token"=>"token_userAdmin"]],
 
         ];
     }

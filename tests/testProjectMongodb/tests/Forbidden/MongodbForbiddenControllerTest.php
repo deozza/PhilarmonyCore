@@ -11,6 +11,7 @@ class MongodbForbiddenControllerTest extends TestAsserter
     public function setUp()
     {
         parent::setTestDatabasePath(self::TEST_DATABASE_PATH);
+        $this->setEnv(json_decode(file_get_contents(__DIR__.'/../../src/DataFixtures/MongoDB/env.json'), true));
         parent::setUp();
     }
     /**
@@ -25,16 +26,16 @@ class MongodbForbiddenControllerTest extends TestAsserter
     {
         return
         [
-            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/00100000-0000-4000-a000-000000000000'      , "status"=>403]],
-            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/00100000-0000-4000-a000-000000000000'      , "status"=>403, 'token'=>'token_userForbidden']],
-            ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entity/00100000-0000-4000-a000-000000000000'      , "status"=>403, 'token'=>'token_userForbidden']],
-            ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entity/00100000-0000-4000-a000-000000000000'      , "status"=>403, 'token'=>'token_userForbidden']],
+            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/#annonce_6#'      , "status"=>403]],
+            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/#annonce_6#'      , "status"=>403, 'token'=>'token_userForbidden']],
+            ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entity/#annonce_6#'      , "status"=>403, 'token'=>'token_userForbidden']],
+            ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entity/#annonce_6#'      , "status"=>403, 'token'=>'token_userForbidden']],
 
-            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/00500000-0000-4000-a000-000000000000/photo', "status"=>403]],
-            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/00500000-0000-4000-a000-000000000000/photo', "status"=>403, 'token'=>'token_userForbidden']],
+            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/#annonce_10#/file/photo', "status"=>403]],
+            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/#annonce_10#/file/photo', "status"=>403, 'token'=>'token_userForbidden']],
 
-            ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/validate/00500000-0000-4000-a000-000000000000'    , "status"=>403, 'token'=>'token_userActive']],
-            ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/retrograde/00400000-0000-4000-a000-000000000000'  , "status"=>403, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/validate/#annonce_10#'    , "status"=>403, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/retrograde/#annonce_9#'  , "status"=>403, 'token'=>'token_userActive']],
         ];
     }
 }

@@ -11,6 +11,7 @@ class MongodbMethodNotAllowedControllerTest extends TestAsserter
     public function setUp()
     {
         parent::setTestDatabasePath(self::TEST_DATABASE_PATH);
+        $this->setEnv(json_decode(file_get_contents(__DIR__.'/../../src/DataFixtures/MongoDB/env.json'), true));
         parent::setUp();
     }
     /**
@@ -29,26 +30,26 @@ class MongodbMethodNotAllowedControllerTest extends TestAsserter
             ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/annonce'                                , "status"=>405, 'token'=>'token_userActive']],
             ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/annonce'                                , "status"=>405, 'token'=>'token_userActive']],
 
-            ["kind"=>"unit", "test"=>['method'=>'PUT'   , 'url'=>'/api/entity/00300000-0000-4000-a000-000000000000'     , "status"=>405, 'token'=>'token_userActive']],
-            ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/00300000-0000-4000-a000-000000000000'     , "status"=>405, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'PUT'   , 'url'=>'/api/entity/#annonce_8#'     , "status"=>405, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/#annonce_8#'     , "status"=>405, 'token'=>'token_userActive']],
 
             ["kind"=>"unit", "test"=>['method'=>'PUT'   , 'url'=>'/api/entity/annonce'                                  , "status"=>405, 'token'=>'token_userActive']],
             ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/annonce'                                  , "status"=>405, 'token'=>'token_userActive']],
             ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entity/annonce'                                  , "status"=>405, 'token'=>'token_userActive']],
             ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entity/annonce'                                  , "status"=>405, 'token'=>'token_userActive']],
 
-            ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/validate/00300000-0000-4000-a000-000000000000'   , "status"=>405, 'token'=>'token_userActive']],
-            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/validate/00300000-0000-4000-a000-000000000000'   , "status"=>405, 'token'=>'token_userActive']],
-            ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/validate/00300000-0000-4000-a000-000000000000'   , "status"=>405, 'token'=>'token_userActive']],
-            ["kind"=>"unit", "test"=>['method'=>'PUT'   , 'url'=>'/api/validate/00300000-0000-4000-a000-000000000000'   , "status"=>405, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/validate/#annonce_8#'   , "status"=>405, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/validate/#annonce_8#'   , "status"=>405, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/validate/#annonce_8#'   , "status"=>405, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'PUT'   , 'url'=>'/api/validate/#annonce_8#'   , "status"=>405, 'token'=>'token_userActive']],
 
-            ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/retrograde/00300000-0000-4000-a000-000000000000' , "status"=>405, 'token'=>'token_userActive']],
-            ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/retrograde/00300000-0000-4000-a000-000000000000' , "status"=>405, 'token'=>'token_userActive']],
-            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/retrograde/00300000-0000-4000-a000-000000000000' , "status"=>405, 'token'=>'token_userActive']],
-            ["kind"=>"unit", "test"=>['method'=>'PUT'   , 'url'=>'/api/retrograde/00300000-0000-4000-a000-000000000000' , "status"=>405, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/retrograde/#annonce_8#' , "status"=>405, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/retrograde/#annonce_8#' , "status"=>405, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/retrograde/#annonce_8#' , "status"=>405, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'PUT'   , 'url'=>'/api/retrograde/#annonce_8#' , "status"=>405, 'token'=>'token_userActive']],
 
-            ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entity/00300000-0000-4000-a000-000000000000/file', "status"=>405, 'token'=>'token_userActive']],
-            ["kind"=>"unit", "test"=>['method'=>'PUT'   , 'url'=>'/api/entity/00300000-0000-4000-a000-000000000000/file', "status"=>405, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entity/#annonce_8#/file/photo', "status"=>405, 'token'=>'token_userActive']],
+            ["kind"=>"unit", "test"=>['method'=>'PUT'   , 'url'=>'/api/entity/#annonce_8#/file/photo', "status"=>405, 'token'=>'token_userActive']],
 
             ["kind"=>"unit", "test"=>['method'=>'PUT'   , 'url'=>'/api/doc/entities'                                    , "status"=>405, 'token'=>'token_userActive']],
             ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/doc/entities'                                    , "status"=>405, 'token'=>'token_userActive']],

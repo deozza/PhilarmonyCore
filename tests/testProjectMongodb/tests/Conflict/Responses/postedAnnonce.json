@@ -9,8 +9,8 @@
     "kind":"annonce",
     "validation_state":"posted",
     "owner":{
-      "username":"userActive",
-      "email":"userActive@mail.com"
+      "uuid":"@string@",
+      "username":"userActive"
     },
     "date_of_creation":"@date@",
     "last_update":"@date@",

@@ -38,7 +38,19 @@ class BasicFixtures extends Fixture
             ]
         );
         $this->manager->flush();
+        $env = [];
+        $i = 1;
+        foreach($this->users as $user)
+        {
+            $env['user_'.$i] = $user->getUuidAsString();
+            $i++;
+        }
+        foreach($this->annonces as $annonce)
+        {
+            $env['annonce_'.$i] = $annonce->getUuidAsString();
+            $i++;
+        }
+
+        file_put_contents(__DIR__.'/env.json', json_encode($env, JSON_PRETTY_PRINT));
     }
-
-
 }

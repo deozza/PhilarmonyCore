@@ -1,70 +1,51 @@
 {
-  "current_page_number":1,
-  "num_items_per_page":10,
-  "items":[
+  "current_page_number": 1,
+  "num_items_per_page": 10,
+  "items": [
     {
-      "uuid":"00200000-0000-4000-a000-000000000000",
-      "kind":"annonce",
-      "validation_state":"published",
-      "owner":{
-        "username":"userActive",
-        "email": "userActive@mail.com"
+      "uuid": "@string@.isUuid()",
+      "kind": "annonce",
+      "validation_state": "@string@",
+      "owner": {
+        "uuid": "@string@.isUuid()",
+        "username": "@string@"
       },
-      "date_of_creation":"@date@",
-      "last_update":"@date@",
-      "properties":{
-        "price":"@int@",
-        "title":"@string@",
-        "description":[
-            "@string@"
-        ],
-        "nbPersonMax":"@int@",
-        "annonce_category":["@string@"]
-      }
-    },
-    {
-      "uuid":"00300000-0000-4000-a000-000000000000",
-      "kind":"annonce",
-      "validation_state":"published",
-      "owner":{
-        "username":"userForbidden",
-        "email": "userForbidden@mail.com"
-      },
-      "date_of_creation":"@date@",
-      "last_update":"@date@",
-      "properties":{
-        "price":"@int@",
-        "title":"@string@",
-        "description":[
-            "@string@"
-        ],
-        "nbPersonMax":"@int@",
-        "annonce_category":["@string@"]
-      }
-    },
-    {
-      "uuid":"00400000-0000-4000-a000-000000000000",
-      "kind":"annonce",
-      "validation_state":"published",
-      "owner":{
-        "username":"userForbidden",
-        "email": "userForbidden@mail.com"
-      },
-      "date_of_creation":"@date@",
-      "last_update":"@date@",
-      "properties":{
-        "photo": {
-          "testfile":"@string@"
-        },
-        "price":"@int@",
-        "title":"@string@",
-        "description":[
+      "date_of_creation": "@date@",
+      "last_update": "@date@",
+      "properties": {
+        "title": "@string@",
+        "description": [
           "@string@"
         ],
-        "nbPersonMax":"@int@",
-        "annonce_category":["@string@"]
+        "price": "@int@",
+        "annonce_category": [
+          "@string@"
+        ],
+        "nbPersonMax": "@int@"
+      }
+    },
+    {
+      "uuid": "@string@.isUuid()",
+      "kind": "annonce",
+      "validation_state": "@string@",
+      "owner": {
+        "uuid": "@string@.isUuid()",
+        "username": "@string@"
+      },
+      "date_of_creation": "@date@",
+      "last_update": "@date@",
+      "properties": {
+        "title": "@string@",
+        "description": [
+          "@string@"
+        ],
+        "price": "@int@",
+        "annonce_category": [
+          "@string@"
+        ],
+        "nbPersonMax": "@int@"
       }
     }
   ],
-  "total_count":3
+  "total_count": 2
 }

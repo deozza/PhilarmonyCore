@@ -11,6 +11,7 @@ class MongodbOkControllerTest extends TestAsserter
     public function setUp()
     {
         parent::setTestDatabasePath(self::TEST_DATABASE_PATH);
+        $this->setEnv(json_decode(file_get_contents(__DIR__.'/../../src/DataFixtures/MongoDB/env.json'), true));
         parent::setUp();
     }
 
@@ -34,9 +35,9 @@ class MongodbOkControllerTest extends TestAsserter
             ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entity/00100000-0000-4000-a000-000000000000'      , "status"=>204, "token"=>"token_userActive"]],
             ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entity/00100000-0000-4000-a000-000000000000'      , "status"=>204, "token"=>"token_userAdmin" ]],
             
-            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/00400000-0000-4000-a000-000000000000/photo', "status"=>200]],
-            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/00500000-0000-4000-a000-000000000000/photo', "status"=>200, "token"=>"token_userActive"]],
-            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/00500000-0000-4000-a000-000000000000/photo', "status"=>200, "token"=>"token_userAdmin"]],
+            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/00400000-0000-4000-a000-000000000000/file/photo', "status"=>200]],
+            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/00500000-0000-4000-a000-000000000000/file/photo', "status"=>200, "token"=>"token_userActive"]],
+            ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entity/00500000-0000-4000-a000-000000000000/file/photo', "status"=>200, "token"=>"token_userAdmin"]],
             
             ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/validate/00500000-0000-4000-a000-000000000000'    , "status"=>200, "token"=>"token_userAdmin"]],
             ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/reservation'                               , "status"=>201, "token"=>"token_userActive2", "in"=>"postReservation", "out"=>"postedReservation"]],

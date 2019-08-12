@@ -30,6 +30,7 @@ trait UserFixtureTrait
 
         $user->setPassword('');
         $user->setRoles($role);
+        $user->setUuid();
 
         $this->manager->persist($user);
 

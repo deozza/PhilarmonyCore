@@ -153,7 +153,7 @@ class EntityController extends BaseController
         $data = $form->getData();
         foreach($data as $property => $content)
         {
-            if(is_a($content,$this->entityClassName))
+            if(is_a($content,Entity::class))
             {
                 $data[$property] = [
                     "uuid"=>$content->getUuidAsString(),

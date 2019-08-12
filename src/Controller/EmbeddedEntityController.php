@@ -62,7 +62,7 @@ class EmbeddedEntityController extends BaseController
         $data = $form->getData();
         foreach($data as $key=>$value)
         {
-            if(is_a($value, $this->entityClassName))
+            if(is_a($value, Entity::class))
             {
                 $data[$key] = [
                     "uuid"=>$value->getUuidAsString(),
@@ -188,7 +188,7 @@ class EmbeddedEntityController extends BaseController
         $data = $form->getData();
         foreach($data as $key=>$value)
         {
-            if(is_a($value, $this->entityClassName))
+            if(is_a($value, Entity::class))
             {
                 $data[$key] = [
                     "uuid"=>$value->getUuidAsString(),

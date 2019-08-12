@@ -31,13 +31,14 @@
         "symfony/yaml": "4.2.* || 4.3.*"
     },
     "require-dev": {
-        "symfony/security-bundle": "4.2.* || 4.3.*",
-        "symfony/profiler-pack": "^1.0",
-        "symfony/web-server-bundle": "4.2.* || 4.3.*",
-        "deozza/philarmony-api-tester-bundle": "@dev",
-        "fzaninotto/faker": "^1.8",
+        "deozza/philarmony-api-tester-bundle": "^3.0",
+        "doctrine/doctrine-fixtures-bundle": "^3.2",
         "firebase/php-jwt": "^5.0",
-        "symfony/console": "4.2.* || 4.3.*"
+        "fzaninotto/faker": "^1.8",
+        "symfony/console": "4.2.* || 4.3.*",
+        "symfony/profiler-pack": "^1.0",
+        "symfony/security-bundle": "4.2.* || 4.3.*",
+        "symfony/web-server-bundle": "4.2.* || 4.3.*"
     },
     "suggest": {
         "deozza/philarmony-user-bundle": "^1.0",
@@ -64,5 +65,16 @@
             "type": "vcs",
             "url": "https://github.com/deozza/ApiTesterBundle.git"
         }
-    ]
+    ],
+    "scripts": {
+        "test": [
+            "rm -rf ./tests/testProjectMongodb/src/Form/*",
+            "./tests/testProjectMongodb/bin/console p:m:m",
+            "./tests/testProjectMongodb/bin/console d:m:s:d",
+            "./tests/testProjectMongodb/bin/console d:m:s:c",
+            "./tests/testProjectMongodb/bin/console d:m:f:l --append",
+            "mongodump -d philarmony-core-test -o ./tests/testProjectMongodb/var/db_test/",
+            "./bin/phpunit"
+        ]
+    }
 }

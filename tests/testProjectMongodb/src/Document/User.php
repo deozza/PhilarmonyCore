@@ -2,6 +2,7 @@
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\User\UserInterface;
 use JMS\Serializer\Annotation as JMS;
 use Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Repository\UserRepository;
@@ -13,7 +14,7 @@ use Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Repository\UserRepo
 class User implements UserInterface
 {
     /**
-     * @ODM\Id(strategy="UUID", type="string")
+     * @ODM\Id(strategy="NONE", type="string")
      * @JMS\Groups({"user_id", "entity_complete"})
      */
     private $uuid;
@@ -79,12 +80,16 @@ class User implements UserInterface
         $this->registerDate = new \DateTime('now');
     }
 
+    public function setUuid(): self
+    {
+        $this->uuid = Uuid::uuid4()->toString();
+        return $this;
+    }
 
-    public function getUuid()
+    public function getUuidAsString(): ?string
     {
         return $this->uuid;
     }
-
 
     public function getUsername(): ?string
     {

@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 use Doctrine\ORM\EntityRepository;
 use Deozza\PhilarmonyCoreBundle\Document\Entity;
 
@@ -45,16 +46,11 @@ class POST extends AbstractType
                 ],
         ]);
 
-        $builder->add('annonce', EntityType::class, [
+        $builder->add('annonce', DocumentType::class, [
             'class' => Entity::class,
-            'query_builder'=> function(EntityRepository $er){
-                return $er->createQueryBuilder('e')
-                ->where("e.kind = :kind")
-                ->setParameter(':kind', 'annonce');
-            },
-            'choice_value' =>  function(Entity $entity = null){
-                return $entity ? $entity->getUuidAsString() : '';
-            }
+            'constraints'=>[
+                new Assert\NotBlank()
+            ]
         ]);
 
         $builder->add('paid', HiddenType::class, [

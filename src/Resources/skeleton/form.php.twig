@@ -25,9 +25,9 @@ class {{ classname }} extends AbstractType
     {
 {% for field,constraints in properties %}
 {% if constraints.array is defined %}
-{{ input.arrayField(constraints, field) }}
+{{ input.arrayField(constraints, field, dbManager) }}
 {% elseif constraints.constraints.automatic is not defined %}
-{{ input.field(constraints, field) }}
+{{ input.field(constraints, field, dbManager) }}
 {% elseif constraints.constraints.automatic is defined%}
         $builder->add('{{ field }}', HiddenType::class, [
 {% set explodedAutomatic = constraints.constraints.automatic|split('.') %}

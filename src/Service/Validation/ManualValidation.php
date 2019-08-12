@@ -1,13 +1,10 @@
 <?php
 
-
 namespace Deozza\PhilarmonyCoreBundle\Service\Validation;
 
-use Deozza\PhilarmonyCoreBundle\Entity\Entity;
 use Deozza\PhilarmonyCoreBundle\Service\Authorization\AuthorizeAccessToEntity;
 use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\ResponseMakerBundle\Service\ResponseMaker;
-
 
 class ManualValidation
 {
@@ -18,7 +15,7 @@ class ManualValidation
         $this->authorizeAccessToEntity = $authorizeAccessToEntity;
     }
 
-    public function ableToValidateEntity(?Entity $entity, $user)
+    public function ableToValidateEntity($entity, $user)
     {
         $states = $this->setup($entity, $user);
         if(is_object($states))
@@ -49,7 +46,7 @@ class ManualValidation
         return $this->response->forbiddenAccess("Access to this resource is forbidden.");
     }
 
-    public function ableToRetrogradeEntity(?Entity $entity, $user)
+    public function ableToRetrogradeEntity($entity, $user)
     {
         $states = $this->setup($entity, $user);
         if(is_object($states))
@@ -81,7 +78,7 @@ class ManualValidation
         return $this->response->forbiddenAccess("Access to this resource is forbidden.");
     }
 
-    private function setup(?Entity $entity, $user)
+    private function setup($entity, $user)
     {
         if(empty($user))
         {
@@ -112,7 +109,7 @@ class ManualValidation
         return $state['constraints']['manual']['by'];
     }
 
-    private function moveToStep(array $availableStates, Entity $entity, bool $sup = true)
+    private function moveToStep(array $availableStates,$entity, bool $sup = true)
     {
         foreach($availableStates as $key=>$state)
         {

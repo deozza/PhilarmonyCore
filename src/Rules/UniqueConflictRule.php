@@ -1,9 +1,9 @@
 <?php
 namespace Deozza\PhilarmonyCoreBundle\Rules;
 
-use Deozza\PhilarmonyCoreBundle\Entity\Entity as MysqlEntity;
-use Deozza\PhilarmonyCoreBundle\Document\Entity as MongoEntity;
+use Deozza\PhilarmonyCoreBundle\Document\Entity;
 use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UniqueConflictRule implements RuleInterface
@@ -15,20 +15,18 @@ class UniqueConflictRule implements RuleInterface
         return in_array($method, ['POST', 'PATCH']);
     }
 
-    public function decide($entity, $posted, $method,  $em, DatabaseSchemaLoader $schemaLoader): ?array
+    public function decide($entity, $posted, $method,  DocumentManager $dm, DatabaseSchemaLoader $schemaLoader): ?array
     {
         $kind = $entity->getKind();
         $properties = $this->getProperties($schemaLoader, $kind);
         $properties = $this->onlyUniqueProperties($properties);
-
-        $className = $em instanceof EntityManagerInterface ? MysqlEntity::class : MongoEntity::class;
 
         $submited = $entity->getProperties();
         foreach($properties as $key=>$value)
         {
             if(array_key_exists($key, $posted))
             {
-                $exist = $em->getRepository($className)->findAllFiltered(['equal.properties.'.$key=>$submited[$key]], [], $entity->getKind());
+                $exist = $dm->getRepository(Entity::class)->findAllFiltered(['equal.properties.'.$key=>$submited[$key]], [], $entity->getKind());
                 if(count($exist)> 0)
                 {
                     return ["conflict" => [$key=>self::ERROR_EXISTS]];
@@ -72,6 +70,5 @@ class UniqueConflictRule implements RuleInterface
         }
 
         return $properties;
-
     }
 }

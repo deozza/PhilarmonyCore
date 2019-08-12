@@ -2,9 +2,11 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Service\Authorization;
 
+use Deozza\PhilarmonyCoreBundle\Document\Entity;
+
 class AuthorizeAccessToEntity
 {
-    public function authorize($user, $by, $entity)
+    public function authorize($user, $by, Entity $entity)
     {
         if(is_string($by))
         {

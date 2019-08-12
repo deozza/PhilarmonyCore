@@ -2,9 +2,6 @@
 namespace Deozza\PhilarmonyCoreBundle\Controller;
 
 use Deozza\PhilarmonyCoreBundle\Controller\BaseController;
-use Deozza\PhilarmonyCoreBundle\Entity\Entity;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 

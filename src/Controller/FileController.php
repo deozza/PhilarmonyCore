@@ -2,6 +2,7 @@
 namespace Deozza\PhilarmonyCoreBundle\Controller;
 
 use Deozza\PhilarmonyCoreBundle\Controller\BaseController;
+use Deozza\PhilarmonyCoreBundle\Document\Entity;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +27,7 @@ class FileController extends BaseController
      */
     public function getFileAction(string $uuid,string $file_property, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
         if(empty($entity))
         {
             return $this->response->notFound("Resource not found");
@@ -72,7 +73,7 @@ class FileController extends BaseController
      */
     public function postFileAction(string $uuid,string $file_property, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
         if(empty($entity))
         {
             return $this->response->notFound("Resource not found");
@@ -143,7 +144,7 @@ class FileController extends BaseController
 
         if($entity->getValidationState() !== "__default")
         {
-            $this->em->flush();
+            $this->dm->flush();
         }
 
         if(is_array($state))
@@ -154,7 +155,7 @@ class FileController extends BaseController
         $this->handleEvents($request->getMethod(), $entityStates['__default'], $entity, $eventDispatcher);
 
         $entity->setLastUpdate(new \DateTime('now'));
-        $this->em->flush();
+        $this->dm->flush();
 
         return $this->response->created($entity, ['entity_complete', 'user_basic']);
     }
@@ -171,7 +172,7 @@ class FileController extends BaseController
      */
     public function deleteFileAction(string $uuid,string $file_property, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
         if(empty($entity))
         {
             return $this->response->notFound("Resource not found");
@@ -218,7 +219,7 @@ class FileController extends BaseController
         $state = $this->validate->processValidation($entity,0, $entityStates, $this->getUser());
         if($entity->getValidationState() !== "__default")
         {
-            $this->em->flush();
+            $this->dm->flush();
         }
         if(is_array($state))
         {
@@ -227,7 +228,7 @@ class FileController extends BaseController
 
         $this->handleEvents($request->getMethod(), $entityStates['__default'], $entity, $eventDispatcher);
         $entity->setLastUpdate(new \DateTime('now'));
-        $this->em->flush();
+        $this->dm->flush();
 
         return $this->response->empty();
     }

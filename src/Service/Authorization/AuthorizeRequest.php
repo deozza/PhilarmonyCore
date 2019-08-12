@@ -2,7 +2,7 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Service\Authorization;
 
-use Deozza\PhilarmonyCoreBundle\Entity\Entity;
+use Deozza\PhilarmonyCoreBundle\Document\Entity;
 use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\ResponseMakerBundle\Service\ResponseMaker;
 
@@ -15,7 +15,7 @@ class AuthorizeRequest
         $this->authorizeAccessToEntity = $authorizeAccessToEntity;
     }
     
-    public function validateRequest($entity, string $method, $user)
+    public function validateRequest(Entity $entity, string $method, $user)
     {
         if(empty($entity))
         {
@@ -42,7 +42,7 @@ class AuthorizeRequest
         }
     }
 
-    public function isAllowed($by, $loggedin = true, $entity = null, $user)
+    public function isAllowed($by, $user, $loggedin = true, ?Entity $entity = null)
     {
         if($loggedin === true && empty($user))
         {

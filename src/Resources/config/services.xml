@@ -6,10 +6,8 @@
 
     <services>
         <service class="Deozza\PhilarmonyCoreBundle\Service\Validation\Validate" id="philarmony.validate">
-            <argument key="$orm">%env(DB_MANAGER)%</argument>
             <bind key="$responseMaker" type="service" id="philarmony.response_maker"/>
             <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
-            <bind key="$em" type="service" id="doctrine.orm.entity_manager"/>
             <bind key="$dm" type="service" id="doctrine_mongodb.odm.document_manager" />
         </service>
         <service id="Deozza\PhilarmonyCoreBundle\Service\Validation\Validate" alias="philarmony.validate" />
@@ -33,11 +31,9 @@
         <service id="Deozza\PhilarmonyCoreBundle\Service\Authorization\AuthorizeRequest" alias="philarmony.authorize_request" />
 
         <service class="Deozza\PhilarmonyCoreBundle\Service\RulesManager\RulesManager" id="philarmony.rule_manager">
-            <bind key="$em" type="service" id="doctrine.orm.entity_manager"/>
             <bind key="$dm" type="service" id="doctrine_mongodb.odm.document_manager" />
             <bind key="$schemaLoader" type="service" id="philarmony.schema_loader"/>
             <argument key="$srcPath">%kernel.project_dir%/src/</argument>
-            <argument key="$orm">%env(DB_MANAGER)%</argument>
         </service>
         <service id="Deozza\PhilarmonyCoreBundle\Service\RulesManager\RulesManager" alias="philarmony.rule_manager" />
 
@@ -59,7 +55,6 @@
             <argument key="$formPath"/>
             <argument key="$formNamespace"/>
             <argument key="$rootPath">%kernel.project_dir%</argument>
-            <argument key="$dbManager">%env(DB_MANAGER)%</argument>
         </service>
         <service id="Deozza\PhilarmonyCoreBundle\Service\FormManager\FormGenerator" alias="philarmony.form_generator" />
 

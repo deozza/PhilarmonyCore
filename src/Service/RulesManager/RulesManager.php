@@ -8,13 +8,12 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class RulesManager
 {
-    public function __construct(EntityManagerInterface $em,DocumentManager $dm, DatabaseSchemaLoader $schemaLoader, string $srcPath, string $orm)
+    public function __construct(DocumentManager $dm, DatabaseSchemaLoader $schemaLoader, string $srcPath)
     {
         $this->schemaLoader = $schemaLoader;
         $this->srcPath = $srcPath;
         $this->folders = [];
-        $this->orm = $orm;
-        $this->em = $orm === 'mysql' ? $em : $dm;
+        $this->dm = $dm;
     }
 
     public function decideConflict($object, $posted, $method, $folder)
@@ -48,7 +47,7 @@ class RulesManager
 
                     if($rule->supports($object, json_decode($posted, true), $method))
                     {
-                        $error = $rule->decide($object, json_decode($posted, true), $method, $this->em, $this->schemaLoader);
+                        $error = $rule->decide($object, json_decode($posted, true), $method, $this->dm, $this->schemaLoader);
                         if(!empty($error))
                         {
                             $errors[] = $error;

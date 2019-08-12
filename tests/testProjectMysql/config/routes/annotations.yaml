@@ -1,8 +1,0 @@
-controllers:
-    resource: ../../src/Controller/
-    type: annotation
-
-philarmony_controllers:
-    resource: '@DeozzaPhilarmonyCoreBundle/Controller'
-    type: annotation
-    prefix: /

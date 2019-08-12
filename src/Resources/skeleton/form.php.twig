@@ -16,8 +16,9 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 use Doctrine\ORM\EntityRepository;
-use Deozza\PhilarmonyCoreBundle\{% if dbManager == 'mongodb' %}Document{% else %}Entity{% endif %}\Entity;
+use Deozza\PhilarmonyCoreBundle\Document\Entity;
 
 class {{ classname }} extends AbstractType
 {
@@ -25,9 +26,9 @@ class {{ classname }} extends AbstractType
     {
 {% for field,constraints in properties %}
 {% if constraints.array is defined %}
-{{ input.arrayField(constraints, field, dbManager) }}
+{{ input.arrayField(constraints, field) }}
 {% elseif constraints.constraints.automatic is not defined %}
-{{ input.field(constraints, field, dbManager) }}
+{{ input.field(constraints, field) }}
 {% elseif constraints.constraints.automatic is defined%}
         $builder->add('{{ field }}', HiddenType::class, [
 {% set explodedAutomatic = constraints.constraints.automatic|split('.') %}

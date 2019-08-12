@@ -1,6 +1,6 @@
 <?php
 
-namespace Deozza\PhilarmonyCoreBundle\Repository\MongoDB;
+namespace Deozza\PhilarmonyCoreBundle\Repository;
 
 use Deozza\PhilarmonyCoreBundle\Document\Entity;
 use Doctrine\ODM\MongoDB\DocumentManager;

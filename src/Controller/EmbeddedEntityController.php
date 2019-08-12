@@ -2,6 +2,7 @@
 namespace Deozza\PhilarmonyCoreBundle\Controller;
 
 use Deozza\PhilarmonyCoreBundle\Controller\BaseController;
+use Deozza\PhilarmonyCoreBundle\Document\Entity;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +27,7 @@ class EmbeddedEntityController extends BaseController
      */
     public function postEmbeddedEntityAction(string $uuid, string $property_name, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
         if(empty($entity))
         {
             return $this->response->notFound("Route not found");
@@ -118,14 +119,14 @@ class EmbeddedEntityController extends BaseController
         $state = $this->validate->processValidation($entity,0, $entityStates, $this->getUser());
         if(is_array($state))
         {
-            $this->em->flush();
+            $this->dm->flush();
             return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
         }
 
         $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher, json_decode($request->getContent(), true));
         $entity->setLastUpdate(new \DateTime('now'));
 
-        $this->em->flush();
+        $this->dm->flush();
 
         return $this->response->created($entity, ['entity_complete', 'user_basic']);
     }
@@ -143,7 +144,7 @@ class EmbeddedEntityController extends BaseController
      */
     public function patchEmbeddedEntityAction(string $uuid, string $property_name, string $property_id, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
         if(empty($entity))
         {
             return $this->response->notFound("Route not found");
@@ -222,14 +223,14 @@ class EmbeddedEntityController extends BaseController
         $state = $this->validate->processValidation($entity,0, $entityStates, $this->getUser());
         if(is_array($state))
         {
-            $this->em->flush();
+            $this->dm->flush();
             return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
         }
 
         $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher, json_decode($request->getContent(), true));
         $entity->setLastUpdate(new \DateTime('now'));
 
-        $this->em->flush();
+        $this->dm->flush();
 
         return $this->response->ok($entity, ['entity_complete', 'user_basic']);
     }
@@ -247,7 +248,7 @@ class EmbeddedEntityController extends BaseController
      */
     public function deleteEmbeddedEntityAction(string $uuid, string $property_name, string $property_id, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
         if(empty($entity))
         {
             return $this->response->notFound("Route not found");
@@ -280,7 +281,7 @@ class EmbeddedEntityController extends BaseController
         $state = $this->validate->processValidation($entity,0, $entityStates, $this->getUser());
         if($entity->getValidationState() !== "__default")
         {
-            $this->em->flush();
+            $this->dm->flush();
         }
         if(is_array($state))
         {
@@ -290,7 +291,7 @@ class EmbeddedEntityController extends BaseController
         $this->handleEvents($request->getMethod(), $entityStates['__default'], $entity, $eventDispatcher);
         $entity->setLastUpdate(new \DateTime('now'));
 
-        $this->em->flush();
+        $this->dm->flush();
 
         return $this->response->empty();
     }

@@ -1,4 +1,4 @@
-{% macro field(constraints, field, dbManager) %}
+{% macro field(constraints, field) %}
 {% if constraints.type == 'string' %}
         $builder->add('{{ field }}' , TextType::class, [
             'constraints' => [
@@ -88,7 +88,7 @@
 {% endif %}
         ]);
 {% elseif constraints.type == 'entity' %}
-        $builder->add('{{ field }}', {% if dbManager == 'mysql'%}EntityType::class{% else %}DocumentType::class{% endif %}, [
+        $builder->add('{{ field }}', DocumentType::class, [
             'class' => Entity::class,
             'constraints'=>[
                 new Assert\NotBlank()
@@ -97,7 +97,7 @@
 {% endif %}
 {% endmacro %}
 
-{% macro arrayField(constraints, field, dbManager) %}
+{% macro arrayField(constraints, field) %}
 {% if constraints.type == 'string' %}
         $builder->add('{{ field }}' , CollectionType::class, [
             'entry_type' => TextType::class,
@@ -210,7 +210,7 @@
         ]);
 {% elseif constraints.type == 'entity' %}
         $builder->add('{{ field }}', CollectionType::class, [
-            'entry_type' => {% if dbManager == 'mysql'%}EntityType::class{% else %}DocumentType::class{% endif %},
+            'entry_type' => DocumentType::class,
             'allow_add' => true,
             'allow_delete' => true,
             'entry_options' => [

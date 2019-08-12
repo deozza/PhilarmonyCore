@@ -2,6 +2,7 @@
 namespace Deozza\PhilarmonyCoreBundle\Controller;
 
 use Deozza\PhilarmonyCoreBundle\Controller\BaseController;
+use Deozza\PhilarmonyCoreBundle\Document\Entity;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +26,7 @@ class ValidationController extends BaseController
      */
     public function postManualValidationAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
 
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
 
@@ -51,7 +52,7 @@ class ValidationController extends BaseController
         $state = $this->validate->processValidation($entity,$valid['key']+1, $entityStates, $this->getUser(), $lastStep+1);
         if($entity->getValidationState() !== "__default")
         {
-            $this->em->flush();
+            $this->dm->flush();
         }
 
         if(is_array($state))
@@ -61,7 +62,7 @@ class ValidationController extends BaseController
         $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher);
         $entity->setLastUpdate(new \DateTime('now'));
 
-        $this->em->flush();
+        $this->dm->flush();
         return $this->response->ok($entity, ['entity_complete', 'user_basic']);
     }
 
@@ -76,7 +77,7 @@ class ValidationController extends BaseController
      */
     public function postManualRetrogradeAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->em->getRepository($this->entityClassName)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
 
         $valid = $this->manualValidation->ableToRetrogradeEntity($entity, $user);
@@ -91,7 +92,7 @@ class ValidationController extends BaseController
         $state = $this->validate->processValidation($entity,$valid['key'], $entityStates, $this->getUser(), $valid['key'] - 1);
         if($entity->getValidationState() !== "__default")
         {
-            $this->em->flush();
+            $this->dm->flush();
         }
 
         if(is_array($state))
@@ -102,7 +103,7 @@ class ValidationController extends BaseController
         $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher);
         $entity->setLastUpdate(new \DateTime('now'));
 
-        $this->em->flush();
+        $this->dm->flush();
         return $this->response->ok($entity, ['entity_complete', 'user_basic']);
     }
 }

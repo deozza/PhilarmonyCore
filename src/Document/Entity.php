@@ -7,7 +7,7 @@ use JMS\Serializer\Annotation as JMS;
 use Ramsey\Uuid\Uuid;
 
 /**
- * @ODM\Document(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\MongoDB\EntityRepository")
+ * @ODM\Document(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\EntityRepository")
  */
 class Entity
 {

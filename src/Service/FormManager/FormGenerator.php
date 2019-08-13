@@ -108,6 +108,11 @@ class FormGenerator
                 continue;
             }
 
+            if($type[0] === 'entity')
+            {
+                $config['constraint']['entity'] = $type[1];
+            }
+
             if(array_key_exists('array', $propertyConfig))
             {
                 $config['array'] = true;

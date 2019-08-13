@@ -90,6 +90,14 @@
 {% elseif constraints.type == 'entity' %}
         $builder->add('{{ field }}', DocumentType::class, [
             'class' => Entity::class,
+            'query_builder'=> function(DocumentRepository $dr){
+                return $dr->createQueryBuilder()->find(Entity::class)
+                    ->eagerCursor(true)
+                    ->field('kind')->equals('{{ constraints.constraints.entity }}');
+            },
+            'choice_value' => function(Entity $entity = null){
+                return $entity ? $entity->getUuidAsString() : '';
+            },
             'constraints'=>[
                 new Assert\NotBlank()
             ]
@@ -214,7 +222,15 @@
             'allow_add' => true,
             'allow_delete' => true,
             'entry_options' => [
-                'class' => Entity::class
+                'class' => Entity::class,
+                'query_builder'=> function(DocumentRepository $dr){
+                    return $dr->createQueryBuilder()->find(Entity::class)
+                        ->eagerCursor(true)
+                        ->field('kind')->equals('{{ constraints.constraints.entity }}');
+                },
+                'choice_value' => function(Entity $entity = null){
+                    return $entity ? $entity->getUuidAsString() : '';
+                },
             ]
         ]);
 {% endif %}

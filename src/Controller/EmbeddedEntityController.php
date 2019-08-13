@@ -68,8 +68,8 @@ class EmbeddedEntityController extends BaseController
                     "uuid"=>$value->getUuidAsString(),
                     "validationState"=>$value->getValidationState(),
                     "owner"=>[
-                        "uuid"=>$value->getOwner()->getUuidAsString(),
-                        "username"=>$value->getOwner()->getUsername(),
+                        "uuid"=>$value->getOwner()['uuid'],
+                        "username"=>$value->getOwner()['username'],
                     ],
                     "properties"=>$value->getProperties()
                 ];

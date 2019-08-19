@@ -133,16 +133,15 @@ class EmbeddedEntityController extends BaseController
 
     /**
      * @Route(
-     *     "entity/{uuid}/embedded/{property_name}/{property_id}",
+     *     "entity/{uuid}/embedded/{property_name}",
      *     requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-     *          "property_name" = "^(\w{1,50})$",
-     *          "property_id" = "^(\w{1,50})$"
+     *          "property_name" = "^(\w{1,50})$"
      *     },
      *     name="patch_embedded_entity",
      *      methods={"PATCH"})
      */
-    public function patchEmbeddedEntityAction(string $uuid, string $property_name, string $property_id, Request $request, EventDispatcherInterface $eventDispatcher)
+    public function patchEmbeddedEntityAction(string $uuid, string $property_name, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
         if(empty($entity))
@@ -153,12 +152,15 @@ class EmbeddedEntityController extends BaseController
         $properties = $entity->getProperties();
         if(!array_key_exists($property_name, $properties) || empty($properties[$property_name]))
         {
-            return $this->response->notFound("Resource not found");
+            return $this->response->notFound("Resource not found property");
         }
+        $property_id = $request->query->get("propertyId", null);
 
-        if(!array_key_exists($property_id, $properties[$property_name]) || empty($properties[$property_name][$property_id]))
+        if(!empty($property_id) &&
+            (!array_key_exists($property_id, $properties[$property_name]) || empty($properties[$property_name][$property_id]))
+        )
         {
-            return $this->response->notFound("Resource not found");
+            return $this->response->notFound("Resource not found propertyId");
         }
 
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
@@ -202,8 +204,14 @@ class EmbeddedEntityController extends BaseController
                 ];
             }
         }
-
-        $properties[$property_name][$property_id] = $data;
+        if(!empty($property_id))
+        {
+            $properties[$property_name][$property_id] = $data;
+        }
+        else
+        {
+            $properties[$property_name] = $data;
+        }
 
         $entity->setProperties($properties);
 
@@ -221,6 +229,8 @@ class EmbeddedEntityController extends BaseController
         $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
 
         $state = $this->validate->processValidation($entity,0, $entityStates, $this->getUser());
+
+        var_dump($entity);die;
         if(is_array($state))
         {
             $this->dm->flush();

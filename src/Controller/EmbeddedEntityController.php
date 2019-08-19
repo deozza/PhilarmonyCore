@@ -230,7 +230,6 @@ class EmbeddedEntityController extends BaseController
 
         $state = $this->validate->processValidation($entity,0, $entityStates, $this->getUser());
 
-        var_dump($entity);die;
         if(is_array($state))
         {
             $this->dm->flush();

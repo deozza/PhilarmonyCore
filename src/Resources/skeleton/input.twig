@@ -22,14 +22,14 @@
 {% if constraints.constraints.greaterThan is defined %}
                 new Assert\GreaterThan({{ constraints.constraints.greaterThan }}),
 {% endif %}
-{% if constraints.constraints.lesserThan is defined %}
-                new Assert\LesserThan({{ constraints.constraints.lesserThan}}),
+{% if constraints.constraints.lessThan is defined %}
+                new Assert\LessThan({{ constraints.constraints.lessThan}}),
 {% endif %}
 {% if constraints.constraints.greaterThanOrEqual is defined %}
                 new Assert\GreaterThanOrEqual({{ constraints.constraints.greaterThanOrEqual }}),
 {% endif %}
-{% if constraints.constraints.lesserThanOrEqual is defined %}
-                new Assert\LesserThanOrEqual({{ constraints.constraints.lesserThanOrEqual }}),
+{% if constraints.constraints.lessThanOrEqual is defined %}
+                new Assert\LessThanOrEqual({{ constraints.constraints.lessThanOrEqual }}),
 {% endif %}
 {% if constraints.constraints.required == true %}
                 new Assert\NotBlank(),
@@ -45,14 +45,14 @@
 {% if constraints.constraints.greaterThan is defined %}
                 new Assert\GreaterThan({{ constraints.constraints.greaterThan }}),
 {% endif %}
-{% if constraints.constraints.lesserThan is defined %}
-                new Assert\LesserThan({{ constraints.constraints.lesserThan}}),
+{% if constraints.constraints.lessThan is defined %}
+                new Assert\LessThan({{ constraints.constraints.lessThan}}),
 {% endif %}
 {% if constraints.constraints.greaterThanOrEqual is defined %}
                 new Assert\GreaterThanOrEqual({{ constraints.constraints.greaterThanOrEqual }}),
 {% endif %}
-{% if constraints.constraints.lesserThanOrEqual is defined %}
-                new Assert\LesserThanOrEqual({{ constraints.constraints.lesserThanOrEqual }}),
+{% if constraints.constraints.lessThanOrEqual is defined %}
+                new Assert\LessThanOrEqual({{ constraints.constraints.lessThanOrEqual }}),
 {% endif %}
 {% if constraints.constraints.required == true %}
                 new Assert\NotBlank(),
@@ -138,14 +138,14 @@
 {% if constraints.constraints.greaterThan is defined %}
                     new Assert\GreaterThan({{ constraints.constraints.greaterThan }}),
 {% endif %}
-{% if constraints.constraints.lesserThan is defined %}
-                    new Assert\LesserThan({{ constraints.constraints.lesserThan}}),
+{% if constraints.constraints.lessThan is defined %}
+                    new Assert\LessThan({{ constraints.constraints.lessThan}}),
 {% endif %}
 {% if constraints.constraints.greaterThanOrEqual is defined %}
                     new Assert\GreaterThanOrEqual({{ constraints.constraints.greaterThanOrEqual }}),
 {% endif %}
-{% if constraints.constraints.lesserThanOrEqual is defined %}
-                    new Assert\LesserThanOrEqual({{ constraints.constraints.lesserThanOrEqual }}),
+{% if constraints.constraints.lessThanOrEqual is defined %}
+                    new Assert\LessThanOrEqual({{ constraints.constraints.lessThanOrEqual }}),
 {% endif %}
 {% if constraints.constraints.required == true %}
                     new Assert\NotBlank(),
@@ -166,14 +166,14 @@
 {% if constraints.constraints.greaterThan is defined %}
                     new Assert\GreaterThan({{ constraints.constraints.greaterThan }}),
 {% endif %}
-{% if constraints.constraints.lesserThan is defined %}
-                    new Assert\LesserThan({{ constraints.constraints.lesserThan}}),
+{% if constraints.constraints.lessThan is defined %}
+                    new Assert\LessThan({{ constraints.constraints.lessThan}}),
 {% endif %}
 {% if constraints.constraints.greaterThanOrEqual is defined %}
                     new Assert\GreaterThanOrEqual({{ constraints.constraints.greaterThanOrEqual }}),
 {% endif %}
-{% if constraints.constraints.lesserThanOrEqual is defined %}
-                    new Assert\LesserThanOrEqual({{ constraints.constraints.lesserThanOrEqual }}),
+{% if constraints.constraints.lessThanOrEqual is defined %}
+                    new Assert\LessThanOrEqual({{ constraints.constraints.lessThanOrEqual }}),
 {% endif %}
 {% if constraints.constraints.required == true %}
                     new Assert\NotBlank(),

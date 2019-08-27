@@ -21,27 +21,6 @@ class EntityRepository extends DocumentRepository
         parent::__construct($dm, $uow, $classMetaData);
     }
 
-    public function findAllAuthorized(string $entityName, array $possibleStates, $user)
-    {
-        $queryBuilder = $this->createQueryBuilder()->find('Entity');
-        $queryBuilder->field("kind")->equals($entityName);
-
-        foreach($possibleStates as $state => $config)
-        {
-            $queryBuilder->field("validationState")->equals($state);
-
-            if(!empty($user))
-            {
-                $parameters['uuid'] = $user->getUuidAsString();
-                if($config === 'owner')
-                {
-                }
-            }
-        }
-
-        return $queryBuilder->getQuery()->execute();
-    }
-
     public function findAllFiltered(Array $filters, Array $sort, $kind)
     {
         $queryBuilder = $this->createQueryBuilder()
@@ -61,15 +40,13 @@ class EntityRepository extends DocumentRepository
                 }
 
                 if(is_numeric($value)) $value = (int) $value;
-
-                switch ($field[0])
+                try
                 {
-                    case "equal"          : $queryBuilder->field($filter)->equals($value);break;
-                    case "less"           : $queryBuilder->field($filter)->lt($value);break;
-                    case "greater"        : $queryBuilder->field($filter)->gt($value);break;
-                    case "lessOrEqual"    : $queryBuilder->field($filter)->lte($value);break;
-                    case "greaterOrEqual" : $queryBuilder->field($filter)->gte($value);break;
-                    case "like"           : $queryBuilder->field($filter)->equals(new \MongoRegex('/.*'.$value.'.*/i'));break;
+                    $this->returnOperator($field[0], $queryBuilder, $filter, $value);
+                }
+                catch(\Exception $e)
+                {
+                    return null;
                 }
             }
         }
@@ -94,53 +71,46 @@ class EntityRepository extends DocumentRepository
 
     public function findAllForValidate($kind, $property, $value, $operator, ?array $referenceParams)
     {
-        $parameters = [];
+        $queryBuilder = $this->createQueryBuilder()
+            ->find(Entity::class)
+            ->eagerCursor(true)
+            ->field('kind')->equals($kind);
+        $this->returnOperator($operator, $queryBuilder, $property, $value);
 
-        $queryBuilder = $this->createQueryBuilder('e');
-        $queryBuilder->select('e');
-        $queryBuilder->andWhere('e.kind = :kind');
-        $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$property."') $operator :value");
-
-        $parameters["kind"] = $kind;
-        $parameters["value"] = $value;
-
-        $queryBuilder->setParameters($parameters);
-        return $queryBuilder->getQuery()->execute();
+        return $queryBuilder->getQuery()->execute()->toArray();
     }
 
     public function findAllBetweenForValidate($kind, $propertyMin, $propertyMax, $value, ?array $referenceParams)
     {
-        $parameters = [];
+        $queryBuilder = $this->createQueryBuilder()
+            ->find(Entity::class)
+            ->eagerCursor(true)
+            ->field('kind')->equals($kind);
 
-        $queryBuilder = $this->createQueryBuilder('e');
-        $queryBuilder->select('e');
-        $queryBuilder->andWhere('e.kind = :kind');
-
-        try
-        {
-            $is_a_date = new \DateTime($value);
-            $queryBuilder->andWhere("JSON_UNQUOTE(JSON_EXTRACT(e.properties, '$.".$propertyMin.".date'))  <= :value");
-            $queryBuilder->andWhere("JSON_UNQUOTE(JSON_EXTRACT(e.properties, '$.".$propertyMax.".date'))  >= :value");
-            $parameters["value"] = $value;
-        }
-        catch(\Exception $e)
-        {
-            $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$propertyMin."')>= :value");
-            $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$propertyMax."')<= :value");
-            $parameters["value"] = $value;
-        }
-
+        $queryBuilder->field($propertyMin)->lte($value);
+        $queryBuilder->field($propertyMax)->gte($value);
         if(!empty($referenceParams))
         {
             foreach($referenceParams as $key=>$value)
             {
-                $queryBuilder->andWhere("JSON_EXTRACT(e.properties, '$.".$key."') = '".$value."'");
+                $queryBuilder->field($key)->equals($value);
             }
         }
 
-        $parameters["kind"] = $kind;
+        return $queryBuilder->getQuery()->execute()->toArray();
+    }
 
-        $queryBuilder->setParameters($parameters);
-        return $queryBuilder->getQuery()->execute();
+    private function returnOperator(string $operator, $queryBuilder, string $field, $value)
+    {
+        switch($operator)
+        {
+            case "equal"          : $queryBuilder->field($field)->equals($value);break;
+            case "less"           : $queryBuilder->field($field)->lt($value);break;
+            case "greater"        : $queryBuilder->field($field)->gt($value);break;
+            case "lessOrEqual"    : $queryBuilder->field($field)->lte($value);break;
+            case "greaterOrEqual" : $queryBuilder->field($field)->gte($value);break;
+            case "like"           : $queryBuilder->field($field)->equals(new \MongoRegex('/.*'.$value.'.*/i'));break;
+            default: throw new \Exception();break;
+        }
     }
 }

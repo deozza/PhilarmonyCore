@@ -152,7 +152,7 @@ class EmbeddedEntityController extends BaseController
         $properties = $entity->getProperties();
         if(!array_key_exists($property_name, $properties) || empty($properties[$property_name]))
         {
-            return $this->response->notFound("Resource not found property");
+            return $this->response->notFound("Resource not found");
         }
         $property_id = $request->query->get("propertyId", null);
 
@@ -160,7 +160,7 @@ class EmbeddedEntityController extends BaseController
             (!array_key_exists($property_id, $properties[$property_name]) || empty($properties[$property_name][$property_id]))
         )
         {
-            return $this->response->notFound("Resource not found propertyId");
+            return $this->response->notFound("Resource not found");
         }
 
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
@@ -198,7 +198,6 @@ class EmbeddedEntityController extends BaseController
                     "owner"=>[
                         "uuid"=>$value->getOwner()->getUuidAsString(),
                         "username"=>$value->getOwner()->getUsername(),
-                        "email" => $value->getOwner()->getEmail()
                     ],
                     "properties"=>$value->getProperties()
                 ];

@@ -24,7 +24,7 @@ class ValidationController extends BaseController
      *     name="validate_entity",
      *      methods={"PATCH"})
      */
-    public function postManualValidationAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
+    public function patchManualValidationAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
 
@@ -75,7 +75,7 @@ class ValidationController extends BaseController
      *     name="retrograde_entity",
      *      methods={"PATCH"})
      */
-    public function postManualRetrogradeAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
+    public function patchManualRetrogradeAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();

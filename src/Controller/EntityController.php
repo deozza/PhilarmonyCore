@@ -129,7 +129,7 @@ class EntityController extends BaseController
         $entityToPost = new Entity();
         $entityToPost->setKind($entity_name);
         $user = empty($this->getUser()->getUuid()) ? null : $this->getUser();
-        $isAllowed = $this->authorizeRequest->isAllowed($entity['states']['__default']['methods']['POST']['by'], true, $entityToPost, $user);
+        $isAllowed = $this->authorizeRequest->isAllowed($entity['states']['__default']['methods']['POST']['by'], $user, true, $entityToPost);
         if(is_object($isAllowed))
         {
             return $isAllowed;
@@ -144,7 +144,7 @@ class EntityController extends BaseController
             return $this->response->badForm($form);
         }
 
-        $entityToPost->setOwner($this->getUser());
+        $entityToPost->setOwner($user);
         $entityToPost->setValidationState("__default");
         $data = $form->getData();
         foreach($data as $property => $content)
@@ -227,7 +227,26 @@ class EntityController extends BaseController
             return $this->response->badForm($form);
         }
 
-        $entity->setProperties($form->getData());
+        $data = $form->getData();
+
+        foreach($data as $property => $content)
+        {
+            if(is_a($content,Entity::class))
+            {
+                $data[$property] = [
+                    "uuid"=>$content->getUuidAsString(),
+                    "validationState"=>$content->getValidationState(),
+                    "owner"=>[
+                        "uuid"=>$content->getOwner()->getUuid(),
+                        "username"=>$content->getOwner()->getUsername(),
+                        "email" => $content->getOwner()->getEmail()
+                    ],
+                    "properties"=>$content->getProperties()
+                ];
+            }
+        }
+
+        $entity->setProperties($data);
 
         $conflict_errors = $this->rulesManager->decideConflict($entity, $request->getContent(), $request->getMethod(),__DIR__);
         if($conflict_errors > 0)

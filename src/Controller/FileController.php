@@ -17,7 +17,7 @@ class FileController extends BaseController
 {
     /**
      * @Route(
-     *     "entity/{uuid}/{file_property}",
+     *     "entity/{uuid}/file/{file_property}",
      *     requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *          "file_property" = "^(\w{1,50})$"
@@ -63,7 +63,7 @@ class FileController extends BaseController
 
     /**
      * @Route(
-     *     "entity/{uuid}/{file_property}",
+     *     "entity/{uuid}/file/{file_property}",
      *     requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *          "file_property" = "^(\w{1,50})$"
@@ -162,7 +162,7 @@ class FileController extends BaseController
 
     /**
      * @Route(
-     *     "entity/{uuid}/{file_property}",
+     *     "entity/{uuid}/file/{file_property}",
      *     requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *          "file_property" = "^(\w{1,50})$"

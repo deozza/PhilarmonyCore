@@ -229,7 +229,25 @@ class EntityController extends BaseController
             return $this->response->badForm($form);
         }
 
-        $entity->setProperties($form->getData());
+        $data = $form->getData();
+
+        foreach($data as $property => $content)
+        {
+            if(is_a($content,Entity::class))
+            {
+                $data[$property] = [
+                    "uuid"=>$content->getUuidAsString(),
+                    "validationState"=>$content->getValidationState(),
+                    "owner"=>[
+                        "uuid"=>$content->getOwner()['uuid'],
+                        "username"=>$content->getOwner()['username']
+                    ],
+                    "properties"=>$content->getProperties()
+                ];
+            }
+        }
+
+        $entity->setProperties($data);
 
         $conflict_errors = $this->rulesManager->decideConflict($entity, $request->getContent(), $request->getMethod(),__DIR__);
         if($conflict_errors > 0)

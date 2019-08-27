@@ -68,6 +68,7 @@ class EntityRepository extends ServiceEntityRepository
                     case "lesserOrEqual": $operator = "<=";break;
                     case "greaterOrEqual": $operator = ">=";break;
                     case "like": $operator = "LIKE";break;
+                    default: return null;break;
                 }
 
                 if(is_numeric($value) === false)

@@ -14,7 +14,7 @@ class AuthorizeRequest
         $this->schemaLoader = $schemaLoader;
         $this->authorizeAccessToEntity = $authorizeAccessToEntity;
     }
-    
+
     public function validateRequest(?Entity $entity, string $method, $user)
     {
         if(empty($entity))
@@ -35,14 +35,14 @@ class AuthorizeRequest
             $loggedin = true;
         }
 
-        $isAllowed = $this->isAllowed($stateConfig[$method]['by'], $loggedin, $entity, $user);
+        $isAllowed = $this->isAllowed($stateConfig[$method]['by'],$user, $loggedin, $entity);
         if(is_object($isAllowed))
         {
             return $isAllowed;
         }
     }
 
-    public function isAllowed($by, $loggedin = true, Entity $entity = null, $user)
+    public function isAllowed($by, $user, $loggedin = true, ?Entity $entity = null)
     {
         if($loggedin === true && empty($user))
         {

@@ -170,7 +170,7 @@ class Validate
 
     private function getReferenceProperties(string $constraint)
     {
-        $regex = "/(\([a-z_,.]+\))/";
+        $regex = "/(\([a-zA-Z_,.]+\))/";
         preg_match($regex, $constraint, $matches);
         $properties = substr($matches[1], 1, strlen($matches[1])-2);
         return explode(',', $properties);

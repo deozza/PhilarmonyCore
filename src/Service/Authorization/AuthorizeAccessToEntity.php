@@ -12,12 +12,12 @@ class AuthorizeAccessToEntity
         {
             return true;
         }
-        
+
         if(empty($user))
         {
             return false;
         }
-        
+
         if(array_key_exists('roles', $by))
         {
             foreach($by['roles'] as $role)
@@ -33,7 +33,7 @@ class AuthorizeAccessToEntity
                 $userPath = explode('.', $userKind);
                 if($userPath[0] === "owner")
                 {
-                    if($entity->getOwner()->getId() === $user->getId())
+                    if($entity->getOwner()->getUuid() === $user->getUuidAsString())
                     {
                         return true;
                     }
@@ -41,7 +41,6 @@ class AuthorizeAccessToEntity
                 else
                 {
                     $properties = $entity->getProperties();
-                    //var_dump($properties['annonce']);die;
                     for($i = 0; $i < count($userPath); $i++)
                     {
                         $properties = $properties[$userPath[$i]];
@@ -54,7 +53,7 @@ class AuthorizeAccessToEntity
                 }
             }
         }
-        
+
         return false;
     }
 }

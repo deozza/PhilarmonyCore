@@ -102,7 +102,7 @@ class EntityController extends BaseController
 
     /**
      * @Route(
-     *     "entity/{entity_name}",
+     *     "entities/{entity_name}",
      *     requirements={
      *          "entity_name" = "^(\w{1,50})$"
      *     },

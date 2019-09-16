@@ -1,5 +1,9 @@
 enumerations:
-  annonce_category: ['maison', 'appartement']
+  genre:
+    - male
+    - female
+    - asexual
+
   boolean:
     - true
     - false

@@ -75,7 +75,7 @@ trait ValidatePropertyTrait
 
     private function checkEmbeddedExists(string $property, string $embedded)
     {
-        if(!array_key_exists($embedded,$this->entities[AuthorizedKeys::ENTITY_HEAD]) || count(array_keys($this->entities[AuthorizedKeys::ENTITY_HEAD][$embedded]))> 1)
+        if(!array_key_exists($embedded,$this->entities[AuthorizedKeys::ENTITY_HEAD]) || array_key_exists(AuthorizedKeys::ENTITY_KEYS[1],$this->entities[AuthorizedKeys::ENTITY_HEAD][$embedded]))
         {
             throw new DataSchemaMissingValueException("'$embedded' (from '$property') was expected to be defined in entity config file. It was not found or it was badly formated.");
         }

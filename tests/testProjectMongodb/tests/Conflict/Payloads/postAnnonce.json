@@ -1,7 +1,0 @@
-{
-  "title": "postAnnonce",
-  "description": ["this is a description"],
-  "price": 100.01,
-  "nbPersonMax": 3,
-  "annonce_category": ["maison"]
-}

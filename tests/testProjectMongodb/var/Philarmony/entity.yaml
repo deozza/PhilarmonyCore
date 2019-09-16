@@ -1,139 +1,109 @@
 entities:
-  annonce:
-    properties: [title, description, price, annonce_category, photo, nbPersonMax]
+  character_naming:
+    properties:
+      - firstname
+      - lastname
+
+  character_stats:
+    properties:
+      - genre
+      - heigth
+      - current_health
+      - max_health
+    constraints:
+      properties:
+        character_stats.current_health:
+          - ltoe.self(character_stats.max_health)
+
+  owned_gear:
+    properties:
+      - gear
+      - stock
+      - equiped
+
+  gear:
+    properties:
+      - name
+      - description
     states:
       __default:
         methods:
           POST:
-            properties: [title, description, price, annonce_category, nbPersonMax]
+            properties:
+              - name
+              - description
             by:
-              roles: [ROLE_USER]
+              users:
+                - ROLE_USER
       posted:
         methods:
-          POST:
-            properties: [description, photo]
-            by:
-              users: [owner]
-              roles: [ROLE_ADMIN]
+          GET:
+            by: all
           PATCH:
-            properties: all
+            properties:
+              - name
+              - description
             by:
-              users: [owner]
-              roles: [ROLE_ADMIN]
+              users:
+                - owner
+              roles:
+                - ROLE_ADMIN
+          DELETE:
+            by:
+              roles:
+                - ROLE_ADMIN
+
+  character:
+    properties:
+      - character_naming
+      - character_stats
+      - owned_gear
+    states:
+      __default:
+        methods:
+          POST:
+            properties: []
+            by:
+              roles:
+                - ROLE_USER
+      posted:
+        methods:
           GET:
             by:
-              users: [owner]
-              roles: [ROLE_ADMIN]
-          DELETE:
-            properties: [description, photo]
+              users:
+                - owner
+              roles:
+                - ROLE_ADMIN
+          POST:
+            properties:
+              - character_naming
+              - character_stats
+              - owned_gear
             by:
-              users: [owner]
-              roles: [ROLE_ADMIN]
-      published:
+              users:
+                - owner
+              roles:
+                - ROLE_ADMIN
+          PATCH:
+            properties:
+              - character_naming
+              - character_stats
+              - owned_gear
+            by:
+              users:
+                - owner
+              roles:
+                - ROLE_ADMIN
+          DELETE:
+            by:
+              users:
+                - owner
+      approved:
         constraints:
           manual:
             by:
               roles:
                 - ROLE_ADMIN
         methods:
-          POST:
-            properties: [description, photo]
-            by:
-              users: [owner]
-              roles: [ROLE_ADMIN]
-          PATCH:
-            properties: all
-            by:
-              users: [owner]
-              roles: [ROLE_ADMIN]
           GET:
             by: all
-          DELETE:
-            properties: [description, photo]
-            by:
-              users: [owner]
-              roles: [ROLE_ADMIN]
-  reservation:
-    properties: [date_begin, date_end, nbPerson, paid, annonce]
-    states:
-      __default:
-        methods:
-          POST:
-            properties: [date_begin, date_end, nbPerson, annonce, paid]
-            by:
-              roles: [ROLE_USER]
-      posted:
-        constraints:
-          properties:
-            date_begin:
-              - notBetween.reservation(date_begin,date_end)
-            date_end:
-              - greaterThan.self(date_begin)
-              - notBetween.reservation(date_begin,date_end)
-            nbPerson:
-              - lesserThanOrEqual.self(annonce.properties.nbPersonMax)
-            annonce.validationState:
-              - equal.value(published)
-        methods:
-          GET:
-            by:
-              users: [owner, annonce.owner]
-              roles: [ROLE_ADMIN]
-          DELETE:
-            by:
-              users: [owner]
-              roles: [ROLE_ADMIN]
-
-  message:
-    properties:
-      - messageTitle
-      - messageContent
-      - receiver
-      - dateOfPost
-      - seen
-
-  conversation:
-    properties:
-      - message
-      - participants
-    states:
-      __default:
-        methods:
-          POST:
-            properties:
-              - participants
-            by:
-              roles:
-                - ROLE_USER
-      posted:
-        methods:
-          PATCH:
-            properties:
-              - participants
-            by:
-              users:
-                - participants
-              roles:
-                - ROLE_ADMIN
-          POST:
-            properties:
-              - message
-            by:
-              users:
-                - participants
-              roles:
-                - ROLE_ADMIN
-          GET:
-            by:
-              roles:
-                - ROLE_ADMIN
-              users:
-                - participants
-          DELETE:
-            properties:
-              - message
-            by:
-              roles:
-                - ROLE_ADMIN
-              users:
-                - participants

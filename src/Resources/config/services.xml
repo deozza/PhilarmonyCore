@@ -64,16 +64,12 @@
         </service>
         <service id="Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\Migration\GenerateMigrationFile" alias="philarmony.migration.generate" />
 
-        <service id="Deozza\PhilarmonyCoreBundle\Command\SchemaMigrationDiffCommand">
-            <tag name="console.command" command="philarmony:migration:diff"/>
-            <bind key="$schemaValidator" type="service" id="philarmony.schema_validator"/>
-        </service>
         <service id="Deozza\PhilarmonyCoreBundle\Command\SchemaValidateCommand">
             <tag name="console.command" command="philarmony:schema:validate"/>
             <bind key="$schemaValidator" type="service" id="philarmony.schema_validator"/>
         </service>
-        <service id="Deozza\PhilarmonyCoreBundle\Command\SchemaMigrationMigrateCommand">
-            <tag name="console.command" command="philarmony:migration:migrate"/>
+        <service id="Deozza\PhilarmonyCoreBundle\Command\SchemaGenerateFormCommand">
+            <tag name="console.command" command="philarmony:generate:form"/>
             <bind key="$formGenerator" type="service" id="philarmony.form_generator"/>
         </service>
     </services>

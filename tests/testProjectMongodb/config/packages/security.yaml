@@ -1,6 +1,6 @@
 security:
     encoders:
-        Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Entity\User: bcrypt
+        Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Entity\User: auto
 
     providers:
         api_key_user_provider:

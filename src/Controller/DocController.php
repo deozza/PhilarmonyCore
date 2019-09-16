@@ -14,7 +14,7 @@ class DocController extends BaseController
 {
     /**
      * @Route(
-     *     "doc/entities",
+     *     "docs/entities",
      *     name="get_entities_doc",
      *      methods={"GET"})
      */
@@ -26,7 +26,7 @@ class DocController extends BaseController
 
     /**
      * @Route(
-     *     "doc/entity/{entity_name}",
+     *     "docs/entities/{entity_name}",
      *     requirements={
      *          "entity_name" = "^(\w{1,50})$"
      *     },
@@ -69,7 +69,7 @@ class DocController extends BaseController
 
     /**
      * @Route(
-     *     "doc/properties",
+     *     "docs/properties",
      *     name="get_properties_doc",
      *      methods={"GET"})
      */
@@ -81,7 +81,7 @@ class DocController extends BaseController
 
     /**
      * @Route(
-     *     "doc/property/{property_name}",
+     *     "docs/properties/{property_name}",
      *     requirements={
      *          "property_name" = "^(\w{1,50})$"
      *     },
@@ -101,7 +101,7 @@ class DocController extends BaseController
 
     /**
      * @Route(
-     *     "doc/enumerations",
+     *     "docs/enumerations",
      *     name="get_enumerations_doc",
      *      methods={"GET"})
      */
@@ -113,7 +113,7 @@ class DocController extends BaseController
 
     /**
      * @Route(
-     *     "doc/enumeration/{enumeration_name}",
+     *     "docs/enumerations/{enumeration_name}",
      *     requirements={
      *          "enumeration_name" = "^(\w{1,50})$"
      *     },

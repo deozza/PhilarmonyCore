@@ -214,7 +214,7 @@ class EntityController extends BaseController
 
         $stateConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
 
-        $formClass = "App\Form\\".$entity->getKind()."\\".$entity->getValidationState()."\PATCH";
+        $formClass = $this->formGenerator->getFormNamespace().$entity->getKind()."\\".$entity->getValidationState()."\PATCH";
         $formObject = new \ReflectionClass($formClass);
 
         $properties = $entity->getProperties();

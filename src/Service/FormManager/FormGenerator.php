@@ -24,6 +24,26 @@ class FormGenerator
         return $this->formNamespace;
     }
 
+    public function removeAll(string $dir = null)
+    {
+        if(empty($dir))
+        {
+            $dir = $this->getFormPath();
+        }
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if ($object != "." && $object != "..") {
+                    if (is_dir($dir."/".$object))
+                        $this->removeAll($dir."/".$object);
+                    else
+                        unlink($dir."/".$object);
+                }
+            }
+            rmdir($dir);
+        }
+    }
+
     protected function render($template, $parameters)
     {
         $twig = $this->getTwigEnvironment();

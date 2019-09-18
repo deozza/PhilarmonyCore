@@ -209,8 +209,8 @@ trait ValidateEntityTrait
                             if(!empty($matches))
                             {
                                 $propertiesAvailable = $this->entities[AuthorizedKeys::ENTITY_HEAD][$entity]['properties'];
-                                $properties = substr($matches[1], 1, strlen($matches[1])-2);
-                                $explodedProperties = explode(",",$properties);
+                                preg_match("/\(([^)]+)\)/", $matches[1], $properties);
+                                $explodedProperties = explode(",",$properties[1]);
                                 foreach($explodedProperties as $explodedProperty)
                                 {
                                     if(!in_array($explodedProperty, $propertiesAvailable))

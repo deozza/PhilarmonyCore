@@ -25,6 +25,7 @@ class SchemaGenerateFormCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->formGenerator->removeAll();
         $this->formGenerator->generate();
     }
 }

@@ -2,21 +2,15 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema;
 
-use Deozza\PhilarmonyCoreBundle\Exceptions\DataSchemaEmptyOrHeadMissingException;
-use Deozza\PhilarmonyCoreBundle\Exceptions\DataSchemaMissingKeyException;
-use Deozza\PhilarmonyCoreBundle\Exceptions\DataSchemaUnexpectedKeyException;
+use Deozza\PhilarmonyCoreBundle\Exceptions\SchemaConfigFileBadlyFormated;
+use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\ValidateEntity\EntitySchema;
+use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\ValidateEntity\ValidateEntity;
+use Symfony\Component\Yaml\Yaml;
 
 class DatabaseSchemaValidator
 {
     use ValidateEntityTrait;
     use ValidatePropertyTrait;
-
-    const ENTITY_HEAD = "entities";
-    const PROPERTY_HEAD = "properties";
-    const ENUM_HEAD = "enumerations";
-
-    const EMPTY_OR_BAD_HEAD_MSG = "The %s schema is empty or does not start with '%s' key.";
-    const INVALID_AMOUNT_HEAD_KEY = "The %s schema should contain only 1 head key.";
 
     public function __construct(DatabaseSchemaLoader $schemaLoader)
     {
@@ -24,45 +18,54 @@ class DatabaseSchemaValidator
         $this->entities     = $this->schemaLoader->loadEntityEnumeration();
         $this->properties   = $this->schemaLoader->loadPropertyEnumeration();
         $this->enumerations = $this->schemaLoader->loadEnumerationEnumeration();
+        $this->authorizedKeys = Yaml::parseFile(__DIR__."/authorizedKeys.yaml");
     }
 
-    public function validateEntities(): void
+    public function validateEntities()
     {
-        if(empty($this->entities) || !array_key_exists(self::ENTITY_HEAD, $this->entities) || empty($this->entities[self::ENTITY_HEAD]))
+        if(empty($this->entities))
         {
-            throw new DataSchemaMissingKeyException(sprintf(self::EMPTY_OR_BAD_HEAD_MSG, 'entity', self::ENTITY_HEAD));
+            throw new SchemaConfigFileBadlyFormated($this->authorizedKeys['entity_head']." config file is empty.");
+        }
+        if(!array_key_exists($this->authorizedKeys['entity_head'], $this->entities))
+        {
+            throw new SchemaConfigFileBadlyFormated($this->authorizedKeys['entity_head']." config file must start with the '".$this->authorizedKeys['entity_head']."' header.");
+        }
+        if(empty($this->entities[$this->authorizedKeys['entity_head']]))
+        {
+            throw new SchemaConfigFileBadlyFormated($this->authorizedKeys['entity_head']." config file does not contain a schema.");
         }
 
-        if(count($this->entities) > 1)
+        foreach($this->entities[$this->authorizedKeys['entity_head']] as $schemaName=>$schemaData)
         {
-            throw new DataSchemaUnexpectedKeyException(sprintf(self::INVALID_AMOUNT_HEAD_KEY, self::ENTITY_HEAD));
-        }
+            $entity = new EntitySchema();
+            $entity->setEntityName($schemaName);
+            $entity->setProperties([]);
+            $entity->setStates([]);
 
-        foreach($this->entities[self::ENTITY_HEAD] as $entity=>$entityContent)
-        {
-            $this->validateEntity($entity, $entityContent);
-        }
-    }
-
-    public function validateProperties()
-    {
-        if(empty($this->properties) || !array_key_exists(self::PROPERTY_HEAD, $this->properties))
-        {
-            throw new DataSchemaMissingKeyException(sprintf(self::EMPTY_OR_BAD_HEAD_MSG, 'property', self::PROPERTY_HEAD));
-        }
-
-        if(count($this->properties) > 1)
-        {
-            throw new DataSchemaUnexpectedKeyException(sprintf(self::INVALID_AMOUNT_HEAD_KEY, self::PROPERTY_HEAD));
-        }
-
-        foreach($this->properties[self::PROPERTY_HEAD] as $property=>$propertyContent)
-        {
-            if(empty($propertyContent))
+            if(!empty($schemaData[$this->authorizedKeys['entity_keys'][0]]))
             {
-                throw new DataSchemaEmptyOrHeadMissingException(sprintf(self::INVALID_AMOUNT_HEAD_KEY, self::PROPERTY_HEAD));
+                $entity->setProperties($schemaData[$this->authorizedKeys['entity_keys'][0]]);
             }
-            $this->validateProperty($property, $propertyContent);
-        }
+
+            if(!empty($schemaData[$this->authorizedKeys['entity_keys'][1]]))
+            {
+                $entity->setStates($schemaData[$this->authorizedKeys['entity_keys'][1]]);
+            }
+
+            if(!empty($schemaData[$this->authorizedKeys['entity_keys'][2]]))
+            {
+                $entity->setConstraints($schemaData[$this->authorizedKeys['entity_keys'][2]]);
+            }
+
+            $validateEntity = new ValidateEntity($entity, $this->properties, $this->authorizedKeys);
+            $validateEntity->validateProperties();
+            $validateEntity->validateStates();
+            if(!empty($entity->getConstraints()))
+            {
+                $validateEntity->validateConstraints($entity->getConstraints());
+            }
+        }die;
     }
+
 }

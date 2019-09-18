@@ -2,7 +2,7 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Exceptions;
 
-class DataSchemaInvalidValueTypeException extends \Exception
+class SchemaConfigFileBadlyFormated extends \Exception
 {
 
 }

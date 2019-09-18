@@ -2,7 +2,7 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema;
 
-use Deozza\PhilarmonyCoreBundle\Exceptions\DataSchemaEmptyOrHeadMissingException;
+use Deozza\PhilarmonyCoreBundle\Exceptions\SchemaConfigFileBadlyFormated;
 use Deozza\PhilarmonyCoreBundle\Exceptions\DataSchemaInvalidValueTypeException;
 use Deozza\PhilarmonyCoreBundle\Exceptions\DataSchemaMissingKeyException;
 use Deozza\PhilarmonyCoreBundle\Exceptions\DataSchemaMissingValueException;
@@ -26,7 +26,7 @@ trait ValidatePropertyTrait
         {
             if(empty($keyContent))
             {
-                throw new DataSchemaEmptyOrHeadMissingException("Empty content in key '$key' of property '$property'.");
+                throw new SchemaConfigFileBadlyFormated("Empty content in key '$key' of property '$property'.");
             }
 
             switch($key)

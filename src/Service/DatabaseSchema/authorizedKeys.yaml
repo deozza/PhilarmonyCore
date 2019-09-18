@@ -1,0 +1,70 @@
+entity_head: entities
+property_head: properties
+enumeration_head: enumerations
+entity_keys:
+  - properties
+  - states
+  - constraints
+default_state: __default
+state_keys:
+  - methods
+  - constraints
+methods:
+  - POST
+  - GET
+  - PATCH
+  - DELETE
+method_keys:
+  - properties
+  - by
+  - events
+by_keys:
+  - roles
+  - users
+property_keys:
+  - type
+  - constraints
+  - array
+types:
+  - string
+  - int
+  - date
+  - float
+  - file
+  - enumeration
+  - entity
+  - embedded
+basic_constraint_operators:
+  - gt
+  - lt
+  - gtoe
+  - ltoe
+  - nb
+  - b
+property_constraint_operators:
+  - required
+  - unique
+  - default
+  - automatic
+  - lengthMax
+  - lengthMin
+  - mime
+entity_constraint_keys:
+  - manual
+  - properties
+entity_operators:
+  - eq
+  - man
+manual_constraint_keys:
+  - by
+  - coming_from_state
+mime_types:
+  - text/csv
+  - image/gif
+  - image/jpeg
+  - image/jpg
+  - application/json
+  - video/mpeg
+  - image/png
+  - application/pdf
+  - application/xml

@@ -104,6 +104,8 @@ entities:
             by:
               roles:
                 - ROLE_ADMIN
+            coming_from_state:
+              - posted
         methods:
           GET:
             by: all

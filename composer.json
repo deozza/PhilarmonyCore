@@ -15,7 +15,6 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "alcaeus/mongo-php-adapter": "^1.1",
-        "deozza/philarmony-utils": "^3.0",
         "deozza/response-maker-bundle": "^1.0",
         "doctrine/mongodb-odm-bundle": "^3.5",
         "jms/serializer-bundle": "^3.2",
@@ -68,7 +67,6 @@
     ],
     "scripts": {
         "test": [
-            "rm -rf ./tests/testProjectMongodb/src/Form/*",
             "./tests/testProjectMongodb/bin/console p:m:m",
             "./tests/testProjectMongodb/bin/console d:m:s:d",
             "./tests/testProjectMongodb/bin/console d:m:s:c",

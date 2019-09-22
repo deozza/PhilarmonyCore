@@ -1,0 +1,9 @@
+{
+  "type":"string",
+  "constraints":{
+    "unique":true,
+    "required":true,
+    "lengthMin":1,
+    "lengthMax":128
+  }
+}

@@ -57,7 +57,7 @@ entity_operators:
   - man
 manual_constraint_keys:
   - by
-  - coming_from_state
+  - coming_from_states
 mime_types:
   - text/csv
   - image/gif

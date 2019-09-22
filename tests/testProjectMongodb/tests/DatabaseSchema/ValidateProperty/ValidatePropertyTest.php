@@ -99,4 +99,80 @@ class ValidatePropertyTest extends DatabaseSchemaTestSetup
         $propertyValidate->validateType();
     }
 
+    public function testRequiredConstraintIsAbsent()
+    {
+        $propertySchema = Yaml::parse(file_get_contents(__DIR__ . "/invalid/requiredConstraintIsAbsent/property.yaml"));
+        $authorizedKeys = Yaml::parse(file_get_contents(__DIR__ . "/../../../../../src/Service/DatabaseSchema/authorizedKeys.yaml"));
+        $property = new PropertySchema();
+        $property->setType($propertySchema['properties']['firstname']['type']);
+        $property->setPropertyName('firstname');
+        $property->setConstraints($propertySchema['properties']['firstname']['constraints']);
+
+        $propertyValidate = new ValidateProperty($property, [], [], $authorizedKeys);
+        $this->expectException("Exception");
+        $this->expectExceptionMessage("A property must contain a required constraint. It was not found in 'firstname'.");
+        $propertyValidate->validateConstraints();
+    }
+
+    public function testUniqueConstraintIsAbsent()
+    {
+        $propertySchema = Yaml::parse(file_get_contents(__DIR__ . "/invalid/uniqueConstraintIsAbsent/property.yaml"));
+        $authorizedKeys = Yaml::parse(file_get_contents(__DIR__ . "/../../../../../src/Service/DatabaseSchema/authorizedKeys.yaml"));
+        $property = new PropertySchema();
+        $property->setType($propertySchema['properties']['firstname']['type']);
+        $property->setPropertyName('firstname');
+        $property->setConstraints($propertySchema['properties']['firstname']['constraints']);
+
+        $propertyValidate = new ValidateProperty($property, [], [], $authorizedKeys);
+        $this->expectException("Exception");
+        $this->expectExceptionMessage("A property must contain a unique constraint. It was not found in 'firstname'.");
+        $propertyValidate->validateConstraints();
+    }
+
+    public function testUnknownConstraint()
+    {
+        $propertySchema = Yaml::parse(file_get_contents(__DIR__ . "/invalid/unknownConstraint/property.yaml"));
+        $authorizedKeys = Yaml::parse(file_get_contents(__DIR__ . "/../../../../../src/Service/DatabaseSchema/authorizedKeys.yaml"));
+        $property = new PropertySchema();
+        $property->setType($propertySchema['properties']['firstname']['type']);
+        $property->setPropertyName('firstname');
+        $property->setConstraints($propertySchema['properties']['firstname']['constraints']);
+
+        $propertyValidate = new ValidateProperty($property, [], [], $authorizedKeys);
+        $this->expectException("Exception");
+        $this->expectExceptionMessage('Valid property constraints are ["required","unique","default","automatic","lengthMax","lengthMin","mime","gt","lt","gtoe","ltoe","nb","b"]'." Invalid 'unknown' found in property 'firstname'.");
+        $propertyValidate->validateConstraints();
+    }
+
+    public function testInvalidRangeConstraint()
+    {
+        $propertySchema = Yaml::parse(file_get_contents(__DIR__ . "/invalid/invalidRangeConstraint/property.yaml"));
+        $authorizedKeys = Yaml::parse(file_get_contents(__DIR__ . "/../../../../../src/Service/DatabaseSchema/authorizedKeys.yaml"));
+        $property = new PropertySchema();
+        $property->setType($propertySchema['properties']['firstname']['type']);
+        $property->setPropertyName('firstname');
+        $property->setConstraints($propertySchema['properties']['firstname']['constraints']);
+
+        $propertyValidate = new ValidateProperty($property, [], [], $authorizedKeys);
+        $this->expectException("Exception");
+        $this->expectExceptionMessage("'lengthMax' of property 'firstname' must be lesser than 100.");
+        $propertyValidate->validateConstraints();
+    }
+
+    public function testMimetypeDoesNotExist()
+    {
+        $propertySchema = Yaml::parse(file_get_contents(__DIR__ . "/invalid/mimetypeDoesNotExist/property.yaml"));
+        $authorizedKeys = Yaml::parse(file_get_contents(__DIR__ . "/../../../../../src/Service/DatabaseSchema/authorizedKeys.yaml"));
+        $property = new PropertySchema();
+        $property->setType($propertySchema['properties']['file']['type']);
+        $property->setPropertyName('file');
+        $property->setConstraints($propertySchema['properties']['file']['constraints']);
+
+        $propertyValidate = new ValidateProperty($property, [], [], $authorizedKeys);
+        $this->expectException("Exception");
+        $this->expectExceptionMessage('Authorized mimetypes are ["text\/csv","image\/gif","image\/jpeg","image\/jpg","application\/json","video\/mpeg","image\/png","application\/pdf","application\/xml"].'." Invalid type 'invalid/mimetype' found in 'file'.");
+        $propertyValidate->validateConstraints();
+    }
+
+
 }

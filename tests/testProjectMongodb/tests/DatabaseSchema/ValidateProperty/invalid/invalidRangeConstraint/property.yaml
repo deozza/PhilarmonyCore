@@ -1,0 +1,8 @@
+properties:
+  firstname:
+    type: string
+    constraints:
+      required: false
+      unique: false
+      lengthMin: 100
+      lengthMax: 1

@@ -1,0 +1,7 @@
+properties:
+  file:
+    type: file
+    constraints:
+      mime: ['invalid/mimetype', 'image/jpeg']
+      required: false
+      unique: false

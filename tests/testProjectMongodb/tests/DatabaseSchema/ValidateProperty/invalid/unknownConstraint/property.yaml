@@ -1,0 +1,7 @@
+properties:
+  firstname:
+    type: string
+    constraints:
+      required: false
+      unique: false
+      unknown: foo

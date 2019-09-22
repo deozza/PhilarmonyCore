@@ -62,7 +62,7 @@ class ValidateEntity
             }
             if(!$containsMethod)
             {
-                throw new \Exception("A state must contain at least one method. \n Declared in the state '$stateName' of the entity '".$this->entity->getEntityName()."'");
+                throw new \Exception("A state must contain at least one method.\nDeclared in the state '$stateName' of the entity '".$this->entity->getEntityName()."'");
             }
         }
     }
@@ -89,7 +89,7 @@ class ValidateEntity
 
     private function validateMethod(string $methodName, array $methodData)
     {
-        $this->checkArrayContains($methodName, $this->authorizedKeys['methods'], "$methodName does not exist. \n Declared in the entity '".$this->entity->getEntityName()."'.");
+        $this->checkArrayContains($methodName, $this->authorizedKeys['methods'], "$methodName method does not exist.\nDeclared in the entity '".$this->entity->getEntityName()."'.");
 
         if($methodName === 'POST' || $methodName === 'PATCH')
         {

@@ -58,7 +58,7 @@ class DatabaseSchemaValidator
                 $entity->setConstraints($schemaData[$this->authorizedKeys['entity_keys'][2]]);
             }
 
-            $validateEntity = new ValidateEntity($entity, $this->properties, $this->authorizedKeys);
+            $validateEntity = new ValidateEntity($entity, $this->properties[$this->authorizedKeys['property_head']], $this->authorizedKeys, $this->entities[$this->authorizedKeys['entity_head']]);
             $validateEntity->validateProperties();
             $validateEntity->validateStates();
             if(!empty($entity->getConstraints()))

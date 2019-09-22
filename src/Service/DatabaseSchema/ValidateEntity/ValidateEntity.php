@@ -7,10 +7,11 @@ class ValidateEntity
 {
     private $entity;
 
-    public function __construct(EntitySchema $entity, array $propertiesSchema, array $authorizedKeys)
+    public function __construct(EntitySchema $entity, array $propertiesSchema, array $authorizedKeys, array $entitiesSchma)
     {
         $this->entity = $entity;
         $this->propertiesSchema = $propertiesSchema;
+        $this->entitiesSchema = $entitiesSchma;
         $this->authorizedKeys = $authorizedKeys;
     }
 
@@ -23,7 +24,7 @@ class ValidateEntity
 
         foreach($this->entity->getProperties() as $property)
         {
-            $this->checkKeyExist($property, $this->propertiesSchema[$this->authorizedKeys['property_head']], 'property does not exist');
+            $this->checkKeyExist($property, $this->propertiesSchema, 'property does not exist');
         }
     }
 
@@ -154,7 +155,97 @@ class ValidateEntity
 
     private function validatePropertiesConstraint($constraint)
     {
-        var_dump($constraint);die;
+        preg_match_all('/([^\.])+/', array_key_first($constraint), $matches);
+        $propertyKey = 0;
+        if(count($matches[0]) > 1)
+        {
+            if($this->entity->getEntityName() !== $matches[0][0])
+            {
+                throw new \Exception("Entity ".$matches[0][0]." does not exist from constraint");
+            }
+            $propertyKey++;
+
+        }
+
+        $this->checkArrayContains($matches[0][$propertyKey], $this->entity->getProperties(), 'Property '.$matches[0][$propertyKey]." does not exist in ".$this->entity->getEntityName());
+
+        if(!is_array($constraint[array_key_first($constraint)]))
+        {
+            throw new \Exception('Constraint in '.$this->entity->getEntityName()." must be an array");
+        }
+
+        foreach($constraint[array_key_first($constraint)] as $data)
+        {
+            $extractedData = $this->extractDataFromConstraint($data);
+            $this->validateOperators($extractedData);
+        }
+    }
+
+    private function extractDataFromConstraint(string $data)
+    {
+        $extractedData = [];
+//        $data .= ".param(oui.truc,bidule)";
+        $regex = "/(?<=\()[^\)]*|[.\w]+/";
+        preg_match_all($regex, $data, $matches);
+        for($i = 0; $i<count($matches[0]); $i+=2)
+        {
+            $extractedData[$matches[0][$i]] = $matches[0][$i+1];
+        }
+        return $extractedData;
+    }
+
+    private function validateOperators(array $operators)
+    {
+        $firstOperator = array_key_first($operators);
+        $explodedFirstOperator = explode('.', $firstOperator);
+        $this->checkArrayContains($explodedFirstOperator[0], $this->authorizedKeys['basic_constraint_operators'], $explodedFirstOperator[0]." is not a valid operator");
+
+        switch($explodedFirstOperator[1])
+        {
+            case 'self':
+            {
+                $this->validateSelfPropertiesTarget($operators[$firstOperator], $this->entity->getProperties(), [$this->entity->getEntityName()], $explodedFirstOperator[0]);
+            }break;
+            case 'value':
+            {
+
+            }break;
+            default:
+            {
+                $this->validateExternalPropertiesTarget($explodedFirstOperator[1], $operators[$firstOperator], $this->entitiesSchema, $explodedFirstOperator[0]);
+            }break;
+        }
+    }
+
+    private function validateExternalPropertiesTarget(string $entityTarget, string $propertiesTarget, array $entityRange, string $operator)
+    {
+        $this->checkKeyExist($entityTarget, $entityRange, 'Entity '.$entityTarget.' does not exist');
+        $propertyRange = $entityRange[$entityTarget]['properties'];
+        $this->validateSelfPropertiesTarget($propertiesTarget, $propertyRange, [$entityTarget], $operator);
+    }
+
+    private function validateSelfPropertiesTarget(string $propertiesTarget, array $propertyRange, array $entityRange, string $operator)
+    {
+        $explodedPropertiesTarget = explode(',', $propertiesTarget);
+        if(($operator === 'b' || $operator === 'nb') && count($explodedPropertiesTarget) < 2)
+        {
+            throw new \Exception('Not enough values for constraint');
+        }
+
+        foreach($explodedPropertiesTarget as $target)
+        {
+            $explodedTarget = explode('.',$target);
+            $propertyId = 0;
+            if(count($explodedTarget) === 2)
+            {
+                $propertyId = 1;
+                if(!in_array($explodedTarget[0], $entityRange))
+                {
+                    throw new \Exception('Entity target '.$explodedTarget[0].' does not exist');
+                }
+            }
+            $this->checkArrayContains($explodedTarget[$propertyId],$propertyRange, 'Property '.$explodedTarget[$propertyId].' does not exist');
+        }
     }
 
     private function checkKeyExist(string $key, array $schema, string $message)

@@ -24,7 +24,7 @@ class ValidateEntity
 
         foreach($this->entity->getProperties() as $property)
         {
-            $this->checkKeyExist($property, $this->propertiesSchema, "Property $property does not exist.\n Declared in ".$this->entity->getEntityName());
+            $this->checkKeyExist($property, $this->propertiesSchema, "Property $property does not exist.\nDeclared in ".$this->entity->getEntityName());
         }
     }
 

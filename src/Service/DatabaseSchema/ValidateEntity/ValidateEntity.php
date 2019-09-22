@@ -24,7 +24,7 @@ class ValidateEntity
 
         foreach($this->entity->getProperties() as $property)
         {
-            $this->checkKeyExist($property, $this->propertiesSchema, 'property does not exist');
+            $this->checkKeyExist($property, $this->propertiesSchema, "Property $property does not exist.\n Declared in ".$this->entity->getEntityName());
         }
     }
 
@@ -32,7 +32,7 @@ class ValidateEntity
     {
         if(empty($this->entity->getStates())) return ;
 
-        $this->checkKeyExist($this->authorizedKeys['default_state'], $this->entity->getStates(),'__default state missing');
+        $this->checkKeyExist($this->authorizedKeys['default_state'], $this->entity->getStates(),'__default state missing in '.$this->entity->getEntityName());
 
         foreach($this->entity->getStates() as $stateName=>$stateData)
         {
@@ -53,16 +53,16 @@ class ValidateEntity
                     {
                         if(!is_array($stateKeyData))
                         {
-                            throw new \Exception("Constraints must be of type array");
+                            throw new \Exception("Constraints must be of type array.\n Declared in the state '$stateName' of the entity '".$this->entity->getEntityName()."'");
                         }
                         $this->validateConstraints($stateKeyData);
                     }break;
-                    default: throw new \Exception("extra key $stateKey in $stateName of ".$this->entity->getEntityName());break;
+                    default: throw new \Exception("$stateKey is not a valid state key.\n Declared in the state '$stateName' of the entity '".$this->entity->getEntityName()."'");break;
                 }
             }
             if(!$containsMethod)
             {
-                throw new \Exception("method must exist");
+                throw new \Exception("A state must contain at least one method. \n Declared in the state '$stateName' of the entity '".$this->entity->getEntityName()."'");
             }
         }
     }
@@ -71,7 +71,7 @@ class ValidateEntity
     {
         if(count($constraints)>1)
         {
-            throw new \Exception("badly formated constraints for".$this->entity->getEntityName());
+            throw new \Exception($this->entity->getEntityName()." contains badly formated constraints. ");
         }
         switch(array_key_first($constraints))
         {
@@ -83,21 +83,21 @@ class ValidateEntity
             {
                 $this->validatePropertiesConstraint($constraints[$this->authorizedKeys['entity_constraint_keys'][1]]);
             }break;
-            default: throw new \Exception("badly formated constraints for ".$this->entity->getEntityName());break;
+            default: throw new \Exception("A constraint is applied to ".json_encode($this->authorizedKeys['entity_constraint_keys']).". ".$this->entity->getEntityName()." constraints are invalid.");break;
         }
     }
 
     private function validateMethod(string $methodName, array $methodData)
     {
-        $this->checkArrayContains($methodName, $this->authorizedKeys['methods'], "$methodName does not exist");
+        $this->checkArrayContains($methodName, $this->authorizedKeys['methods'], "$methodName does not exist. \n Declared in the entity '".$this->entity->getEntityName()."'.");
 
         if($methodName === 'POST' || $methodName === 'PATCH')
         {
-            $this->checkKeyExist($this->authorizedKeys['method_keys'][0], $methodData, 'form must contain properties');
+            $this->checkKeyExist($this->authorizedKeys['method_keys'][0], $methodData, "Properties expected in method $methodName. It was not found one state of the entity '".$this->entity->getEntityName()."'.");
             $this->validateFormProperties($methodData[$this->authorizedKeys['method_keys'][0]]);
         }
 
-        $this->checkKeyExist($this->authorizedKeys['method_keys'][1], $methodData, 'method must contain by');
+        $this->checkKeyExist($this->authorizedKeys['method_keys'][1], $methodData, "You must define who is able to execute a method. 'by' key was not declared for the method $methodName of the entity '".$this->entity->getEntityName()."'.");
         $this->validateMethodBy($methodData[$this->authorizedKeys['method_keys'][1]]);
     }
 
@@ -117,11 +117,11 @@ class ValidateEntity
         }
         if(!is_array($by))
         {
-            throw new \Exception("by must be an array");
+            throw new \Exception("'by' must be an array. It was not declared as such in the entity '".$this->entity->getEntityName()."'.");
         }
         foreach($by as $byKind=>$byData)
         {
-            $this->checkArrayContains($byKind, $this->authorizedKeys['by_keys'], "$byKind does not exist");
+            $this->checkArrayContains($byKind, $this->authorizedKeys['by_keys'], "'by' expected to be ".json_encode($this->authorizedKeys['by_keys']).". Invalid value '$byKind' found in '".$this->entity->getEntityName()."'.");
         }
     }
 
@@ -129,12 +129,12 @@ class ValidateEntity
     {
         if(count($constraint) != 2)
         {
-            throw new \Exception("badly formatted manual constraint");
+            throw new \Exception("Badly formatted manual constraint found in the entity '".$this->entity->getEntityName()."'.");
         }
 
         foreach($this->authorizedKeys['manual_constraint_keys'] as $key)
         {
-            $this->checkKeyExist($key, $constraint, "manual constraint must contain $key.");
+            $this->checkKeyExist($key, $constraint, "A manual constraint must contain $key. It was not found in the entity '".$this->entity->getEntityName()."'.");
             if($key === $this->authorizedKeys['manual_constraint_keys'][0])
             {
                 $this->validateMethodBy($constraint[$key]);
@@ -147,7 +147,7 @@ class ValidateEntity
                 }
                 foreach($constraint[$key] as $state)
                 {
-                    $this->checkKeyExist($state, $this->entity->getStates(), "$state does not exist");
+                    $this->checkKeyExist($state, $this->entity->getStates(), "$state, used in a manual constraint, was not found in the entity '".$this->entity->getEntityName()."'.");
                 }
             }
         }
@@ -184,7 +184,6 @@ class ValidateEntity
     private function extractDataFromConstraint(string $data)
     {
         $extractedData = [];
-//        $data .= ".param(oui.truc,bidule)";
         $regex = "/(?<=\()[^\)]*|[.\w]+/";
         preg_match_all($regex, $data, $matches);
         for($i = 0; $i<count($matches[0]); $i+=2)
@@ -198,7 +197,7 @@ class ValidateEntity
     {
         $firstOperator = array_key_first($operators);
         $explodedFirstOperator = explode('.', $firstOperator);
-        $this->checkArrayContains($explodedFirstOperator[0], $this->authorizedKeys['basic_constraint_operators'], $explodedFirstOperator[0]." is not a valid operator");
+        $this->checkArrayContains($explodedFirstOperator[0], $this->authorizedKeys['basic_constraint_operators'], $explodedFirstOperator[0]." is not a valid operator.\n Declared in the entity '".$this->entity->getEntityName()."'.");
 
         switch($explodedFirstOperator[1])
         {
@@ -219,7 +218,7 @@ class ValidateEntity
 
     private function validateExternalPropertiesTarget(string $entityTarget, string $propertiesTarget, array $entityRange, string $operator)
     {
-        $this->checkKeyExist($entityTarget, $entityRange, 'Entity '.$entityTarget.' does not exist');
+        $this->checkKeyExist($entityTarget, $entityRange, "Entity '$entityTarget' does not exist.\n Declared in a constraint of '".$this->entity->getEntityName()."'.");
         $propertyRange = $entityRange[$entityTarget]['properties'];
         $this->validateSelfPropertiesTarget($propertiesTarget, $propertyRange, [$entityTarget], $operator);
     }
@@ -229,7 +228,7 @@ class ValidateEntity
         $explodedPropertiesTarget = explode(',', $propertiesTarget);
         if(($operator === 'b' || $operator === 'nb') && count($explodedPropertiesTarget) < 2)
         {
-            throw new \Exception('Not enough values for constraint');
+            throw new \Exception("Constraint 'b' and 'nb' must contain 2 values. Not enough values found in a constraint of '".$this->entity->getEntityName()."'.");
         }
 
         foreach($explodedPropertiesTarget as $target)
@@ -241,10 +240,10 @@ class ValidateEntity
                 $propertyId = 1;
                 if(!in_array($explodedTarget[0], $entityRange))
                 {
-                    throw new \Exception('Entity target '.$explodedTarget[0].' does not exist');
+                    throw new \Exception("Entity target ".$explodedTarget[0]." does not exist. \n Declared in a constraint of '".$this->entity->getEntityName()."'.");
                 }
             }
-            $this->checkArrayContains($explodedTarget[$propertyId],$propertyRange, 'Property '.$explodedTarget[$propertyId].' does not exist');
+            $this->checkArrayContains($explodedTarget[$propertyId],$propertyRange, 'Property '.$explodedTarget[$propertyId].' does not exist in '.json_encode($entityRange).". \n Declared in a constraint of '".$this->entity->getEntityName()."'.");
         }
     }
 

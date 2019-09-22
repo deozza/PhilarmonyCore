@@ -28,7 +28,7 @@ class SchemaValidateCommand extends Command
         try
         {
             $this->schemaValidator->validateEntities();
-            //$this->schemaValidator->validateProperties();
+            $this->schemaValidator->validateProperties();
         }
         catch(\Exception $e)
         {

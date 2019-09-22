@@ -1,0 +1,8 @@
+properties:
+  firstname:
+    type: entity.invalid
+    constraints:
+      unique: false
+      required: true
+      lengthMin: 1
+      lengthMax: 128

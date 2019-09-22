@@ -1,0 +1,8 @@
+properties:
+  firstname:
+    type: embedded.invalid
+    constraints:
+      unique: false
+      required: true
+      lengthMin: 1
+      lengthMax: 128

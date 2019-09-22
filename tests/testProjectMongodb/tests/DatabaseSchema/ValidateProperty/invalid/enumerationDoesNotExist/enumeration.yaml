@@ -1,0 +1,9 @@
+enumerations:
+  genre:
+    - male
+    - female
+    - asexual
+
+  boolean:
+    - true
+    - false

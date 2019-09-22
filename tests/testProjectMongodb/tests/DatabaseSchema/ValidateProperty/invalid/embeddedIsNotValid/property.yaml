@@ -1,0 +1,6 @@
+properties:
+  character_naming:
+    type: embedded.character_naming
+    constraints:
+      unique: false
+      required: true

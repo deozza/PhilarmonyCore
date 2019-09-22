@@ -1,0 +1,6 @@
+properties:
+  character_naming:
+    type: entity.character_naming
+    constraints:
+      unique: false
+      required: true

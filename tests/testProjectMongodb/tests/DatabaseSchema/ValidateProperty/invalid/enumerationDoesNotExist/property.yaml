@@ -1,0 +1,6 @@
+properties:
+  firstname:
+    type: enumeration.invalid
+    constraints:
+      unique: false
+      required: true

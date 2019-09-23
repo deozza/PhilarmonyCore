@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\tests\Api\Ok;
-
 
 use Deozza\PhilarmonyApiTesterBundle\Service\TestAsserter;
 
@@ -35,6 +33,10 @@ class OkControllerTest extends TestAsserter
                 ["kind"=>"unit", "test"=>['method'=>'GET'  , 'url'=>'/api/docs/properties/name'                                    , "status"=>200, 'out'=>'docsPropertiesNameGet']],
                 ["kind"=>"unit", "test"=>['method'=>'GET'  , 'url'=>'/api/docs/enumerations'                                       , "status"=>200, 'out'=>'docsEnumerationsGet']],
                 ["kind"=>"unit", "test"=>['method'=>'GET'  , 'url'=>'/api/docs/enumerations/boolean'                               , "status"=>200, 'out'=>'docsEnumerationsBooleanGet']],
+
+                ["kind"=>"unit", "test"=>['method'=>'GET'  , 'url'=>'/api/entities/gear'                                           , "status"=>200, 'out'=>'entitiesGetList']],
+                ["kind"=>"unit", "test"=>['method'=>'GET'  , 'url'=>'/api/entities/#gear_6#'                                       , "status"=>200, 'out'=>'entitiesGetSpecific']],
+
             ];
     }
 }

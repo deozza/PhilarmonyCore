@@ -29,30 +29,32 @@ class InvalidMethodConrollerTest extends TestAsserter
     {
         return
             [
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/docs/entities'                                           , "status"=>405]],
-                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/docs/entities'                                           , "status"=>405]],
-                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/docs/entities'                                           , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/docs/entities'            , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/docs/entities'            , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/docs/entities'            , "status"=>405]],
 
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/docs/entities/gear'                                      , "status"=>405]],
-                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/docs/entities/gear'                                      , "status"=>405]],
-                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/docs/entities/gear'                                      , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/docs/entities/gear'       , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/docs/entities/gear'       , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/docs/entities/gear'       , "status"=>405]],
 
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/docs/properties'                                         , "status"=>405]],
-                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/docs/properties'                                         , "status"=>405]],
-                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/docs/properties'                                         , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/docs/properties'          , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/docs/properties'          , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/docs/properties'          , "status"=>405]],
 
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/docs/properties/name'                                    , "status"=>405]],
-                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/docs/properties/name'                                    , "status"=>405]],
-                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/docs/properties/name'                                    , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/docs/properties/name'     , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/docs/properties/name'     , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/docs/properties/name'     , "status"=>405]],
 
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/docs/enumerations'                                       , "status"=>405]],
-                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/docs/enumerations'                                       , "status"=>405]],
-                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/docs/enumerations'                                       , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/docs/enumerations'        , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/docs/enumerations'        , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/docs/enumerations'        , "status"=>405]],
 
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/docs/enumerations/boolean'                               , "status"=>405]],
-                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/docs/enumerations/boolean'                               , "status"=>405]],
-                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/docs/enumerations/boolean'                               , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/docs/enumerations/boolean', "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/docs/enumerations/boolean', "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/docs/enumerations/boolean', "status"=>405]],
 
+                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/foo'             , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/foo'             , "status"=>405]],
             ];
     }
 }

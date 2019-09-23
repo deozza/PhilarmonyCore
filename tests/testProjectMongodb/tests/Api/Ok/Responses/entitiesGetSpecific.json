@@ -1,0 +1,14 @@
+{
+  "kind":"gear",
+  "validation_state":"posted",
+  "owner":{
+    "uuid":"@string@.isUuid()",
+    "username":"userAdmin"
+  },
+  "date_of_creation":"@date@",
+  "last_update":"@date@",
+  "properties":{
+    "name":"sword",
+    "description":"Stick the pointy end"
+  }
+}

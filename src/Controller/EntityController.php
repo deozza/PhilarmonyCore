@@ -70,7 +70,7 @@ class EntityController extends BaseController
 
     /**
      * @Route(
-     *     "entity/{uuid}",
+     *     "entities/{uuid}",
      *     requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
      *     },
@@ -196,7 +196,7 @@ class EntityController extends BaseController
 
     /**
      * @Route(
-     *     "entity/{uuid}",
+     *     "entities/{uuid}",
      *     requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
      *     },
@@ -273,7 +273,7 @@ class EntityController extends BaseController
 
     /**
      * @Route(
-     *     "entity/{uuid}",
+     *     "entities/{uuid}",
      *     requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
      *     },

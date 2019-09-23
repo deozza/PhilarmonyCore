@@ -67,7 +67,7 @@
     ],
     "scripts": {
         "test": [
-            "./tests/testProjectMongodb/bin/console p:m:m",
+            "./tests/testProjectMongodb/bin/console p:g:f",
             "./tests/testProjectMongodb/bin/console d:m:s:d",
             "./tests/testProjectMongodb/bin/console d:m:s:c",
             "./tests/testProjectMongodb/bin/console d:m:f:l --append",

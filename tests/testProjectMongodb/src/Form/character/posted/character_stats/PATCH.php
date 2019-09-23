@@ -34,18 +34,21 @@ class PATCH extends AbstractType
 
         $builder->add('heigth' , IntegerType::class, [
             'constraints' => [
+                new Assert\GreaterThanOrEqual(1),
                 new Assert\NotBlank(),
                 ],
         ]);
 
         $builder->add('current_health' , IntegerType::class, [
             'constraints' => [
+                new Assert\GreaterThanOrEqual(0),
                 new Assert\NotBlank(),
                 ],
         ]);
 
         $builder->add('max_health' , IntegerType::class, [
             'constraints' => [
+                new Assert\GreaterThanOrEqual(0),
                 new Assert\NotBlank(),
                 ],
         ]);

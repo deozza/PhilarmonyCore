@@ -19,17 +19,17 @@
 {% elseif constraints.type == 'int' %}
         $builder->add('{{ field }}' , IntegerType::class, [
             'constraints' => [
-{% if constraints.constraints.greaterThan is defined %}
-                new Assert\GreaterThan({{ constraints.constraints.greaterThan }}),
+{% if constraints.constraints.gt is defined %}
+                new Assert\GreaterThan({{ constraints.constraints.gt }}),
 {% endif %}
-{% if constraints.constraints.lessThan is defined %}
-                new Assert\LessThan({{ constraints.constraints.lessThan}}),
+{% if constraints.constraints.lt is defined %}
+                new Assert\LessThan({{ constraints.constraints.lt}}),
 {% endif %}
-{% if constraints.constraints.greaterThanOrEqual is defined %}
-                new Assert\GreaterThanOrEqual({{ constraints.constraints.greaterThanOrEqual }}),
+{% if constraints.constraints.gtoe is defined %}
+                new Assert\GreaterThanOrEqual({{ constraints.constraints.gtoe }}),
 {% endif %}
-{% if constraints.constraints.lessThanOrEqual is defined %}
-                new Assert\LessThanOrEqual({{ constraints.constraints.lessThanOrEqual }}),
+{% if constraints.constraints.ltoe is defined %}
+                new Assert\LessThanOrEqual({{ constraints.constraints.ltoe }}),
 {% endif %}
 {% if constraints.constraints.required == true %}
                 new Assert\NotBlank(),
@@ -42,17 +42,17 @@
 {% elseif constraints.type == 'float' %}
         $builder->add('{{ field }}' , NumberType::class, [
             'constraints' => [
-{% if constraints.constraints.greaterThan is defined %}
-                new Assert\GreaterThan({{ constraints.constraints.greaterThan }}),
+{% if constraints.constraints.gt is defined %}
+                new Assert\GreaterThan({{ constraints.constraints.gt }}),
 {% endif %}
-{% if constraints.constraints.lessThan is defined %}
-                new Assert\LessThan({{ constraints.constraints.lessThan}}),
+{% if constraints.constraints.lt is defined %}
+                new Assert\LessThan({{ constraints.constraints.lt}}),
 {% endif %}
-{% if constraints.constraints.greaterThanOrEqual is defined %}
-                new Assert\GreaterThanOrEqual({{ constraints.constraints.greaterThanOrEqual }}),
+{% if constraints.constraints.gtoe is defined %}
+                new Assert\GreaterThanOrEqual({{ constraints.constraints.gtoe }}),
 {% endif %}
-{% if constraints.constraints.lessThanOrEqual is defined %}
-                new Assert\LessThanOrEqual({{ constraints.constraints.lessThanOrEqual }}),
+{% if constraints.constraints.ltoe is defined %}
+                new Assert\LessThanOrEqual({{ constraints.constraints.ltoe }}),
 {% endif %}
 {% if constraints.constraints.required == true %}
                 new Assert\NotBlank(),
@@ -136,17 +136,17 @@
             'allow_delete' => true,
             'entry_options' => [
                 'constraints' => [
-{% if constraints.constraints.greaterThan is defined %}
-                    new Assert\GreaterThan({{ constraints.constraints.greaterThan }}),
+{% if constraints.constraints.gt is defined %}
+                    new Assert\GreaterThan({{ constraints.constraints.gt }}),
 {% endif %}
-{% if constraints.constraints.lessThan is defined %}
-                    new Assert\LessThan({{ constraints.constraints.lessThan}}),
+{% if constraints.constraints.lt is defined %}
+                    new Assert\LessThan({{ constraints.constraints.lt}}),
 {% endif %}
-{% if constraints.constraints.greaterThanOrEqual is defined %}
-                    new Assert\GreaterThanOrEqual({{ constraints.constraints.greaterThanOrEqual }}),
+{% if constraints.constraints.gtoe is defined %}
+                    new Assert\GreaterThanOrEqual({{ constraints.constraints.gtoe }}),
 {% endif %}
-{% if constraints.constraints.lessThanOrEqual is defined %}
-                    new Assert\LessThanOrEqual({{ constraints.constraints.lessThanOrEqual }}),
+{% if constraints.constraints.ltoe is defined %}
+                    new Assert\LessThanOrEqual({{ constraints.constraints.ltoe }}),
 {% endif %}
 {% if constraints.constraints.required == true %}
                     new Assert\NotBlank(),
@@ -164,17 +164,17 @@
             'allow_delete' => true,
             'entry_options' => [
                 'constraints' => [
-{% if constraints.constraints.greaterThan is defined %}
-                    new Assert\GreaterThan({{ constraints.constraints.greaterThan }}),
+{% if constraints.constraints.gt is defined %}
+                    new Assert\GreaterThan({{ constraints.constraints.gt }}),
 {% endif %}
-{% if constraints.constraints.lessThan is defined %}
-                    new Assert\LessThan({{ constraints.constraints.lessThan}}),
+{% if constraints.constraints.lt is defined %}
+                    new Assert\LessThan({{ constraints.constraints.lt}}),
 {% endif %}
-{% if constraints.constraints.greaterThanOrEqual is defined %}
-                    new Assert\GreaterThanOrEqual({{ constraints.constraints.greaterThanOrEqual }}),
+{% if constraints.constraints.gtoe is defined %}
+                    new Assert\GreaterThanOrEqual({{ constraints.constraints.gtoe }}),
 {% endif %}
-{% if constraints.constraints.lessThanOrEqual is defined %}
-                    new Assert\LessThanOrEqual({{ constraints.constraints.lessThanOrEqual }}),
+{% if constraints.constraints.ltoe is defined %}
+                    new Assert\LessThanOrEqual({{ constraints.constraints.ltoe }}),
 {% endif %}
 {% if constraints.constraints.required == true %}
                     new Assert\NotBlank(),

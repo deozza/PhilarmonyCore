@@ -40,6 +40,7 @@ class PATCH extends AbstractType
 
         $builder->add('stock' , IntegerType::class, [
             'constraints' => [
+                new Assert\GreaterThanOrEqual(0),
                 new Assert\NotBlank(),
                 ],
         ]);

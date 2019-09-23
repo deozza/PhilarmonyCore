@@ -1,0 +1,12 @@
+entities:
+  character_naming:
+    properties:
+      - firstname
+    states:
+      __default:
+        methods:
+          POST:
+            properties:
+              - firstname
+            by:
+              foo: owner

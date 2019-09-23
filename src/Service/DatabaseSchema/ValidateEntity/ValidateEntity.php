@@ -93,7 +93,7 @@ class ValidateEntity
 
         if($methodName === 'POST' || $methodName === 'PATCH')
         {
-            $this->checkKeyExist($this->authorizedKeys['method_keys'][0], $methodData, "Properties expected in method $methodName. It was not found one state of the entity '".$this->entity->getEntityName()."'.");
+            $this->checkKeyExist($this->authorizedKeys['method_keys'][0], $methodData, "Properties expected in method $methodName. It was not found in one of the state of the entity '".$this->entity->getEntityName()."'.");
             $this->validateFormProperties($methodData[$this->authorizedKeys['method_keys'][0]]);
         }
 
@@ -105,7 +105,7 @@ class ValidateEntity
     {
         foreach($properties as $property)
         {
-            $this->checkArrayContains($property, $this->entity->getProperties(), "$property does not exist in ".$this->entity->getEntityName());
+            $this->checkArrayContains($property, $this->entity->getProperties(), "'$property' does not exist in the entity '".$this->entity->getEntityName()."'. Was declared in one of its state.");
         }
     }
 

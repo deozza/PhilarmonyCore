@@ -46,7 +46,7 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
 
         try
         {
-            $env = new Dotenv();
+            $env = new Dotenv(true);
             $env->load(__DIR__."/../../.env");
             $secret = getenv("APP_SECRET");
             $data = JWT::decode($credentials, $secret, ["HS256"]);

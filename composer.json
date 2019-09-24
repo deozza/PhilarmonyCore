@@ -59,12 +59,6 @@
             "ext-mongo": "1.6.16"
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/deozza/ApiTesterBundle.git"
-        }
-    ],
     "scripts": {
         "test": [
             "./tests/testProjectMongodb/bin/console p:g:f",

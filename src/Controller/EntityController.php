@@ -177,10 +177,12 @@ class EntityController extends BaseController
 
         $this->dm->persist($entityToPost);
         $state = $this->validate->processValidation($entityToPost,0, $entity['states'], $this->getUser());
+
         if($entityToPost->getValidationState() !== "__default")
         {
             $this->dm->flush();
         }
+
 
         if(is_array($state))
         {

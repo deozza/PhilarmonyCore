@@ -72,7 +72,7 @@ properties:
     constraints:
       unique: true
       required: true
-      lengthMin: 1
+      lengthMin: 2
       lengthMax: 128
 
   description:

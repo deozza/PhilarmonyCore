@@ -33,7 +33,7 @@ entities:
               - name
               - description
             by:
-              users:
+              roles:
                 - ROLE_USER
       posted:
         methods:

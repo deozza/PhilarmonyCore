@@ -1,0 +1,10 @@
+{
+  "conflicts":"You can not access to this entity",
+  "context":[
+    {
+      "conflict":{
+        "name":"PROPERTY_ALREADY_EXISTS"
+      }
+    }
+  ]
+}

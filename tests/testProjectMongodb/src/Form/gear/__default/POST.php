@@ -24,7 +24,7 @@ class POST extends AbstractType
     {
         $builder->add('name' , TextType::class, [
             'constraints' => [
-                new Assert\Length(['min'=>'1']),
+                new Assert\Length(['min'=>'2']),
                 new Assert\Length(['max'=>'128']),
                 new Assert\NotBlank(),
             ],

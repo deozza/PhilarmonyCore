@@ -42,9 +42,9 @@ class AuthorizeRequest
         }
     }
 
-    public function isAllowed($by, $user, $loggedin = true, ?Entity $entity = null)
+    public function isAllowed($by, $user, $mustBeLoggedIn = true, ?Entity $entity = null)
     {
-        if($loggedin === true && empty($user))
+        if($mustBeLoggedIn === true && empty($user))
         {
             return $this->response->notAuthorized();
         }

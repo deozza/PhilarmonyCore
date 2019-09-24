@@ -12,7 +12,7 @@
             "description"
           ],
           "by":{
-            "users":[
+            "roles":[
               "ROLE_USER"
             ]
           }

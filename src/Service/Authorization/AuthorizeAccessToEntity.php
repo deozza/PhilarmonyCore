@@ -17,7 +17,6 @@ class AuthorizeAccessToEntity
         {
             return false;
         }
-        
         if(array_key_exists('roles', $by))
         {
             foreach($by['roles'] as $role)

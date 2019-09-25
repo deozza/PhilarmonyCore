@@ -123,7 +123,7 @@ class Validate
 
             foreach($referenceProperties as $referenceProperty)
             {
-                if($this->validate($a, $method, $referenceProperties, $referenceEntity, $referenceParams) == true);
+                if($this->validate($a, $method, $referenceProperties, $referenceEntity, $referenceParams) == true)
                 {
                     $validate[$constraint] = true;
                     break;

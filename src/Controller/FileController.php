@@ -27,7 +27,7 @@ class FileController extends BaseController
      */
     public function getFileAction(string $uuid,string $file_property, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
         if(empty($entity))
         {
             return $this->response->notFound("Resource not found");
@@ -73,7 +73,7 @@ class FileController extends BaseController
      */
     public function postFileAction(string $uuid,string $file_property, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
         if(empty($entity))
         {
             return $this->response->notFound("Resource not found");
@@ -172,7 +172,7 @@ class FileController extends BaseController
      */
     public function deleteFileAction(string $uuid,string $file_property, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
         if(empty($entity))
         {
             return $this->response->notFound("Resource not found");

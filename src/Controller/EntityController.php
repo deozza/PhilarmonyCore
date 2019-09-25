@@ -79,7 +79,7 @@ class EntityController extends BaseController
      */
     public function getEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
@@ -207,7 +207,7 @@ class EntityController extends BaseController
      */
     public function patchEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
 
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
@@ -284,7 +284,7 @@ class EntityController extends BaseController
      */
     public function deleteEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))

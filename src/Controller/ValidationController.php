@@ -26,7 +26,7 @@ class ValidationController extends BaseController
      */
     public function patchManualValidationAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
 
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
 
@@ -77,7 +77,7 @@ class ValidationController extends BaseController
      */
     public function patchManualRetrogradeAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
 
         $valid = $this->manualValidation->ableToRetrogradeEntity($entity, $user);

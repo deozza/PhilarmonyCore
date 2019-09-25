@@ -27,7 +27,7 @@ class EmbeddedEntityController extends BaseController
      */
     public function postEmbeddedEntityAction(string $uuid, string $property_name, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
         if(empty($entity))
         {
             return $this->response->notFound("Route not found");
@@ -143,7 +143,7 @@ class EmbeddedEntityController extends BaseController
      */
     public function patchEmbeddedEntityAction(string $uuid, string $property_name, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
         if(empty($entity))
         {
             return $this->response->notFound("Route not found");
@@ -256,7 +256,7 @@ class EmbeddedEntityController extends BaseController
      */
     public function deleteEmbeddedEntityAction(string $uuid, string $property_name, string $property_id, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneByUuid($uuid);
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
         if(empty($entity))
         {
             return $this->response->notFound("Route not found");

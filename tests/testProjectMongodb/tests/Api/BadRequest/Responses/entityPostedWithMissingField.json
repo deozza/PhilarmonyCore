@@ -1,12 +1,5 @@
 {
-  "error":{
-    "children":{
-      "name":{
-        "errors":[
-          "This value should not be blank."
-        ]
-      },
-      "description":[]
-    }
-  }
+  "name":[
+    "This value should not be blank."
+  ]
 }

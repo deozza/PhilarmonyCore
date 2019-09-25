@@ -116,14 +116,13 @@ class Validate
         {
             $method = $this->getMethod($constraint);
             $referenceEntity = $this->getReferenceEntity($constraint, $entity);
-            $referenceProperties = explode(',', $this->getReferenceProperties($constraint));
+            $referenceProperties = $this->getReferenceProperties($constraint);
             $referenceParams = $this->getReferenceParams($constraint, $entity);
-
             $validate[$constraint] = false;
 
             foreach($referenceProperties as $referenceProperty)
             {
-                if($this->validate($a, $method, $referenceProperties, $referenceEntity, $referenceParams) == true)
+                if($this->validate($a, $method, $referenceProperties, $referenceEntity, $referenceParams) == true);
                 {
                     $validate[$constraint] = true;
                     break;

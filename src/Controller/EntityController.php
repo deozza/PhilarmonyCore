@@ -102,7 +102,7 @@ class EntityController extends BaseController
 
     /**
      * @Route(
-     *     "entities/{entity_name}",
+     *     "entity/{entity_name}",
      *     requirements={
      *          "entity_name" = "^(\w{1,50})$"
      *     },
@@ -186,7 +186,7 @@ class EntityController extends BaseController
 
         if(is_array($state))
         {
-            return $this->response->conflict($state, $entityToPost, ['entity_basic', 'entity_id', 'user_basic']);
+            return $this->response->created(['warning'=>$state, 'entity'=>$entityToPost], ['entity_basic', 'entity_id', 'user_basic']);
         }
 
         $this->handleEvents($request->getMethod(), $entity['states']['__default'], $entityToPost, $eventDispatcher, json_decode($request->getContent(), true));
@@ -265,7 +265,8 @@ class EntityController extends BaseController
             return $this->response->conflict($state, $entity, ['entity_complete', 'user_basic']);
         }
 
-        $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher, json_decode($request->getContent(), true));
+
+        $this->handleEvents($request->getMethod(), $stateConfig[$entity->getValidationState()], $entity, $eventDispatcher, json_decode($request->getContent(), true));
 
         $this->dm->flush();
 

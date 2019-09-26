@@ -17,7 +17,7 @@ class EmbeddedEntityController extends BaseController
 {
     /**
      * @Route(
-     *     "entity/{uuid}/embedded/{property_name}",
+     *     "entities/{uuid}/embedded/{property_name}",
      *     requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *          "property_name" = "^(\w{1,50})$"
@@ -120,7 +120,7 @@ class EmbeddedEntityController extends BaseController
         if(is_array($state))
         {
             $this->dm->flush();
-            return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
+            return $this->response->created(['warning'=>$state, 'entity'=>$entity], ['entity_basic', 'entity_id', 'user_basic']);
         }
 
         $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher, json_decode($request->getContent(), true));
@@ -133,7 +133,7 @@ class EmbeddedEntityController extends BaseController
 
     /**
      * @Route(
-     *     "entity/{uuid}/embedded/{property_name}",
+     *     "entities/{uuid}/embedded/{property_name}",
      *     requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *          "property_name" = "^(\w{1,50})$"
@@ -245,7 +245,7 @@ class EmbeddedEntityController extends BaseController
 
     /**
      * @Route(
-     *     "entity/{uuid}/embedded/{property_name}/{property_id}",
+     *     "entities/{uuid}/embedded/{property_name}/{property_id}",
      *     requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *          "property_name" = "^(\w{1,50})$",

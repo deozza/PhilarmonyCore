@@ -27,7 +27,7 @@ class UnauthorizedControllerTest extends TestAsserter
     {
         return
             [
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entities/gear'    , "status"=>401]],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/gear'      , "status"=>401]],
 
                 ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/#gear_6#', "status"=>401]],
                 ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/#gear_6#', "status"=>401]],

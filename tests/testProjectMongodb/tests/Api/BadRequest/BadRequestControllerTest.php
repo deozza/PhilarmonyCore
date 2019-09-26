@@ -1,6 +1,6 @@
 <?php
 
-namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\tests\Api\Conflict;
+namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\tests\Api\BadRequest;
 
 use Deozza\PhilarmonyApiTesterBundle\Service\TestAsserter;
 
@@ -27,10 +27,10 @@ class BadRequestControllerTest extends TestAsserter
     {
         return
             [
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entities/gear'    , 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithMissingField' , 'in'=>'entityPostWithMissingField']],
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entities/gear'    , 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithExtraField'   , 'in'=>'entityPostWithExtraField']],
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entities/gear'    , 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithTooLongField' , 'in'=>'entityPostWithTooLongField']],
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entities/gear'    , 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithTooShortField', 'in'=>'entityPostWithTooShortField']],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/gear'    , 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithMissingField' , 'in'=>'entityPostWithMissingField']],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/gear'    , 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithExtraField'   , 'in'=>'entityPostWithExtraField']],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/gear'    , 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithTooLongField' , 'in'=>'entityPostWithTooLongField']],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/gear'    , 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithTooShortField', 'in'=>'entityPostWithTooShortField']],
             ];
     }
 }

@@ -1,12 +1,10 @@
 <?php
 
-
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\tests\Api\NotFound;
-
 
 use Deozza\PhilarmonyApiTesterBundle\Service\TestAsserter;
 
-class NotFoundConrollerTest extends TestAsserter
+class NotFoundControllerTest extends TestAsserter
 {
     const TEST_DATABASE_PATH = __DIR__ . "/../../../var/db_test/philarmony-core-test";
 

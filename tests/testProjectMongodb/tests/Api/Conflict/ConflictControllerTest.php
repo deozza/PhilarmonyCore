@@ -27,7 +27,7 @@ class ConflictControllerTest extends TestAsserter
     {
         return
             [
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entities/gear'    , 'token'=>'token_userAdmin', "status"=>409, 'out'=>'entityPostedWithDuplicatedProperty', 'in'=>'entityPostWithDuplicatedProperty']],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/gear'    , 'token'=>'token_userAdmin', "status"=>409, 'out'=>'entityPostedWithDuplicatedProperty', 'in'=>'entityPostWithDuplicatedProperty']],
             ];
     }
 }

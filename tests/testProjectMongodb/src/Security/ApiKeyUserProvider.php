@@ -18,12 +18,12 @@ class ApiKeyUserProvider implements UserProviderInterface
 
     public function getAuthToken($authTokenHeader)
     {
-        return $this->apiTokenRepository->findOneByValue($authTokenHeader);
+        return $this->apiTokenRepository->findOneBy(['value'=>$authTokenHeader]);
     }
 
     public function loadUserByUsername($username)
     {
-        return $this->userRepository->findByUsername($username);
+        return $this->userRepository->findBy(['username'=>$username]);
     }
 
     public function refreshUser(UserInterface $user)

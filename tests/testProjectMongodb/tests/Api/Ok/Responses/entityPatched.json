@@ -1,0 +1,15 @@
+{
+  "uuid":"@string@.isUuid()",
+  "kind":"gear",
+  "validation_state":"posted",
+  "owner":{
+    "username":"userAdmin",
+    "uuid":"@string@.isUuid()"
+  },
+  "date_of_creation":"@date@",
+  "last_update":"@date@",
+  "properties":{
+    "name":"sword",
+    "description":"Careful with the pointy end. The stick is powerful too."
+  }
+}

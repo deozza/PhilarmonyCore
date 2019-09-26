@@ -1,12 +1,7 @@
 {
   "error":{
-    "children":{
-      "name":{
-        "errors":[
-          "This value is too short. It should have 2 characters or more."
-        ]
-      },
-      "description":[]
-    }
+    "name":[
+      "This value is too short. It should have 2 characters or more."
+    ]
   }
 }

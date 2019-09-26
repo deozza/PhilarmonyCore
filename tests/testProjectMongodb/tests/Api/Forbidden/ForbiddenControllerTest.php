@@ -1,6 +1,6 @@
 <?php
 
-namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\tests\Api\Unauthorized;
+namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\tests\Api\Forbidden;
 
 use Deozza\PhilarmonyApiTesterBundle\Service\TestAsserter;
 
@@ -27,7 +27,6 @@ class ForbiddenControllerTest extends TestAsserter
     {
         return
             [
-
                 ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/#gear_6#', 'token'=>'token_userActive', "status"=>403]],
                 ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/#gear_6#', 'token'=>'token_userActive', "status"=>403]],
             ];

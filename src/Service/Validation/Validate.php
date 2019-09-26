@@ -73,22 +73,22 @@ class Validate
             return true;
         }
 
-        $validate = [];
+        $validate = ["step_to_validate"=>$states[$stateToValidate], "requirements"=>[]];
 
         if(array_key_exists('manual', $stateToValidateConfig['constraints']))
         {
-            $validate['manual'] = ["manual"=>false];
+            $validate["requirements"]['manual_validation'] = [false];
         }
 
         if(array_key_exists('properties', $stateToValidateConfig['constraints']))
         {
             foreach($stateToValidateConfig['constraints']['properties'] as $x=>$y)
             {
-                $validate[$x] = $this->validateField($x, $y, $entity);
+                $validate["requirements"][$x] = $this->validateField($x, $y, $entity);
             }
         }
 
-        foreach($validate as $key=>$value)
+        foreach($validate['requirements'] as $key=>$value)
         {
             if(in_array(false, $value))
             {

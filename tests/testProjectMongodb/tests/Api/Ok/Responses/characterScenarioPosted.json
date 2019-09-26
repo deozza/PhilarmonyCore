@@ -1,0 +1,21 @@
+{
+  "warning":{
+    "step_to_validate":"approved",
+    "requirements":{
+      "manual_validation":[false]
+    }
+  },
+  "entity":
+  {
+    "uuid":"@string@.isUuid().catchAs(character_uuid)",
+    "kind":"character",
+    "validation_state":"posted",
+    "owner":{
+      "username":"userActive",
+      "uuid":"@string@.isUuid()"
+    },
+    "date_of_creation":"@date@",
+    "last_update":"@date@",
+    "properties":[]
+  }
+}

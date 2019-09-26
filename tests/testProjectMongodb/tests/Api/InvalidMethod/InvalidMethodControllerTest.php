@@ -6,7 +6,7 @@ namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\tests\Api\Invalid
 
 use Deozza\PhilarmonyApiTesterBundle\Service\TestAsserter;
 
-class InvalidMethodConrollerTest extends TestAsserter
+class InvalidMethodControllerTest extends TestAsserter
 {
     const TEST_DATABASE_PATH = __DIR__ . "/../../../var/db_test/philarmony-core-test";
 

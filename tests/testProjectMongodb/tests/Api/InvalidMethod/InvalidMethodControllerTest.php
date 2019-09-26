@@ -53,8 +53,8 @@ class InvalidMethodConrollerTest extends TestAsserter
                 ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/docs/enumerations/boolean', "status"=>405]],
                 ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/docs/enumerations/boolean', "status"=>405]],
 
-                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/foo'             , "status"=>405]],
-                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/foo'             , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entity/foo'             , "status"=>405]],
+                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entity/foo'             , "status"=>405]],
             ];
     }
 }

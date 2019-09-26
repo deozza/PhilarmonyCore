@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\tests\Api\InvalidMethod;
+namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\tests\Api\NotFound;
 
 
 use Deozza\PhilarmonyApiTesterBundle\Service\TestAsserter;
@@ -34,7 +34,7 @@ class NotFoundConrollerTest extends TestAsserter
                 ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/docs/enumerations/foo'                        , "status"=>404]],
 
                 ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entities/foo'                                 , "status"=>404]],
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entities/foo'                                 , "status"=>404]],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/foo'                                 , "status"=>404]],
 
                 ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entities/00100000-0000-4000-a000-000000000000', "status"=>404]],
                 ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/00100000-0000-4000-a000-000000000000', "status"=>404]],

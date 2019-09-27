@@ -1,8 +1,6 @@
 <?php
 namespace Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema;
 
-use Deozza\PhilarmonyUtils\DataSchema\AuthorizedKeys;
-use Deozza\PhilarmonyUtils\Exceptions\FileNotFound;
 use Symfony\Component\Yaml\Yaml;
 
 class DatabaseSchemaLoader
@@ -14,6 +12,7 @@ class DatabaseSchemaLoader
         $this->propertyPath = $property;
         $this->enumerationPath = $enumeration;
         $this->rootPath = $path;
+        $this->authorizedKeys = Yaml::parse(file_get_contents(__DIR__.'/authorizedKeys.yaml'));
     }
 
     public function loadEntityEnumeration($entity_name = null, $returnKey = false)
@@ -26,7 +25,7 @@ class DatabaseSchemaLoader
         }
         catch(\Exception $e)
         {
-            throw new FileNotFound($e->getMessage());
+            throw new \Exception($e->getMessage());
         }
 
         if(empty($entity_name))
@@ -34,7 +33,7 @@ class DatabaseSchemaLoader
             return $values;
         }
 
-        foreach (array_keys($values[AuthorizedKeys::ENTITY_HEAD]) as $key)
+        foreach (array_keys($values[$this->authorizedKeys['entity_head']]) as $key)
         {
             if($key == $entity_name)
             {
@@ -42,7 +41,7 @@ class DatabaseSchemaLoader
                 {
                     return $key;
                 }
-                return $values[AuthorizedKeys::ENTITY_HEAD][$key];
+                return $values[$this->authorizedKeys['entity_head']][$key];
             }
         }
 
@@ -59,7 +58,7 @@ class DatabaseSchemaLoader
         }
         catch(\Exception $e)
         {
-            throw new FileNotFound($e->getMessage());
+            throw new \Exception($e->getMessage());
         }
 
         if(empty($property_name))
@@ -67,7 +66,7 @@ class DatabaseSchemaLoader
             return $values;
         }
 
-        foreach (array_keys($values[AuthorizedKeys::PROPERTY_HEAD]) as $key)
+        foreach (array_keys($values[$this->authorizedKeys['property_head']]) as $key)
         {
             if($key == $property_name)
             {
@@ -75,7 +74,7 @@ class DatabaseSchemaLoader
                 {
                     return $key;
                 }
-                return $values[AuthorizedKeys::PROPERTY_HEAD][$key];
+                return $values[$this->authorizedKeys['property_head']][$key];
             }
         }
 
@@ -92,19 +91,19 @@ class DatabaseSchemaLoader
         }
         catch (\Exception $e)
         {
-            throw new FileNotFound($e->getMessage());
+            throw new \Exception($e->getMessage());
         }
 
         if (empty($enumeration_name)) {
             return $values;
         }
 
-        foreach (array_keys($values[AuthorizedKeys::ENUMERATION_HEAD]) as $key) {
+        foreach (array_keys($values[$this->authorizedKeys['enumeration_head']]) as $key) {
             if ($key == $enumeration_name) {
                 if ($returnKey) {
                     return $key;
                 }
-                return $values[AuthorizedKeys::ENUMERATION_HEAD][$key];
+                return $values[$this->authorizedKeys['enumeration_head']][$key];
             }
         }
 
@@ -113,14 +112,13 @@ class DatabaseSchemaLoader
 
     public function propertyFinder(string $propertyName, string $entityName, int $i=0)
     {
-        $entities = $this->loadEntityEnumeration($entityName);
         $explodedPropertyName = explode(".", $propertyName);
         if(count($explodedPropertyName)>1)
         {
             return $this->propertyFinder($explodedPropertyName[$i+2], $explodedPropertyName[$i], 2);
         }
 
-        $availableProperties = $this->loadEntityEnumeration($entityName)[AuthorizedKeys::ENTITY_KEYS[0]];
+        $availableProperties = $this->loadEntityEnumeration($entityName)[$this->authorizedKeys['entity_keys'][0]];
         if(empty($availableProperties))
         {
             return false;

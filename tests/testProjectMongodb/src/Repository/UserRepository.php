@@ -4,7 +4,7 @@ namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Repository;
 
 use Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Document\User;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 
 class UserRepository extends DocumentRepository
 {

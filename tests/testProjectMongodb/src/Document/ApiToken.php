@@ -1,7 +1,6 @@
 <?php
 namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Document;
 
-use Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Document\User;
 use Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Repository\ApiTokenRepository;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use JMS\Serializer\Annotation as JMS;
@@ -23,7 +22,7 @@ class ApiToken
     private $token;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="User")
+     * @ODM\ReferenceOne(targetDocument="Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Document\User")
      * @JMS\Exclude
      */
     private $user;

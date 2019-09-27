@@ -4,7 +4,7 @@ namespace Deozza\PhilarmonyCoreBundle\Repository;
 
 use Deozza\PhilarmonyCoreBundle\Document\Entity;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 
 /**
  * @method Entity|null find($id, $lockMode = null, $lockVersion = null)

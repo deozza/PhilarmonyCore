@@ -2,6 +2,7 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Service\Validation;
 
+use Deozza\PhilarmonyCoreBundle\Document\Entity;
 use Deozza\PhilarmonyCoreBundle\Service\Authorization\AuthorizeAccessToEntity;
 use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
 use Deozza\ResponseMakerBundle\Service\ResponseMaker;
@@ -15,116 +16,49 @@ class ManualValidation
         $this->authorizeAccessToEntity = $authorizeAccessToEntity;
     }
 
-    public function ableToValidateEntity($entity, $user)
+    public function ableToValidateEntity(string $currentState, string $newState, array $entityStates, Entity $entity, $user)
     {
-        $states = $this->setup($entity, $user);
-        if(is_object($states))
+        $isRetrograding = false;
+        try
         {
-            return $states;
+            $by = $entityStates[$newState]['constraints']['manual']['by'];
+            $comingFromStates = $entityStates[$newState]['constraints']['manual']['coming_from_states'];
         }
-
-        $availableStates = array_keys($states);
-
-        $nextStep = $this->moveToStep($availableStates, $entity);
-
-        if(is_object($nextStep))
+        catch(\Exception $e)
         {
-            return $nextStep;
+            $comingFromStates = $entityStates[$currentState]['constraints']['manual']['coming_from_states'];
+            $by = $entityStates[$currentState]['constraints']['manual']['by'];
+            $isRetrograding = true;
         }
-
-        $by = $this->checkConstraintExists($states[$nextStep['step']]);
-        if(is_object($by))
+        $ableToValidate = false;
+        if(array_key_exists('roles', $by))
         {
-            return $by;
-        }
-
-        $access = $this->authorizeAccessToEntity->authorize($user, $by, $entity);
-        if($access === true)
-        {
-            return $nextStep;
-        }
-        return $this->response->forbiddenAccess("Access to this resource is forbidden.");
-    }
-
-    public function ableToRetrogradeEntity($entity, $user)
-    {
-        $states = $this->setup($entity, $user);
-        if(is_object($states))
-        {
-            return $states;
-        }
-
-        $currentState = $states[$entity->getValidationState()];
-        $availableStates = array_keys($states);
-
-        $previousStep = $this->moveToStep($availableStates, $entity, false);
-
-        if(is_object($currentState))
-        {
-            return $currentState;
-        }
-        $by = $this->checkConstraintExists($currentState);
-        if(is_object($by))
-        {
-            return $by;
-        }
-        $access = $this->authorizeAccessToEntity->authorize($user, $by, $entity);
-
-        if($access === true)
-        {
-            return $previousStep;
-        }
-
-        return $this->response->forbiddenAccess("Access to this resource is forbidden.");
-    }
-
-    private function setup($entity, $user)
-    {
-        if(empty($user))
-        {
-            return $this->response->notAuthorized();
-        }
-
-        if(empty($entity))
-        {
-            return $this->response->notFound("Resource not found");
-        }
-
-        return $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
-    }
-
-    private function checkConstraintExists($state)
-    {
-        if(!array_key_exists('constraints', $state))
-        {
-            return $this->response->notFound("Resource not found");
-        }
-
-
-        if(!array_key_exists('manual', $state['constraints']))
-        {
-            return $this->response->notFound("Resource not found");
-        }
-
-        return $state['constraints']['manual']['by'];
-    }
-
-    private function moveToStep(array $availableStates,$entity, bool $sup = true)
-    {
-        foreach($availableStates as $key=>$state)
-        {
-            if($state === $entity->getValidationState())
+            foreach($by['roles'] as $role)
             {
-                $key = $sup === true ? $key + 1 : $key - 1;
-                if(!array_key_exists($key, $availableStates))
-                {
-                    return $this->response->notFound("Resource not found");
-                }
-                $step = $availableStates[$key];
+                if(in_array($role, $user->getRoles())) $ableToValidate = true;
             }
         }
 
-        return ['step'=>$step, 'key'=>$key];
-    }
+        if(array_key_exists('users', $by))
+        {
+            if(in_array('owner', $by['users']))
+            {
+                $ableToValidate = $entity->getOwner()['uuid'] === $user->getUuidAsString();
+            }
+        }
 
+        if(!$ableToValidate) return $this->response->forbiddenAccess('You are not allowed to change the state of this entity');
+
+        if(!$isRetrograding && !in_array($currentState, $comingFromStates))
+        {
+            return $this->response->badRequest('You can not move to this state');
+        }
+
+        if($isRetrograding && !in_array($newState, $comingFromStates))
+        {
+            return $this->response->badRequest('You can not move to this state');
+        }
+
+        return true;
+    }
 }

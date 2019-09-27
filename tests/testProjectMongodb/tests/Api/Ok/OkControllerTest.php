@@ -46,17 +46,21 @@ class OkControllerTest extends TestAsserter
                 [
                     "kind"=>"scenario",
                     "test"=>[
-                        ['method'=>'POST', 'url'=>'/api/entity/character'                                   , 'token'=>'token_userActive', "status"=>201, 'out'=>"characterScenarioPosted", 'in'=>'characterScenarioPost'],
-                        ['method'=>'GET' , 'url'=>'/api/entities/#character_uuid#'                          , 'token'=>'token_userActive', "status"=>200, 'out'=>'characterScenarioGet'],
-                        ['method'=>'GET' , 'url'=>'/api/entities/#character_uuid#'                          , 'token'=>'token_userAdmin' , "status"=>200, 'out'=>'characterScenarioGet'],
-                        ['method'=>'POST', 'url'=>'/api/entities/#character_uuid#/embedded/character_naming', 'token'=>'token_userActive', "status"=>201, 'out'=>"characterNamingScenarioPosted", 'in'=>'characterNamingScenarioPost'],
-                        ['method'=>'GET' , 'url'=>'/api/entities/#character_uuid#'                          , 'token'=>'token_userActive', "status"=>200, 'out'=>'characterScenarioGet2'],
-                        ['method'=>'GET' , 'url'=>'/api/entities/#character_uuid#'                          , 'token'=>'token_userAdmin' , "status"=>200, 'out'=>'characterScenarioGet2'],
-                        ['method'=>'GET' , 'url'=>'/api/entities/#character_uuid#'                                                       , "status"=>403],
+                        ['method'=>'POST' , 'url'=>'/api/entity/character'                                   , 'token'=>'token_userActive', "status"=>201, 'out'=>"characterScenarioPosted"      , 'in'=>'characterScenarioPost'],
+                        ['method'=>'GET'  , 'url'=>'/api/entities/#character_uuid#'                          , 'token'=>'token_userActive', "status"=>200, 'out'=>'characterScenarioGet'],
+                        ['method'=>'GET'  , 'url'=>'/api/entities/#character_uuid#'                          , 'token'=>'token_userAdmin' , "status"=>200, 'out'=>'characterScenarioGet'],
+                        ['method'=>'POST' , 'url'=>'/api/entities/#character_uuid#/embedded/character_naming', 'token'=>'token_userActive', "status"=>201, 'out'=>"characterNamingScenarioPosted", 'in'=>'characterNamingScenarioPost'],
+                        ['method'=>'GET'  , 'url'=>'/api/entities/#character_uuid#'                          , 'token'=>'token_userActive', "status"=>200, 'out'=>'characterScenarioGet2'],
+                        ['method'=>'GET'  , 'url'=>'/api/entities/#character_uuid#'                          , 'token'=>'token_userAdmin' , "status"=>200, 'out'=>'characterScenarioGet2'],
+                        ['method'=>'GET'  , 'url'=>'/api/entities/#character_uuid#'                                                       , "status"=>403],
+                        ['method'=>'PATCH', 'url'=>'/api/entities/#character_uuid#/validation_state'                                      , "status"=>401],
+                        ['method'=>'PATCH', 'url'=>'/api/entities/#character_uuid#/validation_state'         , 'token'=>'token_userActive', "status"=>403                                        , 'in'=>'characterScenarioStatePatch'],
+                        ['method'=>'PATCH', 'url'=>'/api/entities/#character_uuid#/validation_state'         , 'token'=>'token_userAdmin' , "status"=>200, 'out'=>'characterScenarioStatePatched', 'in'=>'characterScenarioStatePatch'],
+                        ['method'=>'GET'  , 'url'=>'/api/entities/#character_uuid#'                                                       , "status"=>200, 'out'=>'characterScenarioGet3'],
+                        ['method'=>'PATCH', 'url'=>'/api/entities/#character_uuid#/validation_state'         , 'token'=>'token_userAdmin' , "status"=>200, 'out'=>'characterScenarioStatePatched2', 'in'=>'characterScenarioStatePatch2'],
+                        ['method'=>'GET'  , 'url'=>'/api/entities/#character_uuid#'                                                       , "status"=>403],
                     ]
                 ]
-
-
             ];
     }
 }

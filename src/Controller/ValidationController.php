@@ -3,6 +3,7 @@ namespace Deozza\PhilarmonyCoreBundle\Controller;
 
 use Deozza\PhilarmonyCoreBundle\Controller\BaseController;
 use Deozza\PhilarmonyCoreBundle\Document\Entity;
+use Deozza\PhilarmonyCoreBundle\Form\ValidateStateManually;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,48 +18,45 @@ class ValidationController extends BaseController
 {
     /**
      * @Route(
-     *     "validate/{uuid}",
+     *     "entities/{uuid}/validation_state",
      *      requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *     },
      *     name="validate_entity",
      *      methods={"PATCH"})
      */
-    public function patchManualValidationAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
+    public function patchValidationStateManualAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
         $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
+        if(empty($entity)) return $this->response->notFound('Route not found');
 
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
 
-        $valid = $this->manualValidation->ableToValidateEntity($entity, $user);
+        if(empty($user)) return $this->response->notAuthorized();
+
+        $form = $this->createForm(ValidateStateManually::class);
+        $form->submit(json_decode($request->getContent(), true), true);
+
+        if(!$form->isValid())
+        {
+            return $this->response->badForm($form);
+        }
+
+        $data = $form->getData();
+        $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
+
+        if(!array_key_exists($data['validation_state'], $entityStates))
+        {
+            return $this->response->badRequest('');
+        }
+
+        $valid = $this->manualValidation->ableToValidateEntity($entity->getValidationState(), $data['validation_state'],$entityStates, $entity, $user);
         if(is_object($valid))
         {
             return $valid;
         }
 
-        $steps = array_keys($this->schemaLoader->loadEntityEnumeration($entity->getKind())['states']);
-        $lastStep = $entity->getValidationState();
-
-        foreach($steps as $stepNumber => $step)
-        {
-            if($step === $lastStep)
-            {
-                $lastStep = $stepNumber;
-            }
-        }
-
-        $entity->setValidationState($valid['step']);
-        $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
-        $state = $this->validate->processValidation($entity,$valid['key']+1, $entityStates, $this->getUser(), $lastStep+1);
-        if($entity->getValidationState() !== "__default")
-        {
-            $this->dm->flush();
-        }
-
-        if(is_array($state))
-        {
-            return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
-        }
+        $entity->setValidationState($data['validation_state']);
         $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher);
         $entity->setLastUpdate(new \DateTime('now'));
 
@@ -66,44 +64,4 @@ class ValidationController extends BaseController
         return $this->response->ok($entity, ['entity_complete', 'user_basic']);
     }
 
-    /**
-     * @Route(
-     *     "retrograde/{uuid}",
-     *      requirements={
-     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-     *     },
-     *     name="retrograde_entity",
-     *      methods={"PATCH"})
-     */
-    public function patchManualRetrogradeAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
-    {
-        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
-        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
-
-        $valid = $this->manualValidation->ableToRetrogradeEntity($entity, $user);
-        if(is_object($valid))
-        {
-            return $valid;
-        }
-
-        $entity->setValidationState($valid['step']);
-        $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
-
-        $state = $this->validate->processValidation($entity,$valid['key'], $entityStates, $this->getUser(), $valid['key'] - 1);
-        if($entity->getValidationState() !== "__default")
-        {
-            $this->dm->flush();
-        }
-
-        if(is_array($state))
-        {
-            return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
-        }
-
-        $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher);
-        $entity->setLastUpdate(new \DateTime('now'));
-
-        $this->dm->flush();
-        return $this->response->ok($entity, ['entity_complete', 'user_basic']);
-    }
 }

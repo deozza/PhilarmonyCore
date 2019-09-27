@@ -1,0 +1,17 @@
+{
+  "uuid": "@string@.isUuid()",
+  "kind":"character",
+  "validation_state":"approved",
+  "owner":{
+    "username":"userActive",
+    "uuid":"@string@.isUuid()"
+  },
+  "date_of_creation":"@date@",
+  "last_update":"@date@",
+  "properties":{
+    "character_naming":{
+      "firstname":"John",
+      "lastname":"Doe"
+    }
+  }
+}

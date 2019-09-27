@@ -1,0 +1,30 @@
+{
+  "kind":"character",
+  "validation_state":"posted",
+  "owner":{
+    "username":"userActive",
+    "uuid":"@string@.isUuid()"
+  },
+  "date_of_creation":"@date@",
+  "last_update":"@date@",
+  "properties":{
+    "owned_gear":[
+      {
+        "gear":{
+          "uuid":"@string@.isUuid()",
+          "validationState":"posted",
+          "owner":{
+            "uuid":"@string@.isUuid()",
+            "username":"userAdmin"
+          },
+          "properties":{
+            "name":"sword",
+            "description":"Stick the pointy end"
+          }
+        },
+        "stock":10,
+        "equiped":"1"
+      }
+    ]
+  }
+}

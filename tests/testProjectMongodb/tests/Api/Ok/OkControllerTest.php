@@ -60,6 +60,15 @@ class OkControllerTest extends TestAsserter
                         ['method'=>'PATCH', 'url'=>'/api/entities/#character_uuid#/validation_state'         , 'token'=>'token_userAdmin' , "status"=>200, 'out'=>'characterScenarioStatePatched2', 'in'=>'characterScenarioStatePatch2'],
                         ['method'=>'GET'  , 'url'=>'/api/entities/#character_uuid#'                                                       , "status"=>403],
                     ]
+                ],
+                [
+                    "kind" => "scenario",
+                    "test" => [
+                        ['method'=>'POST' , 'url'=>'/api/entity/character'                             , 'token'=>'token_userActive', "status"=>201, 'out'=>"characterScenarioPosted"           , 'in'=>'characterScenarioPost'],
+                        ['method'=>'POST' , 'url'=>'/api/entities/#character_uuid#/embedded/owned_gear', 'token'=>'token_userActive', "status"=>400, 'out'=>"characterGearScenarioInvalidPosted", 'in'=>'characterGearScenarioInvalidPost'],
+                        ['method'=>'POST' , 'url'=>'/api/entities/#character_uuid#/embedded/owned_gear', 'token'=>'token_userActive', "status"=>201, 'out'=>"characterGearScenarioPosted"       , 'in'=>'characterGearScenarioPost'],
+                        ['method'=>'GET'  , 'url'=>'/api/entities/#character_uuid#'                    , 'token'=>'token_userActive', "status"=>200, 'out'=>'characterGearScenarioGet'],
+                    ]
                 ]
             ];
     }

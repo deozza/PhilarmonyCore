@@ -34,8 +34,7 @@ class POST extends AbstractType
             },
             'constraints'=>[
                 new Assert\NotBlank()
-            ],
-            'mapped'=>false
+            ]
         ]);
 
         $builder->add('stock' , IntegerType::class, [

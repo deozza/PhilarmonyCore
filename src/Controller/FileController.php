@@ -17,7 +17,7 @@ class FileController extends BaseController
 {
     /**
      * @Route(
-     *     "entity/{uuid}/file/{file_property}",
+     *     "entities/{uuid}/files/{file_property}",
      *     requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *          "file_property" = "^(\w{1,50})$"
@@ -63,7 +63,7 @@ class FileController extends BaseController
 
     /**
      * @Route(
-     *     "entity/{uuid}/file/{file_property}",
+     *     "entities/{uuid}/files/{file_property}",
      *     requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *          "file_property" = "^(\w{1,50})$"
@@ -149,7 +149,7 @@ class FileController extends BaseController
 
         if(is_array($state))
         {
-            return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
+            return $this->response->created(['warning'=>$state, 'entity'=>$entity], ['entity_id', 'entity_property', 'entity_basic']);
         }
 
         $this->handleEvents($request->getMethod(), $entityStates['__default'], $entity, $eventDispatcher);
@@ -162,7 +162,7 @@ class FileController extends BaseController
 
     /**
      * @Route(
-     *     "entity/{uuid}/file/{file_property}",
+     *     "entities/{uuid}/files/{file_property}",
      *     requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
      *          "file_property" = "^(\w{1,50})$"

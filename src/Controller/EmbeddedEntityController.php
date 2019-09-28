@@ -232,7 +232,7 @@ class EmbeddedEntityController extends BaseController
         if(is_array($state))
         {
             $this->dm->flush();
-            return $this->response->conflict($state, $entity, ['entity_id', 'entity_property', 'entity_basic']);
+            return $this->response->ok(['warning'=>$state, 'entity'=>$entity], ['entity_id', 'entity_property', 'entity_basic']);
         }
 
         $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher, json_decode($request->getContent(), true));

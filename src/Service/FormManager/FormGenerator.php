@@ -2,7 +2,7 @@
 namespace Deozza\PhilarmonyCoreBundle\Service\FormManager;
 
 use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
-use Deozza\PhilarmonyUtils\DataSchema\AuthorizedKeys;
+use Symfony\Component\Yaml\Yaml;
 
 class FormGenerator
 {
@@ -12,6 +12,7 @@ class FormGenerator
         $this->formPath = $formPath;
         $this->formNamespace = $formNamespace;
         $this->rootPath = $rootPath;
+        $this->authorizedKeys = Yaml::parse(file_get_contents(__DIR__.'/../DatabaseSchema/authorizedKeys.yaml'));
     }
 
     public function getFormPath()
@@ -66,21 +67,21 @@ class FormGenerator
 
     public function generate()
     {
-        $entities = $this->schemaLoader->loadEntityEnumeration()[AuthorizedKeys::ENTITY_HEAD];
+        $entities = $this->schemaLoader->loadEntityEnumeration()[$this->authorizedKeys['entity_header']];
         foreach($entities as $entityName => $entityContent)
         {
-            if(!array_key_exists(AuthorizedKeys::ENTITY_KEYS[1], $entityContent))
+            if(!array_key_exists($this->authorizedKeys['entity_keys'][1], $entityContent))
             {
                 continue;
             }
 
-            foreach($entityContent[AuthorizedKeys::ENTITY_KEYS[1]] as $state => $stateContent)
+            foreach($entityContent[$this->authorizedKeys['entity_keys'][1]] as $state => $stateContent)
             {
-                foreach($stateContent[AuthorizedKeys::STATE_KEYS[0]] as $method => $methodContent)
+                foreach($stateContent[$this->authorizedKeys['state_keys'][0]] as $method => $methodContent)
                 {
-                    if($method === AuthorizedKeys::METHODS[0] || $method === AuthorizedKeys::METHODS[1])
+                    if($method === $this->authorizedKeys['methods'][0] || $method === $this->authorizedKeys['methods'][1])
                     {
-                        $this->generateForm($entityName, $state, $method, $methodContent[AuthorizedKeys::METHOD_KEYS[0]]);
+                        $this->generateForm($entityName, $state, $method, $methodContent[$this->authorizedKeys['method_keys'][0]]);
                     }
                 }
             }

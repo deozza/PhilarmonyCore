@@ -42,21 +42,21 @@ class ValidateEntity
                 switch($stateKey)
                 {
                     case $this->authorizedKeys['state_keys'][0]:
-                    {
-                        $containsMethod = true;
-                        foreach($stateKeyData as $methodName=>$methodData)
                         {
-                            $this->validateMethod($methodName, $methodData);
-                        }
-                    }break;
+                            $containsMethod = true;
+                            foreach($stateKeyData as $methodName=>$methodData)
+                            {
+                                $this->validateMethod($methodName, $methodData);
+                            }
+                        }break;
                     case $this->authorizedKeys['state_keys'][1]:
-                    {
-                        if(!is_array($stateKeyData))
                         {
-                            throw new \Exception("Constraints must be of type array.\n Declared in the state '$stateName' of the entity '".$this->entity->getEntityName()."'");
-                        }
-                        $this->validateConstraints($stateKeyData);
-                    }break;
+                            if(!is_array($stateKeyData))
+                            {
+                                throw new \Exception("Constraints must be of type array.\n Declared in the state '$stateName' of the entity '".$this->entity->getEntityName()."'");
+                            }
+                            $this->validateConstraints($stateKeyData);
+                        }break;
                     default: throw new \Exception("$stateKey is not a valid state key.\n Declared in the state '$stateName' of the entity '".$this->entity->getEntityName()."'");break;
                 }
             }
@@ -76,13 +76,13 @@ class ValidateEntity
         switch(array_key_first($constraints))
         {
             case $this->authorizedKeys['entity_constraint_keys'][0]:
-            {
-                $this->validateManualConstraint($constraints[$this->authorizedKeys['entity_constraint_keys'][0]]);
-            }break;
+                {
+                    $this->validateManualConstraint($constraints[$this->authorizedKeys['entity_constraint_keys'][0]]);
+                }break;
             case $this->authorizedKeys['entity_constraint_keys'][1]:
-            {
-                $this->validatePropertiesConstraint($constraints[$this->authorizedKeys['entity_constraint_keys'][1]]);
-            }break;
+                {
+                    $this->validatePropertiesConstraint($constraints[$this->authorizedKeys['entity_constraint_keys'][1]]);
+                }break;
             default: throw new \Exception("A constraint is applied to ".json_encode($this->authorizedKeys['entity_constraint_keys']).". ".$this->entity->getEntityName()." constraints are invalid.");break;
         }
     }
@@ -202,17 +202,17 @@ class ValidateEntity
         switch($explodedFirstOperator[1])
         {
             case 'self':
-            {
-                $this->validateSelfPropertiesTarget($operators[$firstOperator], $this->entity->getProperties(), [$this->entity->getEntityName()], $explodedFirstOperator[0]);
-            }break;
+                {
+                    $this->validateSelfPropertiesTarget($operators[$firstOperator], $this->entity->getProperties(), array_keys($this->entitiesSchema), $explodedFirstOperator[0]);
+                }break;
             case 'value':
-            {
+                {
 
-            }break;
+                }break;
             default:
-            {
-                $this->validateExternalPropertiesTarget($explodedFirstOperator[1], $operators[$firstOperator], $this->entitiesSchema, $explodedFirstOperator[0]);
-            }break;
+                {
+                    $this->validateExternalPropertiesTarget($explodedFirstOperator[1], $operators[$firstOperator], $this->entitiesSchema, $explodedFirstOperator[0]);
+                }break;
         }
     }
 
@@ -240,6 +240,7 @@ class ValidateEntity
                 $propertyId = 1;
                 if(!in_array($explodedTarget[0], $entityRange))
                 {
+                    var_dump($entityRange);die;
                     throw new \Exception("Entity target ".$explodedTarget[0]." does not exist. \n Declared in a constraint of '".$this->entity->getEntityName()."'.");
                 }
             }

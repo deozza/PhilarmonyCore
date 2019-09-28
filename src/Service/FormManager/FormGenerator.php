@@ -79,7 +79,7 @@ class FormGenerator
             {
                 foreach($stateContent[$this->authorizedKeys['state_keys'][0]] as $method => $methodContent)
                 {
-                    if($method === $this->authorizedKeys['methods'][0] || $method === $this->authorizedKeys['methods'][1])
+                    if($method === $this->authorizedKeys['methods'][0] || $method === $this->authorizedKeys['methods'][2])
                     {
                         $this->generateForm($entityName, $state, $method, $methodContent[$this->authorizedKeys['method_keys'][0]]);
                     }

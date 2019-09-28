@@ -67,7 +67,7 @@ class FormGenerator
 
     public function generate()
     {
-        $entities = $this->schemaLoader->loadEntityEnumeration()[$this->authorizedKeys['entity_header']];
+        $entities = $this->schemaLoader->loadEntityEnumeration()[$this->authorizedKeys['entity_head']];
         foreach($entities as $entityName => $entityContent)
         {
             if(!array_key_exists($this->authorizedKeys['entity_keys'][1], $entityContent))

@@ -113,7 +113,7 @@ class EmbeddedEntityController extends BaseController
         $embeddedValidation = $this->validate->processEmbeddedValidation($entity, $this->schemaLoader->loadEntityEnumeration($property_name), $this->getUser());
         if(is_array($embeddedValidation))
         {
-            return $this->response->conflict($embeddedValidation, $entity, ['entity_id', 'entity_property', 'entity_basic']);
+            return $this->response->created(['warning'=>$embeddedValidation, 'entity'=>$entity], ['entity_basic', 'entity_id', 'entity_property']);
         }
 
         $state = $this->validate->processValidation($entity,0, $entityStates, $this->getUser());
@@ -223,7 +223,7 @@ class EmbeddedEntityController extends BaseController
         $embeddedValidation = $this->validate->processEmbeddedValidation($entity, $this->schemaLoader->loadEntityEnumeration($property_name), $this->getUser());
         if(is_array($embeddedValidation))
         {
-            return $this->response->conflict($embeddedValidation, $entity, ['entity_id', 'entity_property', 'entity_basic']);
+            return $this->response->ok(['warning'=>$embeddedValidation, 'entity'=>$entity], ['entity_basic', 'entity_id', 'entity_property']);
         }
         $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
 

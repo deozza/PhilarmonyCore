@@ -95,8 +95,8 @@
                     ->eagerCursor(true)
                     ->field('kind')->equals('{{ constraints.constraints.entity }}');
             },
-            'choice_value' => function(Entity $entity = null){
-                return $entity ? $entity->getUuidAsString() : '';
+            'choice_value' => function($entity = null){
+                return is_a($entity, Entity::class) ? $entity->getUuidAsString() : '';
             },
             'constraints'=>[
                 new Assert\NotBlank()
@@ -228,8 +228,8 @@
                         ->eagerCursor(true)
                         ->field('kind')->equals('{{ constraints.constraints.entity }}');
                 },
-                'choice_value' => function(Entity $entity = null){
-                    return $entity ? $entity->getUuidAsString() : '';
+                'choice_value' => function($entity = null){
+                    return is_a($entity, Entity::class) ? $entity->getUuidAsString() : '';
                 },
             ]
         ]);

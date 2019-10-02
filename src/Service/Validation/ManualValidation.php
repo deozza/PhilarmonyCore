@@ -19,17 +19,17 @@ class ManualValidation
     public function ableToValidateEntity(string $currentState, string $newState, array $entityStates, Entity $entity, $user)
     {
         $isRetrograding = false;
-        try
+
+        $by = $entityStates[$newState]['constraints']['manual']['by'];
+        $comingFromStates = $entityStates[$currentState]['constraints']['manual']['coming_from_states'];
+
+        if(empty($by))
         {
-            $by = $entityStates[$newState]['constraints']['manual']['by'];
-            $comingFromStates = $entityStates[$newState]['constraints']['manual']['coming_from_states'];
-        }
-        catch(\Exception $e)
-        {
-            $comingFromStates = $entityStates[$currentState]['constraints']['manual']['coming_from_states'];
             $by = $entityStates[$currentState]['constraints']['manual']['by'];
             $isRetrograding = true;
+            $comingFromStates = $entityStates[$newState]['constraints']['manual']['coming_from_states'];
         }
+        
         $ableToValidate = false;
         if(array_key_exists('roles', $by))
         {

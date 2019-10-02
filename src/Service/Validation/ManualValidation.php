@@ -21,11 +21,12 @@ class ManualValidation
         $isRetrograding = false;
 
         $by = $entityStates[$newState]['constraints']['manual']['by'];
-        $comingFromStates = $entityStates[$currentState]['constraints']['manual']['coming_from_states'];
+        $comingFromStates = $entityStates[$newState]['constraints']['manual']['coming_from_states'];
 
         if(empty($by))
         {
             $by = $entityStates[$currentState]['constraints']['manual']['by'];
+            $comingFromStates = $entityStates[$currentState]['constraints']['manual']['coming_from_states'];
             $isRetrograding = true;
         }
 

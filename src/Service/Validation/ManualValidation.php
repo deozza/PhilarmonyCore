@@ -27,9 +27,8 @@ class ManualValidation
         {
             $by = $entityStates[$currentState]['constraints']['manual']['by'];
             $isRetrograding = true;
-            $comingFromStates = $entityStates[$newState]['constraints']['manual']['coming_from_states'];
         }
-        
+
         $ableToValidate = false;
         if(array_key_exists('roles', $by))
         {

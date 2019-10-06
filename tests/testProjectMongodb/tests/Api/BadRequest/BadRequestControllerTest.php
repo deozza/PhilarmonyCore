@@ -27,10 +27,34 @@ class BadRequestControllerTest extends TestAsserter
     {
         return
             [
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/gear'    , 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithMissingField' , 'in'=>'entityPostWithMissingField']],
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/gear'    , 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithExtraField'   , 'in'=>'entityPostWithExtraField']],
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/gear'    , 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithTooLongField' , 'in'=>'entityPostWithTooLongField']],
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/gear'    , 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithTooShortField', 'in'=>'entityPostWithTooShortField']],
+                [
+                    "kind"=>"scenario",
+                    "test"=>[
+                        ['method'=>'POST'  , 'url'=>'/api/entity/gear'                                  , 'token'=>'token_userAdmin', "status"=>201, 'out'=>'entityPostedScenario'],
+                        ['method'=>'POST'  , 'url'=>'/api/entities/#gear_uuid#/embedded/gear_properties', 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithMissingField' , 'in'=>'entityPostWithMissingField']
+                    ]
+                ],
+                [
+                    "kind" => "scenario",
+                    "test" => [
+                        ['method'=>'POST'  , 'url'=>'/api/entity/gear'                                  , 'token'=>'token_userAdmin', "status"=>201, 'out'=>'entityPostedScenario'],
+                        ['method'=>'POST'  , 'url'=>'/api/entities/#gear_uuid#/embedded/gear_properties', 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithExtraField'   , 'in'=>'entityPostWithExtraField']
+                    ]
+                ],
+                [
+                    "kind"=>"scenario",
+                    "test"=>[
+                        ['method'=>'POST'  , 'url'=>'/api/entity/gear'                                  , 'token'=>'token_userAdmin', "status"=>201, 'out'=>'entityPostedScenario'],
+                        ['method'=>'POST'  , 'url'=>'/api/entities/#gear_uuid#/embedded/gear_properties', 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithTooShortField' , 'in'=>'entityPostWithTooShortField']
+                    ]
+                ],
+                [
+                    "kind"=>"scenario",
+                    "test"=>[
+                        ['method'=>'POST'  , 'url'=>'/api/entity/gear'                                  , 'token'=>'token_userAdmin', "status"=>201, 'out'=>'entityPostedScenario'],
+                        ['method'=>'POST'  , 'url'=>'/api/entities/#gear_uuid#/embedded/gear_properties', 'token'=>'token_userAdmin', "status"=>400, 'out'=>'entityPostedWithTooLongField' , 'in'=>'entityPostWithTooLongField']
+                    ]
+                ]
             ];
     }
 }

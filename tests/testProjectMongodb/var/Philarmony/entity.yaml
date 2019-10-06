@@ -41,6 +41,14 @@ entities:
         methods:
           GET:
             by: all
+          POST:
+            properties:
+              - gear_properties
+            by:
+              users:
+                - owner
+              roles:
+                - ROLE_ADMIN
           PATCH:
             properties:
               - gear_properties

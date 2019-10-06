@@ -15,7 +15,7 @@ class DatabaseSchemaLoader
         $this->authorizedKeys = Yaml::parse(file_get_contents(__DIR__.'/authorizedKeys.yaml'));
     }
 
-    public function loadEntityEnumeration($entity_name = null, $returnKey = false)
+    public function loadEntityEnumeration($entity_name = null)
     {
         $entities = file_get_contents($this->rootPath.$this->entityPath.".yaml");
 
@@ -37,10 +37,6 @@ class DatabaseSchemaLoader
         {
             if($key == $entity_name)
             {
-                if($returnKey)
-                {
-                    return $key;
-                }
                 return $values[$this->authorizedKeys['entity_head']][$key];
             }
         }
@@ -48,7 +44,7 @@ class DatabaseSchemaLoader
         return null;
     }
 
-    public function loadPropertyEnumeration($property_name = null, $returnKey = false)
+    public function loadPropertyEnumeration($property_name = null)
     {
         $properties = file_get_contents($this->rootPath.$this->propertyPath.".yaml");
 
@@ -70,10 +66,6 @@ class DatabaseSchemaLoader
         {
             if($key == $property_name)
             {
-                if($returnKey)
-                {
-                    return $key;
-                }
                 return $values[$this->authorizedKeys['property_head']][$key];
             }
         }
@@ -81,7 +73,7 @@ class DatabaseSchemaLoader
         return null;
     }
 
-    public function loadEnumerationEnumeration($enumeration_name = null, $returnKey = false)
+    public function loadEnumerationEnumeration($enumeration_name = null)
     {
         $enumerations = file_get_contents($this->rootPath . $this->enumerationPath . ".yaml");
 
@@ -99,10 +91,8 @@ class DatabaseSchemaLoader
         }
 
         foreach (array_keys($values[$this->authorizedKeys['enumeration_head']]) as $key) {
-            if ($key == $enumeration_name) {
-                if ($returnKey) {
-                    return $key;
-                }
+            if ($key == $enumeration_name)
+            {
                 return $values[$this->authorizedKeys['enumeration_head']][$key];
             }
         }

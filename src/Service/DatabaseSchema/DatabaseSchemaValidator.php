@@ -25,18 +25,18 @@ class DatabaseSchemaValidator
     {
         if(empty($this->entities))
         {
-            throw new SchemaConfigFileBadlyFormated($this->authorizedKeys['entity_headss'][0]." config file is empty.");
+            throw new SchemaConfigFileBadlyFormated($this->authorizedKeys['entity_head']." config file is empty.");
         }
-        if(!array_key_exists($this->authorizedKeys['entity_heads'][0], $this->entities))
+        if(!array_key_exists($this->authorizedKeys['entity_head'], $this->entities))
         {
-            throw new SchemaConfigFileBadlyFormated($this->authorizedKeys['entity_heads'][0]." config file must contain the '".$this->authorizedKeys['entity_heads']."' header.");
+            throw new SchemaConfigFileBadlyFormated($this->authorizedKeys['entity_head']." config file must contain the '".$this->authorizedKeys['entity_head']."' header.");
         }
-        if(empty($this->entities[$this->authorizedKeys['entity_heads'][0]]))
+        if(empty($this->entities[$this->authorizedKeys['entity_head']]))
         {
-            throw new SchemaConfigFileBadlyFormated($this->authorizedKeys['entity_heads'][0]." config file does not contain a schema.");
+            throw new SchemaConfigFileBadlyFormated($this->authorizedKeys['entity_head']." config file does not contain a schema.");
         }
 
-        foreach($this->entities[$this->authorizedKeys['entity_heads'][0]] as $schemaName=>$schemaData)
+        foreach($this->entities[$this->authorizedKeys['entity_head']] as $schemaName=>$schemaData)
         {
             $entity = new EntitySchema();
             $entity->setEntityName($schemaName);
@@ -58,7 +58,7 @@ class DatabaseSchemaValidator
                 $entity->setConstraints($schemaData[$this->authorizedKeys['entity_keys'][2]]);
             }
 
-            $validateEntity = new ValidateEntity($entity, $this->properties[$this->authorizedKeys['property_head']], $this->authorizedKeys, $this->entities);
+            $validateEntity = new ValidateEntity($entity, $this->properties[$this->authorizedKeys['property_head']], $this->authorizedKeys, $this->entities[$this->authorizedKeys['entity_head']]);
             $validateEntity->validateProperties();
             $validateEntity->validateStates();
             if(!empty($entity->getConstraints()))
@@ -100,7 +100,7 @@ class DatabaseSchemaValidator
                 $property->setConstraints($schemaData[$this->authorizedKeys['property_keys'][1]]);
             }
 
-            $validateProperty = new ValidateProperty($property, $this->enumerations[$this->authorizedKeys['enumeration_head']], $this->entities, $this->authorizedKeys);
+            $validateProperty = new ValidateProperty($property, $this->enumerations[$this->authorizedKeys['enumeration_head']], $this->entities[$this->authorizedKeys['entity_head']], $this->authorizedKeys);
             $validateProperty->validateType();
             $validateProperty->validateConstraints();
         }

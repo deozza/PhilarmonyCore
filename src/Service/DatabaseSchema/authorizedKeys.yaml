@@ -1,6 +1,4 @@
-entity_heads:
-  - entities
-  - embedded
+entity_head: entities
 property_head: properties
 enumeration_head: enumerations
 entity_keys:

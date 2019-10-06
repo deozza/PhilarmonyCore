@@ -1,6 +1,6 @@
 <?php
 
-namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Form\gear\posted;
+namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\Form\gear\posted\gear_properties;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -22,6 +22,22 @@ class PATCH extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('name' , TextType::class, [
+            'constraints' => [
+                new Assert\Length(['min'=>'2']),
+                new Assert\Length(['max'=>'128']),
+                new Assert\NotBlank(),
+            ],
+        ]);
+
+        $builder->add('description' , TextType::class, [
+            'constraints' => [
+                new Assert\Length(['min'=>'1']),
+                new Assert\Length(['max'=>'255']),
+                new Assert\NotBlank(),
+            ],
+        ]);
+
     }
 
     public function configureOptions(OptionsResolver $resolver)

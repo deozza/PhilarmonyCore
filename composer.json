@@ -64,7 +64,9 @@
             "./tests/testProjectMongodb/bin/console p:g:f",
             "./tests/testProjectMongodb/bin/console d:m:s:d",
             "./tests/testProjectMongodb/bin/console d:m:s:c",
-            "./tests/testProjectMongodb/bin/console d:m:f:l --append"
+            "./tests/testProjectMongodb/bin/console d:m:f:l --append",
+            "mongodump -d philarmony-core-test -o ./tests/testProjectMongodb/var/db_test/",
+            "./bin/phpunit"
         ]
     }
 }

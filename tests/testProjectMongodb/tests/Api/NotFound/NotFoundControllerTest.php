@@ -11,7 +11,7 @@ class NotFoundControllerTest extends TestAsserter
     public function setUp()
     {
         parent::setTestDatabasePath(self::TEST_DATABASE_PATH);
-        parent::setEnv(json_decode(file_get_contents(__DIR__ . "/../../../src/DataFixtures/MongoDB/env.json"), true));
+        parent::setEnv(json_decode(file_get_contents(__DIR__ . "/../../../DataFixtures/MongoDB/env.json"), true));
         parent::setUp();
     }
 

@@ -16,11 +16,8 @@
     },
     "date_of_creation":"@date@",
     "last_update":"@date@",
-    "properties":{
-      "character_naming":{
-        "firstname":"John",
-        "lastname":"Doe"
-      }
-    }
+    "properties":[
+
+    ]
   }
 }

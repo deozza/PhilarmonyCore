@@ -1,16 +1,12 @@
 {
   "properties":[
-    "name",
-    "description"
+    "gear_properties"
   ],
   "states":{
     "__default":{
       "methods":{
         "POST":{
-          "properties":[
-            "name",
-            "description"
-          ],
+          "properties":[],
           "by":{
             "roles":[
               "ROLE_USER"
@@ -24,10 +20,22 @@
         "GET":{
           "by":"all"
         },
+        "POST":{
+          "properties":[
+            "gear_properties"
+          ],
+          "by":{
+            "users":[
+              "owner"
+            ],
+            "roles":[
+              "ROLE_ADMIN"
+            ]
+          }
+        },
         "PATCH":{
           "properties":[
-            "name",
-            "description"
+            "gear_properties"
           ],
           "by":{
             "users":[

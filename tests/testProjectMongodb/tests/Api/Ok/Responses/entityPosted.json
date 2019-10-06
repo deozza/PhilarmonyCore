@@ -8,8 +8,5 @@
   },
   "date_of_creation":"@date@",
   "last_update":"@date@",
-  "properties":{
-    "name":"spear",
-    "description":"Careful with the pointy end"
-  }
+  "properties":[]
 }

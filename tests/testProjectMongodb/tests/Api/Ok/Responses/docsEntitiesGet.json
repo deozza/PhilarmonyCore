@@ -1,76 +1,91 @@
 {
-  "entities":{
-    "character_naming":{
-      "properties":[
+  "entities": {
+    "character_naming": {
+      "properties": [
         "firstname",
         "lastname"
       ]
     },
-    "character_stats":{
-      "properties":[
+    "character_stats": {
+      "properties": [
         "genre",
         "heigth",
         "current_health",
         "max_health"
       ],
-      "constraints":{
-        "properties":{
-          "character_stats.current_health":[
+      "constraints": {
+        "properties": {
+          "character_stats.current_health": [
             "ltoe.self(character_stats.max_health)"
           ]
         }
       }
     },
-    "owned_gear":{
-      "properties":[
+    "owned_gear": {
+      "properties": [
         "gear",
         "stock",
         "equiped"
       ]
     },
-    "gear":{
-      "properties":[
+    "gear_properties": {
+      "properties": [
         "name",
         "description"
+      ]
+    },
+    "gear": {
+      "properties": [
+        "gear_properties"
       ],
-      "states":{
-        "__default":{
-          "methods":{
-            "POST":{
-              "properties":[
-                "name",
-                "description"
+      "states": {
+        "__default": {
+          "methods": {
+            "POST": {
+              "properties": [
               ],
-              "by":{
-                "roles":[
+              "by": {
+                "roles": [
                   "ROLE_USER"
                 ]
               }
             }
           }
         },
-        "posted":{
-          "methods":{
-            "GET":{
-              "by":"all"
+        "posted": {
+          "methods": {
+            "GET": {
+              "by": "all"
             },
-            "PATCH":{
-              "properties":[
-                "name",
-                "description"
+            "POST": {
+              "properties": [
+                "gear_properties"
               ],
-              "by":{
-                "users":[
+              "by": {
+                "users": [
                   "owner"
                 ],
-                "roles":[
+                "roles": [
                   "ROLE_ADMIN"
                 ]
               }
             },
-            "DELETE":{
-              "by":{
-                "roles":[
+            "PATCH": {
+              "properties": [
+                "gear_properties"
+              ],
+              "by": {
+                "users": [
+                  "owner"
+                ],
+                "roles": [
+                  "ROLE_ADMIN"
+                ]
+              }
+            },
+            "DELETE": {
+              "by": {
+                "roles": [
                   "ROLE_ADMIN"
                 ]
               }
@@ -79,83 +94,82 @@
         }
       }
     },
-    "character":{
-      "properties":[
+    "character": {
+      "properties": [
         "character_naming",
         "character_stats",
         "owned_gear"
       ],
-      "states":{
-        "__default":{
-          "methods":{
-            "POST":{
-              "properties":[
-
+      "states": {
+        "__default": {
+          "methods": {
+            "POST": {
+              "properties": [
               ],
-              "by":{
-                "roles":[
+              "by": {
+                "roles": [
                   "ROLE_USER"
                 ]
               }
             }
           }
         },
-        "posted":{
-          "methods":{
-            "GET":{
-              "by":{
-                "users":[
+        "posted": {
+          "methods": {
+            "GET": {
+              "by": {
+                "users": [
                   "owner"
                 ],
-                "roles":[
+                "roles": [
                   "ROLE_ADMIN"
                 ]
               }
             },
-            "POST":{
-              "properties":[
+            "POST": {
+              "properties": [
                 "character_naming",
                 "character_stats",
                 "owned_gear"
               ],
-              "by":{
-                "users":[
+              "by": {
+                "users": [
                   "owner"
                 ],
-                "roles":[
+                "roles": [
                   "ROLE_ADMIN"
                 ]
               }
             },
-            "PATCH":{
-              "properties":[
+            "PATCH": {
+              "properties": [
                 "character_naming",
                 "character_stats",
                 "owned_gear"
               ],
-              "by":{
-                "users":[
+              "by": {
+                "users": [
                   "owner"
                 ],
-                "roles":[
+                "roles": [
                   "ROLE_ADMIN"
                 ]
               }
             },
-            "DELETE":{
-              "by":{
-                "users":[
+            "DELETE": {
+              "by": {
+                "users": [
                   "owner"
                 ]
               }
             }
           }
         },
-        "approved":{
-          "constraints":{
-            "manual":{
-              "by":{
-                "roles":[
+        "approved": {
+          "constraints": {
+            "manual": {
+              "by": {
+                "roles": [
                   "ROLE_ADMIN"
                 ]
               },
@@ -164,9 +178,9 @@
               ]
             }
           },
-          "methods":{
-            "GET":{
-              "by":"all"
+          "methods": {
+            "GET": {
+              "by": "all"
             }
           }
         }

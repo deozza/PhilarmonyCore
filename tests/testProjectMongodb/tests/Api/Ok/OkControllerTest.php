@@ -37,9 +37,9 @@ class OkControllerTest extends TestAsserter
                 ["kind"=>"unit", "test"=>['method'=>'GET'  , 'url'=>'/api/entities/gear'            , "status"=>200, 'out'=>'entitiesGetList']],
                 ["kind"=>"unit", "test"=>['method'=>'GET'  , 'url'=>'/api/entities/#gear_6#'        , "status"=>200, 'out'=>'entitiesGetSpecific']],
 
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/gear'             , 'token'=>'token_userAdmin', "status"=>201, 'out'=>'entityPosted', 'in'=>'entityPost']],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/gear'             , 'token'=>'token_userAdmin', "status"=>201, 'out'=>'entityPosted']],
 
-                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/#gear_6#'       , 'token'=>'token_userAdmin', "status"=>200, 'out'=>'entityPatched', 'in'=>'entityPatch']],
+                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/embedded/#gear_properties_7#', 'token'=>'token_userAdmin', "status"=>200, 'out'=>'entityPatched', 'in'=>'entityPatch']],
 
                 ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/#gear_6#'       , 'token'=>'token_userAdmin', "status"=>204]],
 
@@ -61,15 +61,15 @@ class OkControllerTest extends TestAsserter
                         ['method'=>'GET'  , 'url'=>'/api/entities/#character_uuid#'                                                       , "status"=>403],
                     ]
                 ],
-                [
-                    "kind" => "scenario",
-                    "test" => [
-                        ['method'=>'POST' , 'url'=>'/api/entity/character'                             , 'token'=>'token_userActive', "status"=>201, 'out'=>"characterScenarioPosted"           , 'in'=>'characterScenarioPost'],
-                        ['method'=>'POST' , 'url'=>'/api/entities/#character_uuid#/embedded/owned_gear', 'token'=>'token_userActive', "status"=>400, 'out'=>"characterGearScenarioInvalidPosted", 'in'=>'characterGearScenarioInvalidPost'],
-                        ['method'=>'POST' , 'url'=>'/api/entities/#character_uuid#/embedded/owned_gear', 'token'=>'token_userActive', "status"=>201, 'out'=>"characterGearScenarioPosted"       , 'in'=>'characterGearScenarioPost'],
-                        ['method'=>'GET'  , 'url'=>'/api/entities/#character_uuid#'                    , 'token'=>'token_userActive', "status"=>200, 'out'=>'characterGearScenarioGet'],
-                    ]
-                ]
+                #[
+                #    "kind" => "scenario",
+                #    "test" => [
+                #        ['method'=>'POST' , 'url'=>'/api/entity/character'                             , 'token'=>'token_userActive', "status"=>201, 'out'=>"characterScenarioPosted"           , 'in'=>'characterScenarioPost'],
+                #        ['method'=>'POST' , 'url'=>'/api/entities/#character_uuid#/embedded/owned_gear', 'token'=>'token_userActive', "status"=>400, 'out'=>"characterGearScenarioInvalidPosted", 'in'=>'characterGearScenarioInvalidPost'],
+                #        ['method'=>'POST' , 'url'=>'/api/entities/#character_uuid#/embedded/owned_gear', 'token'=>'token_userActive', "status"=>201, 'out'=>"characterGearScenarioPosted"       , 'in'=>'characterGearScenarioPost'],
+                #        ['method'=>'GET'  , 'url'=>'/api/entities/#character_uuid#'                    , 'token'=>'token_userActive', "status"=>200, 'out'=>'characterGearScenarioGet'],
+                #    ]
+                #]
             ];
     }
 }

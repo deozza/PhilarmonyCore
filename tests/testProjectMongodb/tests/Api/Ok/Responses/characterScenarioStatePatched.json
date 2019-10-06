@@ -8,10 +8,20 @@
   },
   "date_of_creation":"@date@",
   "last_update":"@date@",
-  "properties":{
-    "character_naming":{
-      "firstname":"John",
-      "lastname":"Doe"
+  "properties":[
+    {
+      "uuid":"@string@.isUuid()",
+      "kind":"character_naming",
+      "owner":{
+        "uuid":"@string@.isUuid()",
+        "username":"userActive"
+      },
+      "date_of_creation":"@date@",
+      "last_update":"@date@",
+      "properties":{
+        "firstname":"John",
+        "lastname":"Doe"
+      }
     }
-  }
+  ]
 }

@@ -20,10 +20,12 @@ class ManualValidation
     {
         $isRetrograding = false;
 
-        $by = $entityStates[$newState]['constraints']['manual']['by'];
-        $comingFromStates = $entityStates[$newState]['constraints']['manual']['coming_from_states'];
-
-        if(empty($by))
+        if(array_key_exists('constraints', $entityStates[$newState]))
+        {
+            $by = $entityStates[$newState]['constraints']['manual']['by'];
+            $comingFromStates = $entityStates[$newState]['constraints']['manual']['coming_from_states'];
+        }
+        else
         {
             $by = $entityStates[$currentState]['constraints']['manual']['by'];
             $comingFromStates = $entityStates[$currentState]['constraints']['manual']['coming_from_states'];

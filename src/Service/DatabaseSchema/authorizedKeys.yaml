@@ -32,7 +32,7 @@ types:
   - float
   - file
   - enumeration
-  - entities
+  - entity
   - embedded
 basic_constraint_operators:
   - gt

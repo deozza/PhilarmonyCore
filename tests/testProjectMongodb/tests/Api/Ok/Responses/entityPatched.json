@@ -3,13 +3,21 @@
   "kind":"gear",
   "validation_state":"posted",
   "owner":{
-    "username":"userAdmin",
-    "uuid":"@string@.isUuid()"
+    "uuid":"@string@.isUuid()",
+    "username":"userAdmin"
   },
   "date_of_creation":"@date@",
   "last_update":"@date@",
-  "properties":{
-    "name":"sword",
-    "description":"Careful with the pointy end. The stick is powerful too."
-  }
+  "properties":[
+    {
+      "uuid":"@string@.isUuid()",
+      "kind":"gear_properties",
+      "date_of_creation":"@date@",
+      "last_update":"@date@",
+      "properties":{
+        "name":"sword",
+        "description":"Careful with the pointy end. The stick is powerful too."
+      }
+    }
+  ]
 }

@@ -133,7 +133,7 @@ class EmbeddedEntityController extends BaseController
 
         $this->dm->flush();
 
-        return $this->response->created($entity, ['entity_complete', 'user_basic']);
+        return $this->response->created($property->getEntity(), ['entity_complete', 'user_basic']);
     }
 
     /**
@@ -170,13 +170,15 @@ class EmbeddedEntityController extends BaseController
         }
 
         $formObject = new \ReflectionClass($formClass);
-        $form = $this->createForm($formObject->getName(), null);
-        $form->submit(json_decode($request->getContent(), true), true);
+        $form = $this->createForm($formObject->getName(), $property->getProperties());
+        $form->submit(json_decode($request->getContent(), true), false);
 
         if(!$form->isValid())
         {
             return $this->response->badForm($form);
         }
+
+        $property->setProperties($form->getData());
 
         $conflict_errors = $this->rulesManager->decideConflict($property->getEntity(), $request->getContent(), $request->getMethod(),__DIR__);
         if($conflict_errors > 0)
@@ -189,7 +191,7 @@ class EmbeddedEntityController extends BaseController
         {
             $property->getEntity()->setLastUpdate(new \DateTime('now'));
             $this->dm->flush();
-            return $this->response->created(['warning'=>$embeddedValidation, 'entity'=>$property->getEntity()], ['entity_basic', 'entity_id', 'entity_property']);
+            return $this->response->ok(['warning'=>$embeddedValidation, 'entity'=>$property->getEntity()], ['entity_basic', 'entity_id', 'entity_property']);
         }
 
         $state = $this->validate->processValidation($property->getEntity(),0, $entityStates, $this->getUser());
@@ -197,7 +199,7 @@ class EmbeddedEntityController extends BaseController
         {
             $property->getEntity()->setLastUpdate(new \DateTime('now'));
             $this->dm->flush();
-            return $this->response->created(['warning'=>$state, 'entity'=>$property->getEntity()], ['entity_basic', 'entity_id', 'user_basic']);
+            return $this->response->ok(['warning'=>$state, 'entity'=>$property->getEntity()], ['entity_basic', 'entity_id', 'user_basic']);
         }
 
         $this->handleEvents($request->getMethod(), $entityStates[$property->getEntity()->getValidationState()], $property->getEntity(), $eventDispatcher, json_decode($request->getContent(), true));

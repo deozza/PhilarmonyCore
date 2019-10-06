@@ -22,6 +22,20 @@ class PATCH extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('gear', DocumentType::class, [
+            'class' => Entity::class,
+            'query_builder'=> function(DocumentRepository $dr){
+                return $dr->createQueryBuilder()->find(Entity::class)
+                    ->eagerCursor(true)
+                    ->field('kind')->equals('gear');
+            },
+            'choice_value' => function($entity = null){
+                return is_a($entity, Entity::class) ? $entity->getUuidAsString() : '';
+            },
+            'constraints'=>[
+                new Assert\NotBlank()
+            ]
+        ]);
 
         $builder->add('stock' , IntegerType::class, [
             'constraints' => [

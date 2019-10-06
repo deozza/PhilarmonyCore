@@ -26,7 +26,7 @@ properties:
       required: true
 
   gear:
-    type: entities.gear
+    type: entity.gear
     constraints:
       unique: false
       required: true

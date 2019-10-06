@@ -7,8 +7,15 @@
   },
   "date_of_creation":"@date@",
   "last_update":"@date@",
-  "properties":{
-    "name":"sword",
-    "description":"Stick the pointy end"
-  }
+  "properties":[
+    {
+      "kind":"gear_properties",
+      "date_of_creation":"@date@",
+      "last_update":"@date@",
+      "properties":{
+        "name":"sword",
+        "description":"Stick the pointy end"
+      }
+    }
+  ]
 }

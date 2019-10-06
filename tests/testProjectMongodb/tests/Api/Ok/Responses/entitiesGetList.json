@@ -12,10 +12,18 @@
       },
       "date_of_creation":"@date@",
       "last_update":"@date@",
-      "properties":{
-        "name":"sword",
-        "description":"Stick the pointy end"
-      }
+      "properties": [
+        {
+          "uuid":"@string@.isUuid()",
+          "kind":"gear_properties",
+          "date_of_creation":"@date@",
+          "last_update":"@date@",
+          "properties":{
+            "name":"sword",
+            "description":"Stick the pointy end"
+          }
+        }
+      ]
     },
     {
       "uuid":"@string@.isUuid()",
@@ -27,10 +35,18 @@
       },
       "date_of_creation":"@date@",
       "last_update":"@date@",
-      "properties":{
-        "name":"shield",
-        "description":"Block the others pointy end"
-      }
+      "properties":[
+        {
+          "uuid":"@string@.isUuid()",
+          "kind":"gear_properties",
+          "date_of_creation":"@date@",
+          "last_update":"@date@",
+          "properties":{
+            "name":"shield",
+            "description":"Block the others pointy end"
+          }
+        }
+      ]
     }
   ],
   "total_count":2

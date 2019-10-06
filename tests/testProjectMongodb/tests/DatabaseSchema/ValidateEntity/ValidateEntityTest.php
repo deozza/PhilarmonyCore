@@ -32,7 +32,7 @@ class ValidateEntityTest extends DatabaseSchemaTestSetup
         $entity->setProperties($entitySchema['entities']['character_naming']['properties']);
         $validateEntity = new ValidateEntity($entity, $propertySchema['properties'], $authorizedKeys,[] );
         $this->expectException("Exception");
-        $this->expectExceptionMessage("Property unknown does not exist.\nDeclared in character_naming");
+        $this->expectExceptionMessage("Property unknown does not exist in the properties schema.\nDeclared in character_naming");
         $validateEntity->validateProperties();
     }
 

@@ -35,7 +35,7 @@ class ValidatePropertyTest extends DatabaseSchemaTestSetup
 
         $propertyValidate = new ValidateProperty($property, [], $entitySchema['entities'], $authorizedKeys);
         $this->expectException("Exception");
-        $this->expectExceptionMessage("Entity 'invalid' was not found in the entity config file.\nDeclared in the property 'firstname'.");
+        $this->expectExceptionMessage("Entity 'invalid' was not found in the entity config file as an embedded entity.\nDeclared in the property 'firstname'.");
         $propertyValidate->validateType();
     }
 
@@ -50,7 +50,7 @@ class ValidatePropertyTest extends DatabaseSchemaTestSetup
 
         $propertyValidate = new ValidateProperty($property, [], $entitySchema['entities'], $authorizedKeys);
         $this->expectException("Exception");
-        $this->expectExceptionMessage("Entity 'invalid' was not found in the entity config file.\nDeclared in the property 'firstname'.");
+        $this->expectExceptionMessage("Entity 'invalid' was not found in the entity config file as an entity.\nDeclared in the property 'firstname'.");
         $propertyValidate->validateType();
     }
 

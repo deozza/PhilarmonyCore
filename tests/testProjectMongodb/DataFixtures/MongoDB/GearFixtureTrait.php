@@ -1,5 +1,5 @@
 <?php
-namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\DataFixtures\MongoDB;
+namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\DataFixtures\MongoDB;
 
 
 use Deozza\PhilarmonyCoreBundle\Document\Entity;

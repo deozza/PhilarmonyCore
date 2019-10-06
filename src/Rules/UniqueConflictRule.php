@@ -17,6 +17,7 @@ class UniqueConflictRule implements RuleInterface
 
     public function decide($entity, $posted, $method,  DocumentManager $dm, DatabaseSchemaLoader $schemaLoader): ?array
     {
+        if(empty($posted)) return null;
         $kind = $entity->getKind();
         $properties = $this->getProperties($schemaLoader, $kind);
         $properties = $this->onlyUniqueProperties($properties);

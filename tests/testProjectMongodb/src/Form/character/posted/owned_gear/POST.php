@@ -14,7 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 use Deozza\PhilarmonyCoreBundle\Document\Entity;
 
@@ -29,8 +29,8 @@ class POST extends AbstractType
                     ->eagerCursor(true)
                     ->field('kind')->equals('gear');
             },
-            'choice_value' => function(Entity $entity = null){
-                return $entity ? $entity->getUuidAsString() : '';
+            'choice_value' => function($entity = null){
+                return is_a($entity, Entity::class) ? $entity->getUuidAsString() : '';
             },
             'constraints'=>[
                 new Assert\NotBlank()

@@ -18,8 +18,15 @@ properties:
       unique: false
       required: false
 
+  gear_properties:
+    type: embedded.gear_properties
+    array: false
+    constraints:
+      unique: false
+      required: true
+
   gear:
-    type: entity.gear
+    type: entities.gear
     constraints:
       unique: false
       required: true

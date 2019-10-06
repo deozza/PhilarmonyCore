@@ -75,8 +75,8 @@ class ValidateProperty
 
     private function validateEmbedded(string $name)
     {
-        $this->checkKeyExist($name, $this->entitiesSchema, "Entity '$name' was not found in the entity config file.\nDeclared in the property '".$this->property->getPropertyName()."'.");
-        if(array_key_exists($this->authorizedKeys['entity_keys'][1], $this->entitiesSchema[$name]))
+        $this->checkKeyExist($name, $this->entitiesSchema[$this->authorizedKeys['entity_heads'][1]], "Entity '$name' was not found in the entity config file as an embedded entity.\nDeclared in the property '".$this->property->getPropertyName()."'.");
+        if(array_key_exists($this->authorizedKeys['entity_keys'][1], $this->entitiesSchema[$this->authorizedKeys['entity_heads'][1]][$name]))
         {
             throw new \Exception("Entity $name contains a state and can not be an embedded entity.\nDeclared in the property '".$this->property->getPropertyName()."'.");
         }
@@ -84,8 +84,8 @@ class ValidateProperty
 
     private function validateEntity(string $name)
     {
-        $this->checkKeyExist($name, $this->entitiesSchema, "Entity '$name' was not found in the entity config file.\nDeclared in the property '".$this->property->getPropertyName()."'.");
-        if(!array_key_exists($this->authorizedKeys['entity_keys'][1], $this->entitiesSchema[$name]))
+        $this->checkKeyExist($name, $this->entitiesSchema[$this->authorizedKeys['entity_heads'][0]], "Entity '$name' was not found in the entity config file as an entity.\nDeclared in the property '".$this->property->getPropertyName()."'.");
+        if(!array_key_exists($this->authorizedKeys['entity_keys'][1], $this->entitiesSchema[$this->authorizedKeys['entity_heads'][0]][$name]))
         {
             throw new \Exception("Entity $name does not contain a state and can not be an joined entity.\nDeclared in the property '".$this->property->getPropertyName()."'.");
         }

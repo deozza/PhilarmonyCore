@@ -2,6 +2,7 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use JMS\Serializer\Annotation as JMS;
 use Ramsey\Uuid\Uuid;
@@ -30,7 +31,7 @@ class Entity
     private $validationState;
 
     /**
-     * @ODM\Field(type="hash")
+     * @ODM\Field(type="raw")
      * @JMS\Groups({"entity_complete", "entity_basic"})
      */
     private $owner;
@@ -48,7 +49,11 @@ class Entity
     private $lastUpdate;
 
     /**
-     * @ODM\Field(type="raw")
+     * @ODM\ReferenceMany(
+     *     targetDocument="Deozza\PhilarmonyCoreBundle\Document\Property",
+     *     discriminatorField="kind",
+     *     mappedBy="entity",
+     *     storeAs="dbRef")
      * @JMS\Groups({"entity_complete", "entity_basic", "entity_property"})
      */
     private $properties;
@@ -58,6 +63,7 @@ class Entity
         $this->setUuid();
         $this->dateOfCreation = new \DateTime('now');
         $this->lastUpdate = $this->dateOfCreation;
+        $this->properties = new ArrayCollection();
     }
 
     public function setUuid(): self
@@ -128,10 +134,15 @@ class Entity
         return $this->properties;
     }
 
-    public function setProperties($properties): self
+    public function getPropertiesByKind(string $kind)
     {
-        $this->properties = $properties;
-        return $this;
+        return $this->getProperties()->filter(function (Property $property) use ($kind) {
+            return $property->getKind() === $kind;
+        });
     }
 
+    public function addProperties(Property $property)
+    {
+        $this->properties[] = $property;
+    }
 }

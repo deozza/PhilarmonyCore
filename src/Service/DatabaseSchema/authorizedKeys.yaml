@@ -1,4 +1,6 @@
-entity_head: entities
+entity_heads:
+  - entities
+  - embedded
 property_head: properties
 enumeration_head: enumerations
 entity_keys:
@@ -32,7 +34,7 @@ types:
   - float
   - file
   - enumeration
-  - entity
+  - entities
   - embedded
 basic_constraint_operators:
   - gt

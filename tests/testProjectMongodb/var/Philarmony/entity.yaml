@@ -1,4 +1,4 @@
-entities:
+embedded:
   character_naming:
     properties:
       - firstname
@@ -21,17 +21,20 @@ entities:
       - stock
       - equiped
 
-  gear:
+  gear_properties:
     properties:
       - name
       - description
+
+entities:
+  gear:
+    properties:
+      - gear_properties
     states:
       __default:
         methods:
           POST:
-            properties:
-              - name
-              - description
+            properties: []
             by:
               roles:
                 - ROLE_USER
@@ -41,8 +44,7 @@ entities:
             by: all
           PATCH:
             properties:
-              - name
-              - description
+              - gear_properties
             by:
               users:
                 - owner

@@ -1,6 +1,6 @@
 <?php
 
-namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\src\DataFixtures\MongoDB;
+namespace Deozza\PhilarmonyCoreBundle\Tests\testProjectMongodb\DataFixtures\MongoDB;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -33,7 +33,7 @@ class BasicFixtures extends Fixture
             $env['user_'.$i] = $user->getUuidAsString();
             $i++;
         }
-
+/*
         $this->gears = $this->createGears(
             [
                 ["owner"=>$this->users[3],'name'=>"sword", "description"=>"Stick the pointy end"],
@@ -46,7 +46,7 @@ class BasicFixtures extends Fixture
             $env['gear_'.$i] = $gear->getUuidAsString();
             $i++;
         }
-
-        file_put_contents(__DIR__.'/env.json', json_encode($env, JSON_PRETTY_PRINT));
+*/
+        file_put_contents(__DIR__ . '/env.json', json_encode($env, JSON_PRETTY_PRINT));
     }
 }

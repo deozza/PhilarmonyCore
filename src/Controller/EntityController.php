@@ -134,15 +134,6 @@ class EntityController extends BaseController
             return $isAllowed;
         }
 
-        $formObject = new \ReflectionClass($formClass);
-        $form = $this->createForm($formObject->getName(), null);
-        $form->submit(json_decode($request->getContent(), true), true);
-
-        if(!$form->isValid())
-        {
-            return $this->response->badForm($form);
-        }
-
         $owner = [
             'username'=>$user->getUsername(),
             'uuid' => $user->getUuidAsString()
@@ -150,24 +141,6 @@ class EntityController extends BaseController
 
         $entityToPost->setOwner($owner);
         $entityToPost->setValidationState("__default");
-        $data = $form->getData();
-        foreach($data as $property => $content)
-        {
-            if(is_a($content,Entity::class))
-            {
-                $data[$property] = [
-                    "uuid"=>$content->getUuidAsString(),
-                    "validationState"=>$content->getValidationState(),
-                    "owner"=>[
-                        "uuid"=>$content->getOwner()['uuid'],
-                        "username"=>$content->getOwner()['username']
-                    ],
-                    "properties"=>$content->getProperties()
-                ];
-            }
-        }
-
-        $entityToPost->setProperties($data);
 
         $conflict_errors = $this->rulesManager->decideConflict($entityToPost , $request->getContent(), $request->getMethod(),__DIR__);
         if($conflict_errors > 0)
@@ -183,7 +156,6 @@ class EntityController extends BaseController
             $this->dm->flush();
         }
 
-
         if(is_array($state))
         {
             return $this->response->created(['warning'=>$state, 'entity'=>$entityToPost], ['entity_basic', 'entity_id', 'user_basic']);
@@ -194,84 +166,6 @@ class EntityController extends BaseController
         $this->dm->flush();
 
         return $this->response->created($entityToPost, ['entity_basic', 'entity_id', 'user_basic']);
-    }
-
-    /**
-     * @Route(
-     *     "entities/{uuid}",
-     *     requirements={
-     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
-     *     },
-     *     name="patch_entity",
-     *      methods={"PATCH"})
-     */
-    public function patchEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
-    {
-        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
-
-        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
-        $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
-        if(is_object($valid))
-        {
-            return $valid;
-        }
-
-        $stateConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
-
-        $formClass = $this->formGenerator->getFormNamespace().$entity->getKind()."\\".$entity->getValidationState()."\PATCH";
-        $formObject = new \ReflectionClass($formClass);
-
-        $properties = $entity->getProperties();
-
-        $form = $this->createForm($formObject->getName(), $properties);
-        $form->submit(json_decode($request->getContent(), true), false);
-
-        if(!$form->isValid())
-        {
-            return $this->response->badForm($form);
-        }
-
-        $data = $form->getData();
-
-        foreach($data as $property => $content)
-        {
-            if(is_a($content,Entity::class))
-            {
-                $data[$property] = [
-                    "uuid"=>$content->getUuidAsString(),
-                    "validationState"=>$content->getValidationState(),
-                    "owner"=>[
-                        "uuid"=>$content->getOwner()['uuid'],
-                        "username"=>$content->getOwner()['username']
-                    ],
-                    "properties"=>$content->getProperties()
-                ];
-            }
-        }
-
-        $entity->setProperties($data);
-
-        $conflict_errors = $this->rulesManager->decideConflict($entity, $request->getContent(), $request->getMethod(),__DIR__);
-        if($conflict_errors > 0)
-        {
-            return $this->response->conflict("You can not access to this entity", $conflict_errors);
-        }
-
-        $state = $this->validate->processValidation($entity,0, $stateConfig, $this->getUser());
-        $this->dm->flush();
-
-        if(is_array($state))
-        {
-            return $this->response->conflict($state, $entity, ['entity_complete', 'user_basic']);
-        }
-
-
-        $this->handleEvents($request->getMethod(), $stateConfig[$entity->getValidationState()], $entity, $eventDispatcher, json_decode($request->getContent(), true));
-
-        $this->dm->flush();
-
-        return $this->response->ok($entity, ['entity_complete', 'user_basic']);
-
     }
 
     /**

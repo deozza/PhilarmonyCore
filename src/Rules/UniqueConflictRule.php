@@ -52,7 +52,7 @@ class UniqueConflictRule implements RuleInterface
                 $sub = $schemaLoader->loadEntityEnumeration($type[1])['properties'];
                 foreach($sub as $item)
                 {
-                    $properties[$property.'.'.$item] = $schemaLoader->loadPropertyEnumeration($item);
+                    $properties[$item] = $schemaLoader->loadPropertyEnumeration($item);
                 }
             }
         }

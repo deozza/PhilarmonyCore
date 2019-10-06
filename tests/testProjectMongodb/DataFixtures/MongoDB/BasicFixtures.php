@@ -16,8 +16,8 @@ class BasicFixtures extends Fixture
     {
         $this->manager = $manager;
 
-        $env = [];
-        $i = 1;
+        $this->env = [];
+        $this->i = 1;
 
         $this->users = $this->createUsers(
             [
@@ -30,23 +30,15 @@ class BasicFixtures extends Fixture
         $this->manager->flush();
         foreach($this->users as $user)
         {
-            $env['user_'.$i] = $user->getUuidAsString();
-            $i++;
+            $this->env['user_'.$this->i] = $user->getUuidAsString();
+            $this->i++;
         }
-/*
         $this->gears = $this->createGears(
             [
-                ["owner"=>$this->users[3],'name'=>"sword", "description"=>"Stick the pointy end"],
-                ["owner"=>$this->users[3],'name'=>"shield", "description"=>"Block the others pointy end"],
+                ["owner"=>$this->users[3],'gear_properties'=>['name'=>"sword", "description"=>"Stick the pointy end"]],
+                ["owner"=>$this->users[3],'gear_properties'=>['name'=>"shield", "description"=>"Block the others pointy end"]],
             ]
         );
-        $this->manager->flush();
-        foreach($this->gears as $gear)
-        {
-            $env['gear_'.$i] = $gear->getUuidAsString();
-            $i++;
-        }
-*/
-        file_put_contents(__DIR__ . '/env.json', json_encode($env, JSON_PRETTY_PRINT));
+        file_put_contents(__DIR__ . '/env.json', json_encode($this->env, JSON_PRETTY_PRINT));
     }
 }

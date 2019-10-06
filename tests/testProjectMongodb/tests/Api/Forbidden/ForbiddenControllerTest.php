@@ -27,8 +27,8 @@ class ForbiddenControllerTest extends TestAsserter
     {
         return
             [
-                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/#gear_6#', 'token'=>'token_userActive', "status"=>403]],
-                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/#gear_6#', 'token'=>'token_userActive', "status"=>403]],
+                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/#gear_6#'         , 'token'=>'token_userActive', "status"=>403]],
+                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/embedded/#gear_properties_7#', 'token'=>'token_userActive', "status"=>403]],
             ];
     }
 }

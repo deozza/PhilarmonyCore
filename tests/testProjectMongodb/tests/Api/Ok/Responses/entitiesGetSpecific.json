@@ -12,7 +12,7 @@
       "kind":"gear_properties",
       "date_of_creation":"@date@",
       "last_update":"@date@",
-      "properties":{
+      "data":{
         "name":"sword",
         "description":"Stick the pointy end"
       }

@@ -104,7 +104,7 @@ class EmbeddedEntityController extends BaseController
 
         $property = new Property($property_name, $entity);
         $property->setOwner(['uuid'=>$user->getUuidAsString(), 'username'=>$user->getUsername()]);
-        $property->setProperties($form->getData());
+        $property->setData($form->getData());
         $this->dm->persist($property);
 
         $conflict_errors = $this->rulesManager->decideConflict($entity, $request->getContent(), $request->getMethod(),__DIR__);
@@ -170,7 +170,7 @@ class EmbeddedEntityController extends BaseController
         }
 
         $formObject = new \ReflectionClass($formClass);
-        $form = $this->createForm($formObject->getName(), $property->getProperties());
+        $form = $this->createForm($formObject->getName(), $property->getData());
         $form->submit(json_decode($request->getContent(), true), false);
 
         if(!$form->isValid())
@@ -178,7 +178,7 @@ class EmbeddedEntityController extends BaseController
             return $this->response->badForm($form);
         }
 
-        $property->setProperties($form->getData());
+        $property->setData($form->getData());
 
         $conflict_errors = $this->rulesManager->decideConflict($property->getEntity(), $request->getContent(), $request->getMethod(),__DIR__);
         if($conflict_errors > 0)

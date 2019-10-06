@@ -39,7 +39,7 @@ trait GearFixtureTrait
     private function addGearProperties(User $user, Entity $gear, array $gear_properties)
     {
         $property = new Property('gear_properties', $gear);
-        $property->setProperties($gear_properties);
+        $property->setData($gear_properties);
         $this->manager->persist($property);
         $this->manager->flush();
         $this->env['gear_properties_'.$this->i] = $property->getUuidAsString();

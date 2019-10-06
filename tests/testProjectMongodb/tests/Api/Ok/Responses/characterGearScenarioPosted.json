@@ -25,7 +25,7 @@
               "uuid":"@string@.isUuid()",
               "username":"userAdmin"
             },
-            "properties":{
+            "data":{
               "name":"sword",
               "description":"Stick the pointy end"
             }

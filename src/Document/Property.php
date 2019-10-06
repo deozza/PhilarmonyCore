@@ -2,6 +2,7 @@
 
 namespace Deozza\PhilarmonyCoreBundle\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use JMS\Serializer\Annotation as JMS;
 use Ramsey\Uuid\Uuid;
@@ -21,7 +22,7 @@ class Property
      * @ODM\Field(type="string")
      * @JMS\Groups({"entity_complete", "entity_basic"})
      */
-    private $kind;
+    private $propertyName;
 
     /**
      * @ODM\Field(type="raw")
@@ -53,15 +54,26 @@ class Property
      * @ODM\Field(type="raw")
      * @JMS\Groups({"entity_complete", "entity_basic", "entity_property"})
      */
-    private $properties;
+    private $data;
 
-    public function __construct(string $kind, Entity $entity)
+    /**
+     * @ODM\ReferenceMany(
+     *     targetDocument="Deozza\PhilarmonyCoreBundle\Document\FileProperty",
+     *     discriminatorField="kind",
+     *     mappedBy="property",
+     *     storeAs="dbRef")
+     * @JMS\Groups({"entity_complete", "entity_basic", "entity_property"})
+     */
+    private $files;
+
+    public function __construct(string $propertyName, Entity $entity)
     {
         $this->setUuid();
         $this->dateOfCreation = new \DateTime('now');
         $this->lastUpdate = $this->dateOfCreation;
-        $this->kind = $kind;
+        $this->propertyName = $propertyName;
         $this->entity = $entity;
+        $this->files = new ArrayCollection();
     }
 
     public function getUuidAsString(): string
@@ -75,13 +87,13 @@ class Property
         return $this;
     }
 
-    public function getKind(): string
+    public function getPropertyName(): string
     {
-        return $this->kind;
+        return $this->propertyName;
     }
-    public function setKind($kind): self
+    public function setPropertyName($propertyName): self
     {
-        $this->kind = $kind;
+        $this->propertyName = $propertyName;
         return $this;
     }
 
@@ -130,15 +142,25 @@ class Property
         return $this;
     }
 
-    public function getProperties()
+    public function getData()
     {
-        return $this->properties;
+        return $this->data;
     }
 
-    public function setProperties($properties): self
+    public function setData($data): self
     {
-        $this->properties = $properties;
+        $this->data = $data;
         return $this;
+    }
+
+    public function getFiles()
+    {
+        return $this->files;
+    }
+
+    public function addFiles(FileProperty $fileProperty)
+    {
+        $this->fileProperty[] = $fileProperty;
     }
 
 

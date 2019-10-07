@@ -44,5 +44,8 @@ trait GearFixtureTrait
         $this->manager->flush();
         $this->env['gear_properties_'.$this->i] = $property->getUuidAsString();
         $this->i++;
+
+        $gear->addProperties($property);
+        $this->manager->flush();
     }
 }

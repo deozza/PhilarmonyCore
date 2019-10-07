@@ -105,8 +105,8 @@ class EmbeddedEntityController extends BaseController
         $property = new Property($property_name, $entity);
         $property->setOwner(['uuid'=>$user->getUuidAsString(), 'username'=>$user->getUsername()]);
         $property->setData($form->getData());
-        $this->dm->persist($property);
 
+        $entity->addProperties($property);
         $conflict_errors = $this->rulesManager->decideConflict($entity, $request->getContent(), $request->getMethod(),__DIR__);
         if($conflict_errors > 0)
         {
@@ -138,24 +138,33 @@ class EmbeddedEntityController extends BaseController
 
     /**
      * @Route(
-     *     "entities/embedded/{uuid}",
+     *     "entities/{uuid}/embedded/{propertyName}/{propertyId}",
      *     requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+     *          "propertyName" = "^(\w{1,50})$",
+     *          "propertyId" = "^(\w{1,50})$"
      *     },
      *     name="patch_embedded_entity",
      *      methods={"PATCH"})
      */
-    public function patchEmbeddedEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
+    public function patchEmbeddedEntityAction(string $uuid, string $propertyName, string $propertyId, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $property = $this->dm->getRepository(Property::class)->findOneBy(['uuid'=>$uuid]);
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
+        if(empty($entity))
+        {
+            return $this->response->notFound("Resource not found");
+        }
+
+        $property = $entity->getPropertiesByKind($propertyName)[$propertyId];
+
         if(empty($property))
         {
             return $this->response->notFound("Resource not found");
         }
 
-        $entityStates = $this->schemaLoader->loadEntityEnumeration($property->getEntity()->getKind())['states'];
+        $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
 
-        $formClass = $this->formGenerator->getFormNamespace().$property->getEntity()->getKind()."\\".$property->getEntity()->getValidationState()."\\".$property->getKind()."\\".$request->getMethod();
+        $formClass = $this->formGenerator->getFormNamespace().$entity->getKind()."\\".$entity->getValidationState()."\\".$propertyName."\\".$request->getMethod();
 
         if(!class_exists($formClass))
         {
@@ -163,7 +172,7 @@ class EmbeddedEntityController extends BaseController
         }
 
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
-        $valid = $this->authorizeRequest->validateRequest($property->getEntity(), $request->getMethod(), $user);
+        $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
             return $valid;
@@ -179,76 +188,83 @@ class EmbeddedEntityController extends BaseController
         }
 
         $property->setData($form->getData());
+        $property->setLastUpdate(new \DateTime('now'));
+        $entity->setLastUpdate(new \DateTime('now'));
 
-        $conflict_errors = $this->rulesManager->decideConflict($property->getEntity(), $request->getContent(), $request->getMethod(),__DIR__);
+        $conflict_errors = $this->rulesManager->decideConflict($entity, $request->getContent(), $request->getMethod(),__DIR__);
         if($conflict_errors > 0)
         {
             return $this->response->conflict("You can not access to this entity", $conflict_errors);
         }
 
-        $embeddedValidation = $this->validate->processEmbeddedValidation($property->getEntity(), $this->schemaLoader->loadEntityEnumeration($property->getKind()), $this->getUser());
+        $embeddedValidation = $this->validate->processEmbeddedValidation($entity, $this->schemaLoader->loadEntityEnumeration($property->getPropertyName()), $this->getUser());
         if(is_array($embeddedValidation))
         {
-            $property->getEntity()->setLastUpdate(new \DateTime('now'));
             $this->dm->flush();
-            return $this->response->ok(['warning'=>$embeddedValidation, 'entity'=>$property->getEntity()], ['entity_basic', 'entity_id', 'entity_property']);
+            return $this->response->ok(['warning'=>$embeddedValidation, 'entity'=>$entity], ['entity_basic', 'entity_id', 'entity_property']);
         }
 
-        $state = $this->validate->processValidation($property->getEntity(),0, $entityStates, $this->getUser());
+        $state = $this->validate->processValidation($entity,0, $entityStates, $this->getUser());
         if(is_array($state))
         {
-            $property->getEntity()->setLastUpdate(new \DateTime('now'));
             $this->dm->flush();
-            return $this->response->ok(['warning'=>$state, 'entity'=>$property->getEntity()], ['entity_basic', 'entity_id', 'user_basic']);
+            return $this->response->ok(['warning'=>$state, 'entity'=>$entity], ['entity_basic', 'entity_id', 'user_basic']);
         }
 
-        $this->handleEvents($request->getMethod(), $entityStates[$property->getEntity()->getValidationState()], $property->getEntity(), $eventDispatcher, json_decode($request->getContent(), true));
+        $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher, json_decode($request->getContent(), true));
 
         $this->dm->flush();
 
-        return $this->response->ok($property->getEntity(), ['entity_complete', 'user_basic']);
+        return $this->response->ok($entity, ['entity_complete', 'user_basic']);
     }
 
     /**
      * @Route(
-     *     "entities/embedded/{uuid}",
+     *     "entities/{uuid}/embedded/{propertyName}/{propertyId}",
      *     requirements={
-     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+     *          "propertyName" = "^(\w{1,50})$",
+     *          "propertyId" = "^(\w{1,50})$"
      *     },
      *     name="delete_embedded_entity",
      *      methods={"DELETE"})
      */
-    public function deleteEmbeddedEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
+    public function deleteEmbeddedEntityAction(string $uuid, string $propertyName, string $propertyId, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $property = $this->dm->getRepository(Property::class)->findOneBy(['uuid'=>$uuid]);
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
+        if(empty($entity))
+        {
+            return $this->response->notFound("Resource not found");
+        }
+
+        $property = $entity->getPropertiesByKind($propertyName)[$propertyId];
+
         if(empty($property))
         {
             return $this->response->notFound("Resource not found");
         }
 
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
-        $valid = $this->authorizeRequest->validateRequest($property->getEntity(), $request->getMethod(), $user);
+        $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
         {
             return $valid;
         }
 
-        $propertyConfig = $this->schemaLoader->loadPropertyEnumeraion($property->getKind());
-        $count = count($property->getEntity()->getPropertiesByKind($property->getKind()));
+        $propertyConfig = $this->schemaLoader->loadPropertyEnumeraion($propertyName);
+        $count = count($property->getEntity()->getPropertiesByKind($propertyName));
         if($propertyConfig['constraints']['required'] === true && $count <=1)
         {
             return $this->response->badRequest(
                 [
-                    $property->getKind() => [
+                    $propertyName => [
                         'This property is required and cannot be deleted.'
                     ]
                 ]
             );
         }
 
-        $entityStates = $this->schemaLoader->loadEntityEnumeration($property->getEntity()->getKind())['states'];
-        $this->handleEvents($request->getMethod(), $entityStates['__default'], $property->getEntity(), $eventDispatcher);
-        $property->getEntity()->setLastUpdate(new \DateTime('now'));
+        $entity->getProperties()->removeElement($property);
 
         $this->dm->flush();
 

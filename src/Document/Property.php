@@ -8,13 +8,13 @@ use JMS\Serializer\Annotation as JMS;
 use Ramsey\Uuid\Uuid;
 
 /**
- * @ODM\Document(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\PropertyRepository")
+ * @ODM\EmbeddedDocument()
  */
 class Property
 {
     /**
      * @ODM\Id(strategy="NONE", type="string")
-     * @JMS\Groups({"entity_id", "entity_complete"})
+     * @JMS\Exclude()
      */
     private $uuid;
 
@@ -29,14 +29,6 @@ class Property
      * @JMS\Groups({"entity_complete", "entity_basic"})
      */
     private $owner;
-
-    /**
-     * @ODM\ReferenceOne(
-     *     targetDocument="Deozza\PhilarmonyCoreBundle\Document\Entity",
-     *     inversedBy="properties")
-     * @JMS\Exclude())
-     */
-    private $entity;
 
     /**
      * @ODM\Field(type="date")
@@ -57,11 +49,10 @@ class Property
     private $data;
 
     /**
-     * @ODM\ReferenceMany(
+     * @ODM\EmbedMany(
      *     targetDocument="Deozza\PhilarmonyCoreBundle\Document\FileProperty",
      *     discriminatorField="kind",
-     *     mappedBy="property",
-     *     storeAs="dbRef")
+     *     strategy="setArray")
      * @JMS\Groups({"entity_complete", "entity_basic", "entity_property"})
      */
     private $files;
@@ -72,7 +63,6 @@ class Property
         $this->dateOfCreation = new \DateTime('now');
         $this->lastUpdate = $this->dateOfCreation;
         $this->propertyName = $propertyName;
-        $this->entity = $entity;
         $this->files = new ArrayCollection();
     }
 
@@ -109,23 +99,12 @@ class Property
         return $this;
     }
 
-    public function getEntity(): Entity
-    {
-        return $this->entity;
-    }
-
-    public function setEntity(Entity $entity): self
-    {
-        $this->entity = $entity;
-        return $this;
-    }
-
     public function getDateOfCreation(): string
     {
         return $this->dateOfCreation;
     }
 
-    public function setDateOfCreation(string $dateOfCreation): self
+    public function setDateOfCreation(\DateTime $dateOfCreation): self
     {
         $this->dateOfCreation = $dateOfCreation;
         return $this;
@@ -136,7 +115,7 @@ class Property
         return $this->lastUpdate;
     }
 
-    public function setLastUpdate(string $lastUpdate): self
+    public function setLastUpdate(\DateTime $lastUpdate): self
     {
         $this->lastUpdate = $lastUpdate;
         return $this;

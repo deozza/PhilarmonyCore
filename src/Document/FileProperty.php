@@ -10,14 +10,14 @@ use Ramsey\Uuid\Uuid;
 use JMS\Serializer\Annotation as JMS;
 
 /**
- * @ODM\Document()
+ * @ODM\EmbeddedDocument()
  * @Vich\Uploadable
  */
 class FileProperty
 {
     /**
      * @ODM\Id(strategy="NONE", type="string")
-     * @JMS\Groups({"file_id", "file_complete"})
+     * @JMS\Exclude()
      */
     private $uuid;
 

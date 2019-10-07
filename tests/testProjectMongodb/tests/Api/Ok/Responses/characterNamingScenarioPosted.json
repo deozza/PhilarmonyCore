@@ -17,7 +17,20 @@
     "date_of_creation":"@date@",
     "last_update":"@date@",
     "properties":[
-
+      {
+        "property_name":"character_naming",
+        "owner":{
+          "uuid":"@string@.isUuid()",
+          "username":"userActive"
+        },
+        "date_of_creation":"@date@",
+        "last_update":"@date@",
+        "data":{
+          "firstname":"John",
+          "lastname":"Doe"
+        },
+        "files": []
+      }
     ]
   }
 }

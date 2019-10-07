@@ -39,7 +39,7 @@ class OkControllerTest extends TestAsserter
 
                 ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/gear'             , 'token'=>'token_userAdmin', "status"=>201, 'out'=>'entityPosted']],
 
-                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/embedded/#gear_properties_7#', 'token'=>'token_userAdmin', "status"=>200, 'out'=>'entityPatched', 'in'=>'entityPatch']],
+                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/#gear_6#/embedded/gear_properties/0', 'token'=>'token_userAdmin', "status"=>200, 'out'=>'entityPatched', 'in'=>'entityPatch']],
 
                 ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/#gear_6#'       , 'token'=>'token_userAdmin', "status"=>204]],
 

@@ -9,13 +9,14 @@
   "last_update":"@date@",
   "properties":[
     {
-      "kind":"gear_properties",
+      "property_name":"gear_properties",
       "date_of_creation":"@date@",
       "last_update":"@date@",
       "data":{
         "name":"sword",
         "description":"Stick the pointy end"
-      }
+      },
+      "files": []
     }
   ]
 }

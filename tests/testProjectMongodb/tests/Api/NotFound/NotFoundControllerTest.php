@@ -37,12 +37,18 @@ class NotFoundControllerTest extends TestAsserter
                 ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entities/00100000-0000-4000-a000-000000000000'                   , "status"=>404]],
                 ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/00100000-0000-4000-a000-000000000000'                   , "status"=>404]],
 
-                ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entities/00100000-0000-4000-a000-000000000000/embedded/not_found', "status"=>404]],
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entities/00100000-0000-4000-a000-000000000000/embedded/not_found', "status"=>404]],
-                ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entities/#gear_properties_7#/embedded/not_found'                 , "status"=>404]],
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entities/#gear_properties_7#/embedded/not_found'                 , "status"=>404]],
-                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/embedded/00100000-0000-4000-a000-000000000000'          , "status"=>404]],
-                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/embedded/00100000-0000-4000-a000-000000000000'          , "status"=>404]],
+                ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entities/00100000-0000-4000-a000-000000000000/embedded/not_found'        , "status"=>404]],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entities/00100000-0000-4000-a000-000000000000/embedded/not_found'        , "status"=>404]],
+                ["kind"=>"unit", "test"=>['method'=>'GET'   , 'url'=>'/api/entities/#gear_properties_7#/embedded/not_found'                         , "status"=>404]],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entities/#gear_properties_7#/embedded/not_found'                         , "status"=>404]],
+                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/00100000-0000-4000-a000-000000000000/embedded/gear_properties/0', "status"=>404]],
+                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/#gear_6#/embedded/not_found/0'                                  , "status"=>404]],
+                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/#gear_6#/embedded/gear_properties/1000'                         , "status"=>404]],
+
+                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/00100000-0000-4000-a000-000000000000/embedded/gear_properties/0', "status"=>404]],
+                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/#gear_6#/embedded/not_found/0'                                  , "status"=>404]],
+                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/#gear_6#/embedded/gear_properties/1000'                         , "status"=>404]],
+
 
             ];
     }

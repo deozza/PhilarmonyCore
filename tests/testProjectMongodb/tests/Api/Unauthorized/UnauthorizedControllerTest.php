@@ -27,13 +27,13 @@ class UnauthorizedControllerTest extends TestAsserter
     {
         return
             [
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/gear'                               , "status"=>401]],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entity/gear'                                 ,"status"=>401]],
 
-                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/#gear_6#'                         , "status"=>401]],
+                ["kind"=>"unit", "test"=>['method'=>'DELETE', 'url'=>'/api/entities/#gear_6#'                           ,"status"=>401]],
 
-                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entities/#gear_6#/embedded/gear_properties', "status"=>401]],
+                ["kind"=>"unit", "test"=>['method'=>'POST'  , 'url'=>'/api/entities/#gear_6#/embedded/gear_properties'  ,"status"=>401]],
 
-                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/embedded/#gear_properties_7#'     , "status"=>401]],
+                ["kind"=>"unit", "test"=>['method'=>'PATCH' , 'url'=>'/api/entities/#gear_6#/embedded/gear_properties/0', "status"=>401]],
             ];
     }
 }

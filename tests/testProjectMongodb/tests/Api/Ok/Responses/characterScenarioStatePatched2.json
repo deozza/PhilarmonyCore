@@ -10,8 +10,7 @@
   "last_update":"@date@",
   "properties":[
     {
-      "uuid":"@string@.isUuid()",
-      "kind":"character_naming",
+      "property_name":"character_naming",
       "owner":{
         "uuid":"@string@.isUuid()",
         "username":"userActive"
@@ -21,7 +20,8 @@
       "data":{
         "firstname":"John",
         "lastname":"Doe"
-      }
+      },
+      "files": []
     }
   ]
 }

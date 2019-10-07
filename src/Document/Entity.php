@@ -49,11 +49,10 @@ class Entity
     private $lastUpdate;
 
     /**
-     * @ODM\ReferenceMany(
+     * @ODM\EmbedMany(
      *     targetDocument="Deozza\PhilarmonyCoreBundle\Document\Property",
      *     discriminatorField="kind",
-     *     mappedBy="entity",
-     *     storeAs="dbRef")
+     *     strategy="setArray")
      * @JMS\Groups({"entity_complete", "entity_basic", "entity_property"})
      */
     private $properties;
@@ -137,7 +136,7 @@ class Entity
     public function getPropertiesByKind(string $kind)
     {
         return $this->getProperties()->filter(function (Property $property) use ($kind) {
-            return $property->getKind() === $kind;
+            return $property->getPropertyName() === $kind;
         });
     }
 

@@ -5,13 +5,11 @@ namespace Deozza\PhilarmonyCoreBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\HttpFoundation\File\File;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Ramsey\Uuid\Uuid;
 use JMS\Serializer\Annotation as JMS;
 
 /**
  * @ODM\EmbeddedDocument()
- * @Vich\Uploadable
  */
 class FileProperty
 {
@@ -22,18 +20,9 @@ class FileProperty
     private $uuid;
 
     /**
-     * @Vich\UploadableField(mapping="property_file")
-     * @var File
+     * @JMS\Exclude()
      */
     private $file;
-
-    /**
-     * @ODM\ReferenceOne(
-     *     targetDocument="Deozza\PhilarmonyCoreBundle\Document\Property",
-     *     inversedBy="files")
-     * @JMS\Exclude())
-     */
-    private $property;
 
     /**
      * @ODM\Field(type="raw")
@@ -42,15 +31,38 @@ class FileProperty
     private $owner;
 
     /**
+     * @ODM\Field(type="string")
+     * @JMS\Groups({"entity_complete", "entity_basic"})
+     */
+    private $filename;
+
+    /**
+     * @ODM\Field(type="string")
+     * @JMS\Groups({"entity_complete", "entity_basic"})
+     */
+    private $description;
+
+    /**
+     * @ODM\Field(type="string")
+     * @JMS\Groups({"entity_complete", "entity_basic"})
+     */
+    private $credit;
+
+    /**
+     * @ODM\Field(type="string")
+     * @JMS\Groups({"entity_complete", "entity_basic"})
+     */
+    private $mimetype;
+
+    /**
      * @ODM\Field(type="date")
      * @JMS\Groups({"entity_complete", "entity_basic"})
      */
     private $dateOfUpload;
 
-    public function __construct(Property $property, $owner)
+    public function __construct($owner)
     {
         $this->setUuid();
-        $this->property = $property;
         $this->owner = $owner;
     }
 
@@ -65,31 +77,55 @@ class FileProperty
         return $this->uuid;
     }
 
-    public function setFile(?File $file = null): void
+    public function setFile(string $file): void
     {
         $this->file = $file;
-
-        if (null !== $file) {
-            // It is required that at least one field changes if you are using doctrine
-            // otherwise the event listeners won't be called and the file is lost
-            $this->dateOfUpload = new \DateTime('now');
-        }
+        $this->dateOfUpload = new \DateTime('now');
     }
 
-    public function getFile(): ?File
+    public function getFile(): ?string
     {
         return $this->file;
     }
 
-    public function getProperty(): Property
+    public function setMimetype(string $mimetype): void
     {
-        return $this->property;
+        $this->mimetype = $mimetype;
     }
 
-    public function setProperty(Entity $property): self
+    public function getMimetype(): ?string
     {
-        $this->property = $property;
-        return $this;
+        return $this->mimetype;
+    }
+
+    public function setFilename(?string $filename): void
+    {
+        $this->filename = $filename;
+    }
+
+    public function getFilename(): ?string
+    {
+        return $this->filename;
+    }
+
+    public function setDescription(?string $description): void
+    {
+        $this->description = $description;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setCredit(?string $credit): void
+    {
+        $this->credit = $credit;
+    }
+
+    public function getCredit(): ?string
+    {
+        return $this->credit;
     }
 
     public function getOwner()

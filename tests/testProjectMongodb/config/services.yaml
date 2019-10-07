@@ -5,7 +5,6 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     mongodb_url: philarmony-core-test
-    app.path.product_images: /uploads/images/products
 services:
     # default configuration for services in *this* file
     _defaults:

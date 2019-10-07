@@ -1,0 +1,8 @@
+oneup_flysystem:
+  adapters:
+    public_uploads_adapter:
+      local:
+        directory: '%kernel.project_dir%/public/uploads'
+  filesystems:
+    public_uploads:
+      adapter: public_uploads_adapter

@@ -139,7 +139,7 @@ class Property
 
     public function addFiles(FileProperty $fileProperty)
     {
-        $this->fileProperty[] = $fileProperty;
+        $this->files[] = $fileProperty;
     }
 
 

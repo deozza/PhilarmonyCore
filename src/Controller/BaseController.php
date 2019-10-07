@@ -6,6 +6,7 @@ use Deozza\PhilarmonyCoreBundle\Document\Entity;
 use Deozza\PhilarmonyCoreBundle\Service\Authorization\AuthorizeAccessToEntity;
 use Deozza\PhilarmonyCoreBundle\Service\Authorization\AuthorizeRequest;
 use Deozza\PhilarmonyCoreBundle\Service\DatabaseSchema\DatabaseSchemaLoader;
+use Deozza\PhilarmonyCoreBundle\Service\FileUploader;
 use Deozza\PhilarmonyCoreBundle\Service\FormManager\FormGenerator;
 use Deozza\PhilarmonyCoreBundle\Service\RulesManager\RulesManager;
 use Deozza\PhilarmonyCoreBundle\Service\Validation\ManualValidation;
@@ -27,7 +28,8 @@ class BaseController extends AbstractController
         AuthorizeAccessToEntity $authorizeAccessToEntity,
         AuthorizeRequest $authorizeRequest,
         RulesManager $rulesManager,
-        DocumentManager $dm
+        DocumentManager $dm,
+        FileUploader $fileUploader
     )
     {
         $this->schemaLoader = $schemaLoader;
@@ -39,6 +41,7 @@ class BaseController extends AbstractController
         $this->authorizeRequest = $authorizeRequest;
         $this->rulesManager = $rulesManager;
         $this->dm = $dm;
+        $this->fileuploader = $fileUploader;
     }
 
     protected function handleEvents(string $method, array $stateConfig, Entity $entity, EventDispatcherInterface $eventDispatcher, array $payload = null)

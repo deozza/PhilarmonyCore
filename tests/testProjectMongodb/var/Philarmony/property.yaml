@@ -90,6 +90,13 @@ properties:
       lengthMin: 1
       lengthMax: 255
 
+  photo:
+    type: file
+    constraints:
+      unique: false
+      required: false
+      mime: ['image/png', 'image/jpeg']
+
   stock:
     type: int
     constraints:

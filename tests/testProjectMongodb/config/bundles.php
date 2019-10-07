@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     Symfony\Bundle\FrameworkBundle\FrameworkBundle::class => ['all' => true],
     JMS\SerializerBundle\JMSSerializerBundle::class => ['all' => true],
@@ -17,5 +16,5 @@ return [
     Deozza\PhilarmonyApiTesterBundle\DeozzaPhilarmonyApiTesterBundle::class => ['dev' => true, 'test' => true],
     Nelmio\CorsBundle\NelmioCorsBundle::class => ['all' => true],
     Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['dev' => true, 'test' => true],
-    Vich\UploaderBundle\VichUploaderBundle::class => ['all'=>true]
+    Oneup\FlysystemBundle\OneupFlysystemBundle::class => ['all'=>true]
 ];

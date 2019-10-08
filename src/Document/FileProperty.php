@@ -40,6 +40,12 @@ class FileProperty
      * @ODM\Field(type="string")
      * @JMS\Groups({"entity_complete", "entity_basic"})
      */
+    private $filetitle;
+
+    /**
+     * @ODM\Field(type="string")
+     * @JMS\Groups({"entity_complete", "entity_basic"})
+     */
     private $description;
 
     /**
@@ -106,6 +112,16 @@ class FileProperty
     public function getFilename(): ?string
     {
         return $this->filename;
+    }
+
+    public function setFiletitle(?string $filetitle): void
+    {
+        $this->filetitle = $filetitle;
+    }
+
+    public function getFiletitle(): ?string
+    {
+        return $this->filetitle;
     }
 
     public function setDescription(?string $description): void

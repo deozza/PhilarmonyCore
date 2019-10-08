@@ -19,9 +19,15 @@ class FileUploader
         $this->fs->write($this->getFilename($fileProperty),$fileProperty->getFile());
     }
 
+    public function getFile(FileProperty $fileProperty)
+    {
+        return $this->fs->read($fileProperty->getFilename());
+    }
+
     private function getFilename(FileProperty $fileProperty): string
     {
         $extension = explode('/', $fileProperty->getMimetype() )[1];
-        return Uuid::uuid4()->toString().".".$extension;
+        $fileProperty->setFilename(Uuid::uuid4()->toString().".".$extension);
+        return $fileProperty->getFilename();
     }
 }

@@ -92,19 +92,14 @@ class FileController extends BaseController
         }
 
         $file = new FileProperty(['uuid'=>$user->getUuidAsString(), 'username'=>$user->getUsername()]);
-        $file->setFile($request->getContent());
         $file->setFiletitle($request->headers->get('X-Filename'));
         $file->setDescription($request->headers->get('X-Description'));
         $file->setCredit($request->headers->get('X-Credit'));
         $file->setMimetype($mimeTypeProvided);
-
-        $property->addFiles($file);
-        $this->dm->flush();
-
         $this->fileuploader->persistFile($file);
+        $property->addFiles($request->getContent());
 
         $this->dm->flush();
-
         return $this->response->created($entity, ['entity_basic', 'entity_id', 'user_basic']);
     }
 
@@ -128,6 +123,7 @@ class FileController extends BaseController
         {
             return $this->response->notFound("Route not found");
         }
+
         $property = $entity->getPropertiesByKind($propertyName)[$propertyId];
 
         if(empty($property))
@@ -141,12 +137,69 @@ class FileController extends BaseController
             return $this->response->notFound("Resource not found");
         }
 
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
+
+        $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
+        if(is_object($valid))
+        {
+            return $valid;
+        }
+
         $headers = [
             'Content-Type'     => $fileToServe->getMimetype(),
             'Content-Disposition' => 'inline',
             'Content-Length' => strlen($fileToServe->getFile())
         ];
 
-        return new Response($fileToServe->getFile(), Response::HTTP_OK, $headers);
+        return new Response($this->fileuploader->getFile($fileToServe), Response::HTTP_OK, $headers);
+    }
+
+    /**
+     * @Route(
+     *     "entities/{uuid}/embedded/{propertyName}/{propertyId}/file/{fileId}",
+     *     requirements={
+     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+     *          "propertyName" = "^(\w{1,50})$",
+     *          "fileProperty" = "^(\w{1,50})$",
+     *          "propertyId" = "^(\w{1,50})$",
+     *          "fileId" = "^(\w{1,50})$"
+     *     },
+     *     name="delete_file",
+     *     methods={"DELETE"})
+     */
+    public function deleteFileFromEmbeddedDocumentAction(string $uuid, string $propertyName, string $propertyId, string $fileId, Request $request)
+    {
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid' => $uuid]);
+        if(empty($entity))
+        {
+            return $this->response->notFound("Route not found");
+        }
+
+        $property = $entity->getPropertiesByKind($propertyName)[$propertyId];
+
+        if(empty($property))
+        {
+            return $this->response->notFound("Resource not found");
+        }
+
+        $fileToServe = $property->getFiles()[$fileId];
+        if(empty($fileToServe))
+        {
+            return $this->response->notFound("Resource not found");
+        }
+
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
+
+        $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
+        if(is_object($valid))
+        {
+            return $valid;
+        }
+
+        $this->fileuploader->deleteFile($fileToServe);
+        $property->getFiles()->removeElement($fileToServe);
+        $this->dm->flush();
+        
+        return $this->response->empty();
     }
 }

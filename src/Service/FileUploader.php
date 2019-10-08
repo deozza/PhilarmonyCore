@@ -14,14 +14,19 @@ class FileUploader
         $this->fs = $filesystem;
     }
 
-    public function persistFile(FileProperty $fileProperty)
+    public function persistFile(FileProperty $fileProperty, string $content)
     {
-        $this->fs->write($this->getFilename($fileProperty),$fileProperty->getFile());
+        $this->fs->write($this->getFilename($fileProperty),$content);
     }
 
     public function getFile(FileProperty $fileProperty)
     {
         return $this->fs->read($fileProperty->getFilename());
+    }
+
+    public function deleteFile(FileProperty $fileProperty)
+    {
+        $this->fs->delete($fileProperty->getFilename());
     }
 
     private function getFilename(FileProperty $fileProperty): string

@@ -21,7 +21,7 @@ class EntityRepository extends DocumentRepository
         parent::__construct($dm, $uow, $classMetaData);
     }
 
-    public function findAllFiltered(Array $filters, Array $sort, $kind, int $count = null, int $page = null, array $validationStates = null, string $userUuid = null)
+    public function findAllFiltered(Array $filters, Array $sort, string $kind)
     {
         $queryBuilder = $this->createQueryBuilder()
             ->find(Entity::class)
@@ -80,13 +80,27 @@ class EntityRepository extends DocumentRepository
             }
         }
 
+        return $queryBuilder;
+    }
+
+    public function findFilteredAndPaginated(Array $filters, Array $sort, string $kind, array $validationStates, int $count, int $page, string $userUuid = null)
+    {
+        $queryBuilder = $this->findAllFiltered($filters, $sort, $kind);
+        $pagination = [];
+        $pagination['total'] = $queryBuilder->getQuery()->execute()->count();
+
         if(!empty($count) && !empty($page))
         {
             $queryBuilder->limit($count);
             $offset = ($page - 1) * $count;
             $queryBuilder->skip($offset);
+            $pagination['current_page_number'] = $page;
+            $pagination['num_items_per_page'] = $count;
         }
-        return $queryBuilder->getQuery()->execute()->toArray();
+
+        $pagination['items'] =  $queryBuilder->getQuery()->execute()->toArray();
+
+        return $pagination;
     }
 
     public function findAllForValidate($kind, $property, $value, $operator, ?array $referenceParams)

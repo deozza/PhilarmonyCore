@@ -60,13 +60,13 @@ class EntityController extends BaseController
         }
 
         $page = $request->query->getInt("page", 1);
-        $count = $request->query->getInt("count", 10);
+        $count = $request->query->getInt("count", null);
         $filter = $request->query->get("filterBy", []);
         $sort = $request->query->get("sortBy", []);
 
-        $entities = $this->dm->getRepository(Entity::class)->findAllFiltered($filter, $sort, $entity_name, $count, $page, $validationStates, $userUuid);
+        $entities = $this->dm->getRepository(Entity::class)->findFilteredAndPaginated($filter, $sort, $entity_name, $validationStates, $count, $page, $userUuid);
 
-        return $this->response->okPaginated($entities, ['entity_basic', 'entity_id','user_basic'], $count, $page);
+        return $this->response->okPaginated($entities, ['entity_basic', 'entity_id','user_basic']);
     }
 
     /**
@@ -98,7 +98,7 @@ class EntityController extends BaseController
         }
 
         $this->handleEvents($request->getMethod(), $stateConfig, $entity, $eventDispatcher);
-        return $this->response->ok($entity, ['entity_basic', 'user_basic']);
+        return $this->response->ok($entity, ['entity_basic', 'user_basic', 'property_id', 'file_id']);
     }
 
     /**

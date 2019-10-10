@@ -14,7 +14,7 @@ class Property
 {
     /**
      * @ODM\Id(strategy="NONE", type="string")
-     * @JMS\Groups({"entity_id", "entity_complete"})
+     * @JMS\Groups({"entity_id", "entity_complete", "property_id"})
      */
     private $uuid;
 

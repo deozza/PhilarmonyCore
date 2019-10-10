@@ -15,7 +15,7 @@ class FileProperty
 {
     /**
      * @ODM\Id(strategy="NONE", type="string")
-     * @JMS\Groups({"entity_id", "entity_complete"})
+     * @JMS\Groups({"entity_id", "entity_complete", "file_id"})
      */
     private $uuid;
 

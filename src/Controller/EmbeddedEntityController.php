@@ -116,11 +116,11 @@ class EmbeddedEntityController extends BaseController
         if(!$ableToPostMultiple && $alreadyPosted >=1)
         {
             return $this->response->badRequest(
-                    [
-                        $property_name => [
-                            'This property has already been posted and cannot be posted again.'
-                        ]
+                [
+                    $property_name => [
+                        'This property has already been posted and cannot be posted again.'
                     ]
+                ]
             );
         }
 
@@ -191,7 +191,7 @@ class EmbeddedEntityController extends BaseController
             return $this->response->notFound("Route not found");
         }
 
-        $formClass = $this->formGenerator->getFormNamespace().$entity->getKind()."\\".$entity->getValidationState()."\\".$property->getpPropertyName()."\\".$request->getMethod();
+        $formClass = $this->formGenerator->getFormNamespace().$entity->getKind()."\\".$entity->getValidationState()."\\".$property->getPropertyName()."\\".$request->getMethod();
 
         if(!class_exists($formClass))
         {

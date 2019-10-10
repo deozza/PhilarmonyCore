@@ -26,7 +26,7 @@ class UniqueConflictRule implements RuleInterface
         {
             if(array_key_exists($key, $posted))
             {
-                $exist = $dm->getRepository(Entity::class)->findAllFiltered(['equal.properties.data.'.$key=>$posted[$key]], [], $entity->getKind());
+                $exist = $dm->getRepository(Entity::class)->findAllFiltered(['equal.properties.data.'.$key=>$posted[$key]], [], $entity->getKind())->getQuery()->execute()->toArray();
                 if(count($exist)> 0)
                 {
                     return ["conflict" => [$key=>self::ERROR_EXISTS]];

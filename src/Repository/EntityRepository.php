@@ -21,12 +21,22 @@ class EntityRepository extends DocumentRepository
         parent::__construct($dm, $uow, $classMetaData);
     }
 
-    public function findAllFiltered(Array $filters, Array $sort, $kind)
+    public function findAllFiltered(Array $filters, Array $sort, $kind, int $count, int $page, array $validationStates, string $userUuid = null)
     {
         $queryBuilder = $this->createQueryBuilder()
             ->find(Entity::class)
             ->eagerCursor(true)
             ->field('kind')->equals($kind);
+
+        if(!empty($userUuid))
+        {
+            $queryBuilder->field('owner.uuid')->equals($userUuid);
+        }
+
+        foreach($validationStates as $state)
+        {
+            $queryBuilder->addOr($queryBuilder->expr()->field('validationState')->equals($state));
+        }
 
         if(!empty($filters))
         {
@@ -66,6 +76,10 @@ class EntityRepository extends DocumentRepository
                 }
             }
         }
+
+        $queryBuilder->limit($count);
+        $offset = ($page - 1) * $count;
+        $queryBuilder->skip($offset);
         return $queryBuilder->getQuery()->execute()->toArray();
     }
 

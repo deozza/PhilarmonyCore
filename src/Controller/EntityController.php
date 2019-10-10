@@ -34,38 +34,39 @@ class EntityController extends BaseController
         }
 
         $user = !empty($this->getUser()->getUuidAsString()) ? $this->getUser() : null;
+        $userUuid = empty($user) ? null : $user->getUuidAsString();
 
-        $filter = $request->query->get("filterBy", []);
-        $sort = $request->query->get("sortBy", []);
-
-        $entities = $this->dm->getRepository(Entity::class)->findAllFiltered($filter, $sort, $entity_name);
-
-        foreach($entities as $key=>$entity)
+        $validationStates = [];
+        foreach($entityConfig['states'] as $state=>$content)
         {
-            $state_name = $entity->getValidationState();
-            $state_config = $entityConfig['states'][$state_name]['methods'];
-
-            if(!array_key_exists($request->getMethod(), $state_config))
+            if(array_key_exists($request->getMethod(), $content['methods']))
             {
-                unset($entities[$key]);
-            }
-
-            $access = $this->authorizeAccessToEntity->authorize($user, $state_config[$request->getMethod()]['by'], $entity);
-
-            if($access === false)
-            {
-                unset($entities[$key]);
+                if($content['methods'][$request->getMethod()]['by'] === 'all')
+                {
+                    $validationStates[] = $state;
+                }
+                elseif(!empty($user))
+                {
+                    foreach($content['methods'][$request->getMethod()]['by']['roles'] as $role)
+                    {
+                        if(in_array($role, $user->getRoles()))
+                        {
+                            $validationStates[] = $state;
+                            break;
+                        }
+                    }
+                }
             }
         }
 
         $page = $request->query->getInt("page", 1);
         $count = $request->query->getInt("count", 10);
+        $filter = $request->query->get("filterBy", []);
+        $sort = $request->query->get("sortBy", []);
 
-        $offset = ($page - 1) * $count;
-        $total = count($entities);
-        $paginatedEntities = array_splice($entities, $offset, $count);
+        $entities = $this->dm->getRepository(Entity::class)->findAllFiltered($filter, $sort, $entity_name, $count, $page, $validationStates, $userUuid);
 
-        return $this->response->okPaginated($paginatedEntities, ['entity_basic', 'entity_id','user_basic'], $count, $page, $total);
+        return $this->response->okPaginated($entities, ['entity_basic', 'entity_id','user_basic'], $count, $page);
     }
 
     /**

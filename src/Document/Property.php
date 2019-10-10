@@ -57,8 +57,7 @@ class Property
     /**
      * @ODM\EmbedMany(
      *     targetDocument="Deozza\PhilarmonyCoreBundle\Document\FileProperty",
-     *     discriminatorField="kind",
-     *     strategy="setArray")
+     *     strategy="atomicSetArray")
      * @JMS\Groups({"entity_complete", "entity_basic", "entity_property"})
      */
     private $files;
@@ -128,7 +127,7 @@ class Property
         return $this;
     }
 
-    public function getLastUpdate(): string
+    public function getLastUpdate(): \DateTime
     {
         return $this->lastUpdate;
     }

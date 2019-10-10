@@ -213,6 +213,6 @@ class EntityController extends BaseController
         $this->dm->remove($entity);
         $this->dm->flush();
 
-        return $this->response->empty();
+        return $this->response->emptyResponse();
     }
 }

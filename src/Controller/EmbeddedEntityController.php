@@ -149,7 +149,7 @@ class EmbeddedEntityController extends BaseController
         {
             $entity->setLastUpdate(new \DateTime('now'));
             $this->dm->flush();
-            return $this->response->created(['warning'=>$embeddedValidation, 'entity'=>$entity], ['entity_basic', 'entity_id', 'entity_property']);
+            return $this->response->created(['warning'=>$embeddedValidation, 'property'=>$property], ['entity_basic', 'entity_id', 'entity_property']);
         }
         $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
 
@@ -158,14 +158,14 @@ class EmbeddedEntityController extends BaseController
         {
             $entity->setLastUpdate(new \DateTime('now'));
             $this->dm->flush();
-            return $this->response->created(['warning'=>$state, 'entity'=>$entity], ['entity_basic', 'entity_id', 'user_basic']);
+            return $this->response->created(['warning'=>$state, 'property'=>$property], ['entity_basic', 'entity_id', 'user_basic']);
         }
 
         $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher, json_decode($request->getContent(), true));
 
         $this->dm->flush();
 
-        return $this->response->created($entity, ['entity_complete', 'user_basic']);
+        return $this->response->created($property, ['entity_complete', 'user_basic']);
     }
 
     /**
@@ -229,7 +229,7 @@ class EmbeddedEntityController extends BaseController
             $this->dm->getRepository(Entity::class)->updateProperty($property);
             $entity->setLastUpdate(new \DateTime('now'));
             $this->dm->flush();
-            return $this->response->ok(['warning'=>$embeddedValidation, 'entity'=>$entity], ['entity_basic', 'entity_id', 'entity_property']);
+            return $this->response->ok(['warning'=>$embeddedValidation, 'property'=>$property], ['entity_basic', 'entity_id', 'entity_property']);
         }
 
         $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
@@ -239,7 +239,7 @@ class EmbeddedEntityController extends BaseController
             $this->dm->getRepository(Entity::class)->updateProperty($property);
             $entity->setLastUpdate(new \DateTime('now'));
             $this->dm->flush();
-            return $this->response->ok(['warning'=>$state, 'entity'=>$entity], ['entity_basic', 'entity_id', 'user_basic']);
+            return $this->response->ok(['warning'=>$state, 'property'=>$property], ['entity_basic', 'entity_id', 'user_basic']);
         }
 
         $this->dm->getRepository(Entity::class)->updateProperty($property);
@@ -249,7 +249,7 @@ class EmbeddedEntityController extends BaseController
 
         $this->dm->flush();
 
-        return $this->response->ok($entity, ['entity_complete', 'user_basic']);
+        return $this->response->ok($property, ['entity_complete', 'user_basic']);
     }
 
     /**
@@ -306,6 +306,6 @@ class EmbeddedEntityController extends BaseController
         $this->dm->remove($property);
         $this->dm->flush();
 
-        return $this->response->empty();
+        return $this->response->emptyResponse();
     }
 }

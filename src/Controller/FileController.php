@@ -192,6 +192,6 @@ class FileController extends BaseController
         $this->dm->remove($propertyFile);
         $this->dm->flush();
 
-        return $this->response->empty();
+        return $this->response->emptyResponse();
     }
 }

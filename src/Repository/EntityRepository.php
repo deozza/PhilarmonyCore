@@ -150,9 +150,10 @@ class EntityRepository extends DocumentRepository
     {
         $this->createQueryBuilder()
             ->findAndUpdate(Entity::class)
-            ->eagerCursor(true)
+            ->returnNew(true)
             ->field('properties.uuid')->equals($property->getUuidAsString())
             ->field('properties.$.data')->set($property->getData())
+            ->field('properties.$.lastUpdate')->set($property->getLastUpdate())
             ->getQuery()
             ->execute();
     }

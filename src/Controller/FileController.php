@@ -77,8 +77,8 @@ class FileController extends BaseController
         }
 
         $allowedMultiple = array_key_exists('array',$propertyConfig) && $propertyConfig['array'] === true;
-
-        if(count($property->getFiles())>=1 && !$allowedMultiple)
+        $nbFiles = $this->dm->getRepository(FileProperty::class)->findBy(['property'=>$property->getUuidAsString()]);
+        if(count($nbFiles)>=1 && !$allowedMultiple)
         {
             return $this->response->badRequest("A file has already been posted to this property");
         }
@@ -96,12 +96,13 @@ class FileController extends BaseController
         $file->setDescription($request->headers->get('X-Description'));
         $file->setCredit($request->headers->get('X-Credit'));
         $file->setMimetype($mimeTypeProvided);
-        $this->persist($file);
-        $this->fileuploader->persistFile($file);
-        $property->addFiles($request->getContent());
+        $this->dm->persist($file);
+        $this->fileuploader->persistFile($file, $request->getContent());
+        $property->getFiles()->add($property);
+        $this->dm->getRepository(Entity::class)->updateProperty($property);
 
         $this->dm->flush();
-        return $this->response->created($entity, ['entity_basic', 'entity_id', 'user_basic']);
+        return $this->response->created($file, ['entity_basic', 'entity_id', 'user_basic']);
     }
 
     /**
@@ -141,13 +142,7 @@ class FileController extends BaseController
             return $valid;
         }
 
-        $headers = [
-            'Content-Type'     => $propertyFile->getMimetype(),
-            'Content-Disposition' => 'inline',
-            'Content-Length' => strlen($propertyFile->getFile())
-        ];
-
-        return new BinaryFileResponse($this->fileuploader->getFile($propertyFile), Response::HTTP_OK, $headers);
+        return new BinaryFileResponse($this->getParameter('kernel.project_dir').'/public/uploads/'.$propertyFile->getFilename(), Response::HTTP_OK);
     }
 
     /**

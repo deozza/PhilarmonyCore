@@ -155,6 +155,7 @@ class EntityRepository extends DocumentRepository
             ->field('properties.uuid')->equals($property->getUuidAsString())
             ->field('properties.$.data')->set($property->getData())
             ->field('properties.$.lastUpdate')->set($property->getLastUpdate())
+            ->field('properties.$.files')->set($property->getFiles())
             ->getQuery()
             ->execute();
     }

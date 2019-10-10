@@ -55,9 +55,7 @@ class Property
     private $data;
 
     /**
-     * @ODM\EmbedMany(
-     *     targetDocument="Deozza\PhilarmonyCoreBundle\Document\FileProperty",
-     *     strategy="atomicSetArray")
+     * @ODM\Field(type="collection")
      * @JMS\Groups({"entity_complete", "entity_basic", "entity_property"})
      */
     private $files;

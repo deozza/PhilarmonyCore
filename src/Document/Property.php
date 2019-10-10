@@ -8,13 +8,13 @@ use JMS\Serializer\Annotation as JMS;
 use Ramsey\Uuid\Uuid;
 
 /**
- * @ODM\EmbeddedDocument()
+ * @ODM\Document(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\PropertyRepository")
  */
 class Property
 {
     /**
      * @ODM\Id(strategy="NONE", type="string")
-     * @JMS\Exclude()
+     * @JMS\Groups({"entity_id", "entity_complete"})
      */
     private $uuid;
 
@@ -29,6 +29,12 @@ class Property
      * @JMS\Groups({"entity_complete", "entity_basic"})
      */
     private $owner;
+
+    /**
+     * @ODM\Field(type="string")
+     * @JMS\Groups({"entity_complete", "entity_basic"})
+     */
+    private $entity;
 
     /**
      * @ODM\Field(type="date")
@@ -64,6 +70,7 @@ class Property
         $this->lastUpdate = $this->dateOfCreation;
         $this->propertyName = $propertyName;
         $this->files = new ArrayCollection();
+        $this->entity = $entity->getUuidAsString();
     }
 
     public function getUuidAsString(): string
@@ -96,6 +103,17 @@ class Property
     {
         $this->owner = $owner;
 
+        return $this;
+    }
+
+    public function getEntity(): ?string
+    {
+        return $this->entity;
+    }
+
+    public function setEntity(string $entity)
+    {
+        $this->entity = $entity;
         return $this;
     }
 

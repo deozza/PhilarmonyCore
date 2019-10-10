@@ -4,8 +4,11 @@ namespace Deozza\PhilarmonyCoreBundle\Controller;
 use Deozza\PhilarmonyCoreBundle\Controller\BaseController;
 use Deozza\PhilarmonyCoreBundle\Document\Entity;
 use Deozza\PhilarmonyCoreBundle\Document\FileProperty;
+use Deozza\PhilarmonyCoreBundle\Document\Property;
+use SebastianBergmann\CodeCoverage\Node\File;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -19,39 +22,36 @@ class FileController extends BaseController
 {
     /**
      * @Route(
-     *     "entities/{uuid}/embedded/{propertyName}/{propertyId}/file/{fileProperty}",
+     *     "entities/embedded/{uuid}/file/{fileProperty}",
      *     requirements={
      *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-     *          "propertyName" = "^(\w{1,50})$",
-     *          "fileProperty" = "^(\w{1,50})$",
-     *          "propertyId" = "^(\w{1,50})$"
+     *          "fileProperty" = "^(\w{1,50})$"
      *     },
      *     name="post_file",
      *     methods={"POST"})
      */
-    public function postFileToEmbeddedDocumentAction(string $uuid, string $propertyName, string $fileProperty, string $propertyId, Request $request)
+    public function postFileToEmbeddedDocumentAction(string $uuid, string $fileProperty, Request $request)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
+        $property = $this->dm->getRepository(Property::class)->findOneBy(['uuid'=>$uuid]);
+        if(empty($property))
+        {
+            return $this->response->notFound("Route not found");
+        }
+
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$property->getEntity()]);
         if(empty($entity))
         {
             return $this->response->notFound("Route not found");
         }
 
-        $property = $entity->getPropertiesByKind($propertyName)[$propertyId];
-
-        if(empty($property))
-        {
-            return $this->response->notFound("Resource not found");
-        }
-
         $entityConfig = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'][$entity->getValidationState()]['methods'][$request->getMethod()]['properties'];
 
-        if(!in_array($propertyName, $entityConfig))
+        if(!in_array($property->getPropertyName(), $entityConfig))
         {
             return $this->response->notFound("Resource not found");
         }
 
-        $embeddedEntity = $this->schemaLoader->loadEntityEnumeration($propertyName)['properties'];
+        $embeddedEntity = $this->schemaLoader->loadEntityEnumeration($property->getPropertyName())['properties'];
         if(!in_array($fileProperty, $embeddedEntity))
         {
             return $this->response->notFound("Resource not found");
@@ -91,11 +91,12 @@ class FileController extends BaseController
             return $this->response->badRequest("Bad mimetype. Accepted files are : ".json_encode($propertyConfig['constraints']['mime']));
         }
 
-        $file = new FileProperty(['uuid'=>$user->getUuidAsString(), 'username'=>$user->getUsername()]);
+        $file = new FileProperty(['uuid'=>$user->getUuidAsString(), 'username'=>$user->getUsername()], $property);
         $file->setFiletitle($request->headers->get('X-Filename'));
         $file->setDescription($request->headers->get('X-Description'));
         $file->setCredit($request->headers->get('X-Credit'));
         $file->setMimetype($mimeTypeProvided);
+        $this->persist($file);
         $this->fileuploader->persistFile($file);
         $property->addFiles($request->getContent());
 
@@ -105,36 +106,31 @@ class FileController extends BaseController
 
     /**
      * @Route(
-     *     "entities/{uuid}/embedded/{propertyName}/{propertyId}/file/{fileId}",
+     *     "entities/embedded/file/{uuid}",
      *     requirements={
-     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-     *          "propertyName" = "^(\w{1,50})$",
-     *          "fileProperty" = "^(\w{1,50})$",
-     *          "propertyId" = "^(\w{1,50})$",
-     *          "fileId" = "^(\w{1,50})$"
+     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
      *     },
      *     name="get_file",
      *     methods={"GET"})
      */
-    public function getFileFromEmbeddedDocumentAction(string $uuid, string $propertyName, string $propertyId, string $fileId, Request $request)
+    public function getFileFromEmbeddedDocumentAction(string $uuid, Request $request)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid' => $uuid]);
-        if(empty($entity))
+        $propertyFile = $this->dm->getRepository(FileProperty::class)->findOneBy(['uuid'=>$uuid]);
+        if(empty($propertyFile))
         {
             return $this->response->notFound("Route not found");
         }
 
-        $property = $entity->getPropertiesByKind($propertyName)[$propertyId];
-
+        $property = $this->dm->getRepository(Property::class)->findOneBy(['uuid'=>$propertyFile->getProperty()]);
         if(empty($property))
         {
-            return $this->response->notFound("Resource not found");
+            return $this->response->notFound("Route not found");
         }
 
-        $fileToServe = $property->getFiles()[$fileId];
-        if(empty($fileToServe))
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$property->getEntity()]);
+        if(empty($entity))
         {
-            return $this->response->notFound("Resource not found");
+            return $this->response->notFound("Route not found");
         }
 
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
@@ -146,46 +142,41 @@ class FileController extends BaseController
         }
 
         $headers = [
-            'Content-Type'     => $fileToServe->getMimetype(),
+            'Content-Type'     => $propertyFile->getMimetype(),
             'Content-Disposition' => 'inline',
-            'Content-Length' => strlen($fileToServe->getFile())
+            'Content-Length' => strlen($propertyFile->getFile())
         ];
 
-        return new Response($this->fileuploader->getFile($fileToServe), Response::HTTP_OK, $headers);
+        return new BinaryFileResponse($this->fileuploader->getFile($propertyFile), Response::HTTP_OK, $headers);
     }
 
     /**
      * @Route(
-     *     "entities/{uuid}/embedded/{propertyName}/{propertyId}/file/{fileId}",
+     *     "entities/embedded/file/{uuid}",
      *     requirements={
-     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-     *          "propertyName" = "^(\w{1,50})$",
-     *          "fileProperty" = "^(\w{1,50})$",
-     *          "propertyId" = "^(\w{1,50})$",
-     *          "fileId" = "^(\w{1,50})$"
+     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
      *     },
      *     name="delete_file",
      *     methods={"DELETE"})
      */
-    public function deleteFileFromEmbeddedDocumentAction(string $uuid, string $propertyName, string $propertyId, string $fileId, Request $request)
+    public function deleteFileFromEmbeddedDocumentAction(string $uuid, Request $request)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid' => $uuid]);
-        if(empty($entity))
+        $propertyFile = $this->dm->getRepository(FileProperty::class)->findOneBy(['uuid'=>$uuid]);
+        if(empty($propertyFile))
         {
             return $this->response->notFound("Route not found");
         }
 
-        $property = $entity->getPropertiesByKind($propertyName)[$propertyId];
-
+        $property = $this->dm->getRepository(Property::class)->findOneBy(['uuid'=>$propertyFile->getProperty()]);
         if(empty($property))
         {
-            return $this->response->notFound("Resource not found");
+            return $this->response->notFound("Route not found");
         }
 
-        $fileToServe = $property->getFiles()[$fileId];
-        if(empty($fileToServe))
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$property->getEntity()]);
+        if(empty($entity))
         {
-            return $this->response->notFound("Resource not found");
+            return $this->response->notFound("Route not found");
         }
 
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
@@ -196,10 +187,11 @@ class FileController extends BaseController
             return $valid;
         }
 
-        $this->fileuploader->deleteFile($fileToServe);
-        $property->getFiles()->removeElement($fileToServe);
+        $this->fileuploader->deleteFile($propertyFile);
+        $property->getFiles()->removeElement($propertyFile);
+        $this->dm->remove($propertyFile);
         $this->dm->flush();
-        
+
         return $this->response->empty();
     }
 }

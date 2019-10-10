@@ -9,13 +9,13 @@ use Ramsey\Uuid\Uuid;
 use JMS\Serializer\Annotation as JMS;
 
 /**
- * @ODM\EmbeddedDocument()
+ * @ODM\Document(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\FilePropertyRepository")
  */
 class FileProperty
 {
     /**
      * @ODM\Id(strategy="NONE", type="string")
-     * @JMS\Exclude()
+     * @JMS\Groups({"entity_id", "entity_complete"})
      */
     private $uuid;
 
@@ -29,6 +29,12 @@ class FileProperty
      * @JMS\Groups({"entity_complete", "entity_basic"})
      */
     private $owner;
+
+    /**
+     * @ODM\Field(type="string")
+     * @JMS\Groups({"entity_complete", "entity_basic"})
+     */
+    private $property;
 
     /**
      * @ODM\Field(type="string")
@@ -66,10 +72,11 @@ class FileProperty
      */
     private $dateOfUpload;
 
-    public function __construct($owner)
+    public function __construct($owner, Property $property)
     {
         $this->setUuid();
         $this->owner = $owner;
+        $this->property = $property->getUuidAsString();
     }
 
     public function setUuid(): self
@@ -152,6 +159,18 @@ class FileProperty
     public function setOwner($owner)
     {
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    public function getProperty()
+    {
+        return $this->property;
+    }
+
+    public function setProperty(string $property)
+    {
+        $this->property = $property;
 
         return $this;
     }

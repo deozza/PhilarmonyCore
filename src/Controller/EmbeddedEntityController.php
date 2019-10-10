@@ -26,7 +26,7 @@ class EmbeddedEntityController extends BaseController
      *     name="get_embedded_entity",
      *      methods={"GET"})
      */
-    public function getEmbeddedEntityAction(string $uuid, string $property_name, Request $request)
+    public function getEmbeddedEntityByKindAction(string $uuid, string $property_name, Request $request)
     {
         $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
         if(empty($entity))
@@ -43,6 +43,38 @@ class EmbeddedEntityController extends BaseController
         }
 
         return $this->response->ok($entity->getPropertiesByKind($property_name), ['entity_basic', 'entity_id', 'user_basic']);
+    }
+
+    /**
+     * @Route(
+     *     "entities/embedded/{uuid}",
+     *     requirements={
+     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+     *     },
+     *     name="get_embedded_entity",
+     *      methods={"GET"})
+     */
+    public function getEmbeddedEntityByUuidAction(string $uuid, Request $request)
+    {
+        $property = $this->dm->getRepository(Property::class)->findOneBy(['uuid'=>$uuid]);
+        if(empty($property))
+        {
+            return $this->response->notFound("Route not found");
+        }
+
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$property->getEntity()]);
+        if(empty($entity))
+        {
+            return $this->response->notFound("Route not found");
+        }
+
+        $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
+        $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
+        if(is_object($valid))
+        {
+            return $valid;
+        }
+        return $this->response->ok($property, ['entity_basic', 'entity_id', 'user_basic']);
     }
 
     /**
@@ -64,7 +96,6 @@ class EmbeddedEntityController extends BaseController
         }
 
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
-        $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
 
         $formClass = $this->formGenerator->getFormNamespace().$entity->getKind()."\\".$entity->getValidationState()."\\".$property_name."\\".$request->getMethod();
 
@@ -120,6 +151,7 @@ class EmbeddedEntityController extends BaseController
             $this->dm->flush();
             return $this->response->created(['warning'=>$embeddedValidation, 'entity'=>$entity], ['entity_basic', 'entity_id', 'entity_property']);
         }
+        $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
 
         $state = $this->validate->processValidation($entity,0, $entityStates, $this->getUser());
         if(is_array($state))
@@ -133,38 +165,33 @@ class EmbeddedEntityController extends BaseController
 
         $this->dm->flush();
 
-        return $this->response->created($property->getEntity(), ['entity_complete', 'user_basic']);
+        return $this->response->created($entity, ['entity_complete', 'user_basic']);
     }
 
     /**
      * @Route(
-     *     "entities/{uuid}/embedded/{propertyName}/{propertyId}",
+     *     "entities/embedded/{uuid}",
      *     requirements={
-     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-     *          "propertyName" = "^(\w{1,50})$",
-     *          "propertyId" = "^(\w{1,50})$"
+     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
      *     },
      *     name="patch_embedded_entity",
      *      methods={"PATCH"})
      */
-    public function patchEmbeddedEntityAction(string $uuid, string $propertyName, string $propertyId, Request $request, EventDispatcherInterface $eventDispatcher)
+    public function patchEmbeddedEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
-        if(empty($entity))
-        {
-            return $this->response->notFound("Resource not found");
-        }
-
-        $property = $entity->getPropertiesByKind($propertyName)[$propertyId];
-
+        $property = $this->dm->getRepository(Property::class)->findOneBy(['uuid'=>$uuid]);
         if(empty($property))
         {
-            return $this->response->notFound("Resource not found");
+            return $this->response->notFound("Route not found");
         }
 
-        $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$property->getEntity()]);
+        if(empty($entity))
+        {
+            return $this->response->notFound("Route not found");
+        }
 
-        $formClass = $this->formGenerator->getFormNamespace().$entity->getKind()."\\".$entity->getValidationState()."\\".$propertyName."\\".$request->getMethod();
+        $formClass = $this->formGenerator->getFormNamespace().$entity->getKind()."\\".$entity->getValidationState()."\\".$property->getpPropertyName()."\\".$request->getMethod();
 
         if(!class_exists($formClass))
         {
@@ -204,6 +231,7 @@ class EmbeddedEntityController extends BaseController
             return $this->response->ok(['warning'=>$embeddedValidation, 'entity'=>$entity], ['entity_basic', 'entity_id', 'entity_property']);
         }
 
+        $entityStates = $this->schemaLoader->loadEntityEnumeration($entity->getKind())['states'];
         $state = $this->validate->processValidation($entity,0, $entityStates, $this->getUser());
         if(is_array($state))
         {
@@ -220,30 +248,26 @@ class EmbeddedEntityController extends BaseController
 
     /**
      * @Route(
-     *     "entities/{uuid}/embedded/{propertyName}/{propertyId}",
+     *     "entities/embedded/{uuid}",
      *     requirements={
-     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-     *          "propertyName" = "^(\w{1,50})$",
-     *          "propertyId" = "^(\w{1,50})$"
+     *          "uuid" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
      *     },
      *     name="delete_embedded_entity",
      *      methods={"DELETE"})
      */
-    public function deleteEmbeddedEntityAction(string $uuid, string $propertyName, string $propertyId, Request $request, EventDispatcherInterface $eventDispatcher)
+    public function deleteEmbeddedEntityAction(string $uuid, Request $request, EventDispatcherInterface $eventDispatcher)
     {
-        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$uuid]);
-        if(empty($entity))
-        {
-            return $this->response->notFound("Resource not found");
-        }
-
-        $property = $entity->getPropertiesByKind($propertyName)[$propertyId];
-
+        $property = $this->dm->getRepository(Property::class)->findOneBy(['uuid'=>$uuid]);
         if(empty($property))
         {
-            return $this->response->notFound("Resource not found");
+            return $this->response->notFound("Route not found");
         }
 
+        $entity = $this->dm->getRepository(Entity::class)->findOneBy(['uuid'=>$property->getEntity()]);
+        if(empty($entity))
+        {
+            return $this->response->notFound("Route not found");
+        }
         $user = empty($this->getUser()->getUuidAsString()) ? null : $this->getUser();
         $valid = $this->authorizeRequest->validateRequest($entity, $request->getMethod(), $user);
         if(is_object($valid))
@@ -251,13 +275,13 @@ class EmbeddedEntityController extends BaseController
             return $valid;
         }
 
-        $propertyConfig = $this->schemaLoader->loadPropertyEnumeraion($propertyName);
-        $count = count($property->getEntity()->getPropertiesByKind($propertyName));
+        $propertyConfig = $this->schemaLoader->loadPropertyEnumeraion($property->getPropertyName());
+        $count = count($property->getEntity()->getPropertiesByKind($property->getPropertyName()));
         if($propertyConfig['constraints']['required'] === true && $count <=1)
         {
             return $this->response->badRequest(
                 [
-                    $propertyName => [
+                    $property->getPropertyName() => [
                         'This property is required and cannot be deleted.'
                     ]
                 ]

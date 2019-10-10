@@ -198,6 +198,18 @@ class EntityController extends BaseController
 
         $this->handleEvents($request->getMethod(), $entityConfig, $entity, $eventDispatcher);
 
+        foreach($entity->getProperties() as $property)
+        {
+            if(!empty($property->getFiles()))
+            {
+                foreach($property->getFiles() as $file)
+                {
+                    $this->dm->remove($file);
+                }
+            }
+            $this->remove($property);
+        }
+
         $this->dm->remove($entity);
         $this->dm->flush();
 

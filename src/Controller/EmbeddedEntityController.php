@@ -288,8 +288,16 @@ class EmbeddedEntityController extends BaseController
             );
         }
 
-        $entity->getProperties()->removeElement($property);
+        if(!empty($property->getFiles()))
+        {
+            foreach($property->getFiles() as $file)
+            {
+                $this->dm->remove($file);
+            }
 
+        }
+        $entity->getProperties()->removeElement($property);
+        $this->dm->remove($property);
         $this->dm->flush();
 
         return $this->response->empty();

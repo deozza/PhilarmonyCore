@@ -66,7 +66,7 @@ class Property
         $this->dateOfCreation = new \DateTime('now');
         $this->lastUpdate = $this->dateOfCreation;
         $this->propertyName = $propertyName;
-        $this->files = new ArrayCollection();
+        $this->files = [];
         $this->entity = $entity->getUuidAsString();
     }
 

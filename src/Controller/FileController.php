@@ -98,7 +98,7 @@ class FileController extends BaseController
         $file->setMimetype($mimeTypeProvided);
         $this->dm->persist($file);
         $this->fileuploader->persistFile($file, $request->getContent());
-        $property->getFiles()->add($property);
+        $property->addFiles($file);
         $this->dm->getRepository(Entity::class)->updateProperty($property);
 
         $this->dm->flush();

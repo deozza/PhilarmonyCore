@@ -5,6 +5,7 @@ namespace Deozza\PhilarmonyCoreBundle\Repository;
 use Deozza\PhilarmonyCoreBundle\Document\Entity;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
+use Deozza\PhilarmonyCoreBundle\Document\Property;
 
 /**
  * @method Entity|null find($id, $lockMode = null, $lockVersion = null)
@@ -132,6 +133,28 @@ class EntityRepository extends DocumentRepository
         }
 
         return $queryBuilder->getQuery()->execute()->toArray();
+    }
+
+    public function removeProperty(Property $property)
+    {
+        $this->createQueryBuilder()
+            ->findAndUpdate(Entity::class)
+            ->eagerCursor(true)
+            ->field('properties.uuid')->equals($property->getUuidAsString())
+            ->field('properties.$')->unsetField()->exists(true)
+            ->getQuery()
+            ->execute();
+    }
+
+    public function updateProperty(Property $property)
+    {
+        $this->createQueryBuilder()
+            ->findAndUpdate(Entity::class)
+            ->eagerCursor(true)
+            ->field('properties.uuid')->equals($property->getUuidAsString())
+            ->field('properties.$.data')->set($property->getData())
+            ->getQuery()
+            ->execute();
     }
 
     private function returnOperator(string $operator, $queryBuilder, string $field, $value)

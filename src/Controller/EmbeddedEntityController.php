@@ -216,7 +216,6 @@ class EmbeddedEntityController extends BaseController
 
         $property->setData($form->getData());
         $property->setLastUpdate(new \DateTime('now'));
-        $entity->setLastUpdate(new \DateTime('now'));
 
         $conflict_errors = $this->rulesManager->decideConflict($entity, $request->getContent(), $request->getMethod(),__DIR__);
         if($conflict_errors > 0)
@@ -227,6 +226,8 @@ class EmbeddedEntityController extends BaseController
         $embeddedValidation = $this->validate->processEmbeddedValidation($entity, $this->schemaLoader->loadEntityEnumeration($property->getPropertyName()), $this->getUser());
         if(is_array($embeddedValidation))
         {
+            $this->dm->getRepository(Entity::class)->updateProperty($property);
+            $entity->setLastUpdate(new \DateTime('now'));
             $this->dm->flush();
             return $this->response->ok(['warning'=>$embeddedValidation, 'entity'=>$entity], ['entity_basic', 'entity_id', 'entity_property']);
         }
@@ -235,9 +236,14 @@ class EmbeddedEntityController extends BaseController
         $state = $this->validate->processValidation($entity,0, $entityStates, $this->getUser());
         if(is_array($state))
         {
+            $this->dm->getRepository(Entity::class)->updateProperty($property);
+            $entity->setLastUpdate(new \DateTime('now'));
             $this->dm->flush();
             return $this->response->ok(['warning'=>$state, 'entity'=>$entity], ['entity_basic', 'entity_id', 'user_basic']);
         }
+
+        $this->dm->getRepository(Entity::class)->updateProperty($property);
+        $entity->setLastUpdate(new \DateTime('now'));
 
         $this->handleEvents($request->getMethod(), $entityStates[$entity->getValidationState()], $entity, $eventDispatcher, json_decode($request->getContent(), true));
 
@@ -275,8 +281,8 @@ class EmbeddedEntityController extends BaseController
             return $valid;
         }
 
-        $propertyConfig = $this->schemaLoader->loadPropertyEnumeraion($property->getPropertyName());
-        $count = count($property->getEntity()->getPropertiesByKind($property->getPropertyName()));
+        $propertyConfig = $this->schemaLoader->loadPropertyEnumeration($property->getPropertyName());
+        $count = count($entity->getPropertiesByKind($property->getPropertyName()));
         if($propertyConfig['constraints']['required'] === true && $count <=1)
         {
             return $this->response->badRequest(
@@ -296,7 +302,7 @@ class EmbeddedEntityController extends BaseController
             }
 
         }
-        $entity->getProperties()->removeElement($property);
+        $this->dm->getRepository(Entity::class)->removeProperty($property);
         $this->dm->remove($property);
         $this->dm->flush();
 

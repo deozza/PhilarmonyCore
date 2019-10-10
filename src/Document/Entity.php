@@ -52,7 +52,7 @@ class Entity
      * @ODM\EmbedMany(
      *     targetDocument="Deozza\PhilarmonyCoreBundle\Document\Property",
      *     discriminatorField="kind",
-     *     strategy="setArray")
+     *     strategy="atomicSetArray")
      * @JMS\Groups({"entity_complete", "entity_basic", "entity_property"})
      */
     private $properties;

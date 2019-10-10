@@ -8,13 +8,13 @@ use JMS\Serializer\Annotation as JMS;
 use Ramsey\Uuid\Uuid;
 
 /**
- * @ODM\Document(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\EntityRepository")
+ * @ODM\Document(repositoryClass="Deozza\PhilarmonyCoreBundle\Repository\PropertyRepository")
  */
-class Entity
+class Property
 {
     /**
      * @ODM\Id(strategy="NONE", type="string")
-     * @JMS\Groups({"entity_id", "entity_complete"})
+     * @JMS\Groups({"entity_id", "entity_complete", "property_id"})
      */
     private $uuid;
 
@@ -22,19 +22,19 @@ class Entity
      * @ODM\Field(type="string")
      * @JMS\Groups({"entity_complete", "entity_basic"})
      */
-    private $kind;
-
-    /**
-     * @ODM\Field(type="string")
-     * @JMS\Groups({"entity_complete", "entity_basic"})
-     */
-    private $validationState;
+    private $propertyName;
 
     /**
      * @ODM\Field(type="raw")
      * @JMS\Groups({"entity_complete", "entity_basic"})
      */
     private $owner;
+
+    /**
+     * @ODM\Field(type="string")
+     * @JMS\Groups({"entity_complete", "entity_basic"})
+     */
+    private $entity;
 
     /**
      * @ODM\Field(type="date")
@@ -49,20 +49,33 @@ class Entity
     private $lastUpdate;
 
     /**
-     * @ODM\EmbedMany(
-     *     targetDocument="Deozza\PhilarmonyCoreBundle\Document\Property",
-     *     discriminatorField="kind",
-     *     strategy="atomicSetArray")
+     * @ODM\Field(type="raw")
      * @JMS\Groups({"entity_complete", "entity_basic", "entity_property"})
      */
-    private $properties;
+    private $data;
 
-    public function __construct()
+    /**
+     * @ODM\EmbedMany(
+     *     targetDocument="Deozza\PhilarmonyCoreBundle\Document\FileProperty",
+     *     discriminatorField="kind",
+     *     strategy="setArray")
+     * @JMS\Groups({"entity_complete", "entity_basic", "entity_property"})
+     */
+    private $files;
+
+    public function __construct(string $propertyName, Entity $entity)
     {
         $this->setUuid();
         $this->dateOfCreation = new \DateTime('now');
         $this->lastUpdate = $this->dateOfCreation;
-        $this->properties = new ArrayCollection();
+        $this->propertyName = $propertyName;
+        $this->files = new ArrayCollection();
+        $this->entity = $entity->getUuidAsString();
+    }
+
+    public function getUuidAsString(): string
+    {
+        return $this->uuid;
     }
 
     public function setUuid(): self
@@ -71,48 +84,13 @@ class Entity
         return $this;
     }
 
-    public function getUuidAsString(): ?string
+    public function getPropertyName(): string
     {
-        return $this->uuid;
+        return $this->propertyName;
     }
-
-    public function getKind(): ?string
+    public function setPropertyName($propertyName): self
     {
-        return $this->kind;
-    }
-
-    public function setKind(string $kind): self
-    {
-        $this->kind = $kind;
-
-        return $this;
-    }
-
-    public function getValidationState(): ?string
-    {
-        return $this->validationState;
-    }
-
-    public function setValidationState(string $validationState): self
-    {
-        $this->validationState = $validationState;
-
-        return $this;
-    }
-
-    public function getDateOfCreation(): ?\DateTime
-    {
-        return $this->dateOfCreation;
-    }
-
-    public function getLastUpdate(): ?\DateTime
-    {
-        return $this->lastUpdate;
-    }
-
-    public function setLastUpdate(\DateTime $lastUpdate): ?self
-    {
-        $this->lastUpdate = $lastUpdate;
+        $this->propertyName = $propertyName;
         return $this;
     }
 
@@ -128,20 +106,59 @@ class Entity
         return $this;
     }
 
-    public function getProperties()
+    public function getEntity(): ?string
     {
-        return $this->properties;
+        return $this->entity;
     }
 
-    public function getPropertiesByKind(string $kind)
+    public function setEntity(string $entity)
     {
-        return $this->getProperties()->filter(function (Property $property) use ($kind) {
-            return $property->getPropertyName() === $kind;
-        });
+        $this->entity = $entity;
+        return $this;
     }
 
-    public function addProperties(Property $property)
+    public function getDateOfCreation(): string
     {
-        $this->properties[] = $property;
+        return $this->dateOfCreation;
     }
+
+    public function setDateOfCreation(\DateTime $dateOfCreation): self
+    {
+        $this->dateOfCreation = $dateOfCreation;
+        return $this;
+    }
+
+    public function getLastUpdate(): string
+    {
+        return $this->lastUpdate;
+    }
+
+    public function setLastUpdate(\DateTime $lastUpdate): self
+    {
+        $this->lastUpdate = $lastUpdate;
+        return $this;
+    }
+
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    public function setData($data): self
+    {
+        $this->data = $data;
+        return $this;
+    }
+
+    public function getFiles()
+    {
+        return $this->files;
+    }
+
+    public function addFiles(FileProperty $fileProperty)
+    {
+        $this->files[] = $fileProperty;
+    }
+
+
 }

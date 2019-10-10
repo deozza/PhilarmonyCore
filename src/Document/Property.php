@@ -154,7 +154,7 @@ class Property
 
     public function addFiles(FileProperty $fileProperty)
     {
-        $this->files[] = $fileProperty;
+        $this->files[] = $fileProperty->getUuidAsString();
     }
 
 

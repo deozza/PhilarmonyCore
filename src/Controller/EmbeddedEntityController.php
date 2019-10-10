@@ -3,6 +3,7 @@ namespace Deozza\PhilarmonyCoreBundle\Controller;
 
 use Deozza\PhilarmonyCoreBundle\Controller\BaseController;
 use Deozza\PhilarmonyCoreBundle\Document\Entity;
+use Deozza\PhilarmonyCoreBundle\Document\FileProperty;
 use Deozza\PhilarmonyCoreBundle\Document\Property;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
@@ -298,11 +299,16 @@ class EmbeddedEntityController extends BaseController
         {
             foreach($property->getFiles() as $file)
             {
-                $this->dm->remove($file);
+                if(is_string($file))
+                {
+                    $fileProperty = $this->dm->getRepository(FileProperty::class)->findOneBy(['uuid'=>$file]);
+                    $this->fileuploader->deleteFile($fileProperty);
+                    $this->dm->remove($fileProperty);
+                }
             }
 
         }
-        $this->dm->getRepository(Entity::class)->removeProperty($property);
+        $entity->getProperties()->remove($property);
         $this->dm->remove($property);
         $this->dm->flush();
 

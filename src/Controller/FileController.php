@@ -141,8 +141,13 @@ class FileController extends BaseController
         {
             return $valid;
         }
+        
+        $response = new BinaryFileResponse($this->getParameter('kernel.project_dir').'/public/uploads/'.$propertyFile->getFilename(), Response::HTTP_OK);
+        $response->headers->set('X-Filename', $propertyFile->getFiletitle());
+        $response->headers->set('X-Credit', $propertyFile->getCredit());
+        $response->headers->set('X-Description', $propertyFile->getDescription());
 
-        return new BinaryFileResponse($this->getParameter('kernel.project_dir').'/public/uploads/'.$propertyFile->getFilename(), Response::HTTP_OK);
+        return $response;
     }
 
     /**
